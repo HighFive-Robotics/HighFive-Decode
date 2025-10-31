@@ -36,7 +36,7 @@ public class Camera implements HighModuleSimple {
     public Camera(HardwareMap hardwareMap){
         aprilTagProcessor = new AprilTagProcessor.Builder()
                 .setLensIntrinsics(1385.92f,1385.92f,951.982f,534.084f)
-                .setCameraPose(new Position(DistanceUnit.CM, 12.5, 15, 26,0), new YawPitchRollAngles(AngleUnit.DEGREES, 0,0,40,0))//TODO
+                .setCameraPose(new Position(DistanceUnit.CM, 0, 0, 0,0), new YawPitchRollAngles(AngleUnit.DEGREES, 0,0,0,0))//TODO
                 .setOutputUnits(DistanceUnit.CM, AngleUnit.RADIANS)
                 .setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
                 .build();
@@ -59,17 +59,22 @@ public class Camera implements HighModuleSimple {
     public Constants.Case getCase(){
         if(!detections.isEmpty()){
             for(int i = 0; i < detections.size(); i++) {
-                if (getAprilTagID(i) == 21) {
-                    randomizedCase = Constants.Case.Left;
-                    break;
-                } else if (getAprilTagID(i) == 22) {
-                    randomizedCase = Constants.Case.Middle;
-                    break;
-                } else if (getAprilTagID(i) == 23) {
-                    randomizedCase = Constants.Case.Right;
-                    break;
-                } else {
-                    randomizedCase = Constants.Case.None;
+                switch (getAprilTagID(i)){
+                    case 21:
+                        randomizedCase = Constants.Case.Left;
+                        i=detections.size();
+                        break;
+                    case 22:
+                        randomizedCase = Constants.Case.Middle;
+                        i=detections.size();
+                        break;
+                    case 23:
+                        randomizedCase = Constants.Case.Right;
+                        i=detections.size();
+                        break;
+                    default:
+                        randomizedCase = Constants.Case.None;
+                        break;
                 }
             }
         }
@@ -83,11 +88,7 @@ public class Camera implements HighModuleSimple {
         Vector vector = new Vector();
         if(!detections.isEmpty()){
             for(int i = 0; i < detections.size(); i++) {
-                if (getAprilTagID(i) == 20) {
-                    index = i;
-                    detection = detections.get(i);
-                    break;
-                } else if (getAprilTagID(i) == 24) {
+                if (getAprilTagID(i) == 23 || getAprilTagID(i) ==24) {
                     index = i;
                     detection = detections.get(i);
                     break;
@@ -105,8 +106,9 @@ public class Camera implements HighModuleSimple {
 
     public Pose targetPose(Pose currentPose){
         Pose aux = distanceToAprilTag();
-        aux = aux.rotate(-currentPose.getHeading(), false);
-        return new Pose(currentPose.getX() + aux.getX() + xOffset,currentPose.getY() + aux.getY() + yOffset, currentPose.getHeading() + aux.getHeading());
+        aux = new Pose(aux.getX()/2.54,aux.getY()/2.54,aux.getHeading());
+        aux = aux.rotate(currentPose.getHeading() + aux.getHeading(), false);
+        return new Pose(currentPose.getY() + aux.getY() + xOffset,currentPose.getX() + aux.getX() + yOffset, currentPose.getHeading() + aux.getHeading());
     }
 
     @Override

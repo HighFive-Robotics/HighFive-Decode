@@ -20,6 +20,7 @@ import com.pedropathing.paths.callbacks.PathCallback;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.math.Vector;
 import com.pedropathing.util.Timer;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 /**
  * This is the Follower class. It handles the actual following of the paths and all the on-the-fly
@@ -59,6 +60,8 @@ public class Follower {
     public boolean useHeading = true;
     public boolean useDrive = true;
     private Timer zeroVelocityDetectedTimer = null;
+    public boolean fieldCentric = true;
+    private Gamepad gamepad;
     private Runnable resetFollowing = null;
 
     /**
@@ -95,6 +98,10 @@ public class Follower {
         this.centripetalScaling = constants.centripetalScaling;
         this.turnHeadingErrorThreshold = constants.turnHeadingErrorThreshold;
         this.automaticHoldEnd = constants.automaticHoldEnd;
+    }
+
+    public void setGamepad(Gamepad gamepad) {
+        this.gamepad = gamepad;
     }
 
     /**

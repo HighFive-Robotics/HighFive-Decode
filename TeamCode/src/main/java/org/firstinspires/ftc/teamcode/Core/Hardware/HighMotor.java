@@ -393,6 +393,11 @@ public class HighMotor {
      * @return this method returns the velocity of the motor
      */
     public double getVelocity() {
+//        if(runMode.equals(RunMode.Velocity)) {
+//            return (motor.getVelocity() / encoderResolution) * wheelDiameter;
+//        }else {
+//            return motor.getVelocity();
+//        }
         return motor.getVelocity();
     }
 
@@ -416,7 +421,7 @@ public class HighMotor {
         this.target = target;
         pidfController.setSetPoint(target);
         squidController.setSetPoint(target);
-        pidfVelocity.setSetPoint(target);
+        pidfVelocity.setSetPoint((target/wheelDiameter)*encoderResolution);
     }
 
     /**
@@ -761,12 +766,8 @@ public class HighMotor {
     public double getEncoderResolution(){
         return encoderResolution;
     }
+    public double getWheelDiameter(){return wheelDiameter;}
 
-    public double getVelocity(double encoderResolution, double wheelDiameter) {
-        this.encoderResolution = encoderResolution;
-        this.wheelDiameter = wheelDiameter;
-        return (motor.getVelocity() / encoderResolution) * wheelDiameter;
-    }
 
     /**
      * This method sets the Squid coefficients (kP, kI, kD) for the Squid controller.
@@ -859,8 +860,8 @@ public class HighMotor {
                 }
                 break;
             case Velocity:
-                currentVelocity = getVelocity(encoderResolution,wheelDiameter);
-                power = getPowerPID(currentVelocity);
+                currentVelocity = getVelocity();
+                power = pidfVelocity.calculate(currentVelocity);
                 if (Math.abs(power - lastPower) >= epsilon) {
                     motor.setPower(power);
                     lastPower = power;

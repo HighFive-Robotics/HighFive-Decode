@@ -61,6 +61,9 @@ public class HighServo {
         this.CRServo = CRServo;
         this.runMode = runMode;
     }
+    public HighServo(){
+
+    }
 
     /**
      * This constructor is used for the MotionProfiler or Standard runModes,
@@ -348,6 +351,67 @@ public class HighServo {
                 telemetry.addData("Current power: ", power);
                 telemetry.addData("Last power: ", lastPower);
                 break;
+        }
+    }
+    /*
+       |
+       | BUILDER CLASS
+       |
+     */
+
+    public interface ServoSetStep{
+        public RunModeStep setServo(Servo servo);
+        public RunModeStep setServo(CRServo servo);
+    }
+    public interface RunModeStep{
+        public Builder setRunMode(HighServo.RunMode runMode);
+    }
+    public static class Builder implements ServoSetStep , RunModeStep{
+        public HighServo servo = new HighServo();
+        private Builder(){
+        }
+        public static ServoSetStep startBuilding(){
+            return new Builder();
+        }
+        @Override
+        public RunModeStep setServo(Servo servo) {
+            this.servo.servo = servo;
+            return this;
+        }
+        @Override
+        public RunModeStep setServo(CRServo servo) {
+            this.servo.CRServo = servo;
+            return this;
+        }
+        @Override
+        public Builder setRunMode(HighServo.RunMode runMode) {
+            this.servo.runMode = runMode;
+            return this;
+        }
+        public Builder setInitPosition(double position , boolean isAuto){
+            this.servo.setInitialPosition(position ,isAuto);
+            return this;
+        }
+        public Builder setAnalogInput(AnalogInput analogInput){
+            this.servo.analogInput = analogInput;
+            this.servo.useAnalogInput = true;
+            return this;
+        }
+        public Builder setAnalogInputCoefficients(double error, double minVoltage, double maxVoltage, double minPosition, double maxPosition) {
+            this.servo.error = error;
+            this.servo.minVoltage = minVoltage;
+            this.servo.maxVoltage = maxVoltage;
+            this.servo.minPosition = minPosition;
+            this.servo.maxPosition = maxPosition;
+
+            return this;
+        }
+        public Builder setMotionProfilerCoefficients(double maxVelocity, double acceleration, double deceleration) {
+            this.servo.motionProfiler.setCoefficients(maxVelocity, acceleration, deceleration);
+            return this;
+        }
+        public HighServo build(){
+            return this.servo;
         }
     }
 }
