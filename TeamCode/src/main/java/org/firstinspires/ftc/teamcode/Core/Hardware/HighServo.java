@@ -364,9 +364,24 @@ public class HighServo {
         public RunModeStep setServo(CRServo servo);
     }
     public interface RunModeStep{
-        public Builder setRunMode(HighServo.RunMode runMode);
+        public Builder setContinousRotationRunMode();
+        public MotionProfilerRunMode setMotionProfilerRunMode();
+        public StandardRunMode setStandardRunMode();
     }
-    public static class Builder implements ServoSetStep , RunModeStep{
+    public interface StandardRunMode{
+        public StandardRunMode setAnalogInput(AnalogInput analogInput);
+        public Builder setAnalogInputCoefficients(double error, double minVoltage, double maxVoltage, double minPosition, double maxPosition);;
+    }
+    public interface MotionProfilerRunMode{
+        public Builder setMotionProfilerCoefficients(double maxVelocity, double acceleration, double deceleration);
+    }
+
+
+    public static class Builder implements
+            ServoSetStep,
+            RunModeStep,
+            StandardRunMode,
+            MotionProfilerRunMode{
         public HighServo servo = new HighServo();
         private Builder(){
         }
@@ -383,35 +398,49 @@ public class HighServo {
             this.servo.CRServo = servo;
             return this;
         }
+
         @Override
-        public Builder setRunMode(HighServo.RunMode runMode) {
-            this.servo.runMode = runMode;
+        public Builder setContinousRotationRunMode() {
+            this.servo.runMode = RunMode.ContinuousRotation;
             return this;
+        }
+
+        @Override
+        public MotionProfilerRunMode setMotionProfilerRunMode() {
+            this.servo.runMode = RunMode.MotionProfiler;
+            return this;
+        }
+
+        @Override
+        public Builder setStandardRunMode() {
+            this.servo.runMode = RunMode.Standard;
+            return this;
+        }
+
+        @Override
+        public Builder setMotionProfilerCoefficients(double maxVelocity, double acceleration, double deceleration) {
+            servo.setMotionProfilerCoefficients(maxVelocity,acceleration,deceleration);
+            return null;
+        }
+
+        @Override
+        public StandardRunMode setAnalogInput(AnalogInput analogInput) {
+            servo.analogInput = analogInput;
+            servo.useAnalogInput = true;
+            return null;
+        }
+
+        @Override
+        public Builder setAnalogInputCoefficients(double error, double minVoltage, double maxVoltage, double minPosition, double maxPosition) {
+            servo.setAnalogInputCoefficients(error, minVoltage, maxVoltage, minPosition, maxPosition);
+            return null;
         }
         public Builder setInitPosition(double position , boolean isAuto){
-            this.servo.setInitialPosition(position ,isAuto);
-            return this;
-        }
-        public Builder setAnalogInput(AnalogInput analogInput){
-            this.servo.analogInput = analogInput;
-            this.servo.useAnalogInput = true;
-            return this;
-        }
-        public Builder setAnalogInputCoefficients(double error, double minVoltage, double maxVoltage, double minPosition, double maxPosition) {
-            this.servo.error = error;
-            this.servo.minVoltage = minVoltage;
-            this.servo.maxVoltage = maxVoltage;
-            this.servo.minPosition = minPosition;
-            this.servo.maxPosition = maxPosition;
-
-            return this;
-        }
-        public Builder setMotionProfilerCoefficients(double maxVelocity, double acceleration, double deceleration) {
-            this.servo.motionProfiler.setCoefficients(maxVelocity, acceleration, deceleration);
+            servo.setInitialPosition(position,isAuto);
             return this;
         }
         public HighServo build(){
-            return this.servo;
+            return servo;
         }
     }
 }
