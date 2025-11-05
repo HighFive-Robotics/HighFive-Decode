@@ -63,7 +63,7 @@ public class HighMotor {
     private double currentPosition = 0, maxPIDPower = 1, kF = 0, initialAngle = 0, ticksPerDegree = 0;
     private double currentVelocity, encoderResolution = 1, wheelDiameter = 0;
     private double time=-1;
-
+    public HighMotor(){}
     /**
      * This constructor can be used for any runMode.
      * It helps us set if the motor is reversed or not.
@@ -947,6 +947,168 @@ public class HighMotor {
                 telemetry.addData("Timer time : ", timer.milliseconds());
                 telemetry.addData("Target time: ", time);
                 break;
+        }
+    }
+    /*
+       |
+       | BUILDER CLASS
+       |
+     */
+
+    public interface MotorStep {
+
+        public RunModeStep setMotor(DcMotorEx motor);
+    }
+
+    public interface RunModeStep {
+
+        public ReverseMotorStep setRunMode(RunMode runMode);
+    }
+
+    public interface ReverseMotorStep {
+
+        public Builder setReverseMotor(boolean reverse);
+    }
+
+    public static class Builder implements
+            MotorStep,
+            RunModeStep,
+            ReverseMotorStep {
+
+        private HighMotor motor = new HighMotor();
+
+        private Builder() {
+        }
+
+        public static MotorStep startBuilding() {
+            return new Builder();
+        }
+
+        @Override
+        public RunModeStep setMotor(DcMotorEx motor) {
+            this.motor.motor = motor;
+
+            this.motor.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            this.motor.setUseZeroPowerBehaviour(true);
+            return this;
+        }
+
+        @Override
+        public ReverseMotorStep setRunMode(RunMode runMode) {
+            this.motor.runMode = runMode;
+
+            if (runMode == RunMode.PID || runMode == RunMode.Squid) {
+                this.motor.setTarget(0);
+                this.motor.setTolerance(0);
+            }
+            return this;
+        }
+
+        @Override
+        public Builder setReverseMotor(boolean reverse) {
+            this.motor.setReverseMotor(reverse);
+            return this;
+        }
+
+        public Builder setUseZeroPowerBehaviour(boolean useBrake) {
+            this.motor.setUseZeroPowerBehaviour(useBrake);
+            return this;
+        }
+
+        public Builder setEncoder(boolean useEncoder, boolean reverseEncoder) {
+            this.motor.setUseEncoder(useEncoder);
+            this.motor.setReverseEncoder(reverseEncoder);
+            return this;
+        }
+
+        public Builder setMultiplier(double multiplier) {
+            this.motor.setMultiplier(multiplier);
+            return this;
+        }
+
+        public Builder setMinimumPowerToOvercomeFriction(double minPower) {
+            this.motor.setMinimumPowerToOvercomeFriction(minPower);
+            return this;
+        }
+
+        public Builder setPIDCoefficients(double kP, double kI, double kD) {
+            motor.setPIDCoefficients(kP, kI, kD);
+            return this;
+        }
+
+        public Builder setPIDCoefficients(double kP, double kI, double kD, double maxPIDPower) {
+            motor.setPIDCoefficients(kP, kI, kD, maxPIDPower);
+            return this;
+        }
+
+        public Builder setPIDCoefficients(double kP, double kI, double kD, double kF, FeedForwardType feedForwardType, double initialAngle, double ticksPerDegree) {
+            motor.setPIDCoefficients(kP, kI, kD, kF, feedForwardType, initialAngle, ticksPerDegree);
+            return this;
+        }
+
+        public Builder setPIDCoefficients(double kP, double kI, double kD, double kF, FeedForwardType feedForwardType) {
+            motor.setPIDCoefficients(kP, kI, kD, kF, feedForwardType);
+            return this;
+        }
+
+        public Builder setPIDCoefficients(double kP, double kI, double kD, double kF, FeedForwardType feedForwardType, double maxPIDPower) {
+            motor.setPIDCoefficients(kP, kI, kD, kF, feedForwardType, maxPIDPower);
+            return this;
+        }
+
+        public Builder setPIDCoefficients(double kP, double kI, double kD, double kF, FeedForwardType feedForwardType, double initialAngle, double ticksPerDegree, double maxPIDPower) {
+            motor.setPIDCoefficients(kP, kI, kD, kF, feedForwardType, initialAngle, ticksPerDegree, maxPIDPower);
+            return this;
+        }
+
+        public Builder setSquidCoefficients(double kP, double kI, double kD) {
+            motor.setSquidCoefficients(kP, kI, kD);
+            return this;
+        }
+
+        public Builder setSquidCoefficients(double kP, double kI, double kD, double maxPIDPower) {
+            motor.setSquidCoefficients(kP, kI, kD, maxPIDPower);
+            return this;
+        }
+
+        public Builder setSquidCoefficients(double kP, double kI, double kD, double kF, FeedForwardType feedForwardType, double initialAngle, double ticksPerDegree) {
+            motor.setSquidCoefficients(kP, kI, kD, kF, feedForwardType, initialAngle, ticksPerDegree);
+            return this;
+        }
+
+        public Builder setSquidCoefficients(double kP, double kI, double kD, double kF, FeedForwardType feedForwardType, double initialAngle, double ticksPerDegree, double maxPIDPower) {
+            motor.setSquidCoefficients(kP, kI, kD, kF, feedForwardType, initialAngle, ticksPerDegree, maxPIDPower);
+            return this;
+        }
+
+        public Builder setVelocityPIDCoefficients(double kP, double kI, double kD) {
+            motor.setVelocityPIDCoefficients(kP, kI, kD);
+            return this;
+        }
+
+        public Builder setVelocityPIDCoefficients(double kP, double kI, double kD, double maxPIDPower) {
+            motor.setVelocityPIDCoefficients(kP, kI, kD, maxPIDPower);
+            return this;
+        }
+
+        public Builder setVelocityPIDCoefficients(double kP, double kI, double kD, double kF, double maxPIDPower) {
+            motor.setVelocityPIDCoefficients(kP, kI, kD, kF, maxPIDPower);
+            return this;
+        }
+
+        public Builder setEncoderResolution(double encoderResolution) {
+            motor.setEncoderResolution(encoderResolution);
+            return this;
+        }
+
+        public Builder setWheelDiameter(double wheelDiameter) {
+            motor.setWheelDiameter(wheelDiameter);
+            return this;
+        }
+
+        public HighMotor build() {
+
+            return this.motor;
         }
     }
 }
