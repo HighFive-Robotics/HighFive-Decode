@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighServo;
 
+@TeleOp
 public class ServoTest extends LinearOpMode {
 
     HighServo s1,s2,s3,s4,s5,s6;
