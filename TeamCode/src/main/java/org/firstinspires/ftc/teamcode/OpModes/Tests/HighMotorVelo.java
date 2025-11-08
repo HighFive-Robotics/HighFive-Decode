@@ -21,7 +21,7 @@ public class HighMotorVelo extends LinearOpMode {
     Telemetry graph;
     @Override
     public void runOpMode() throws InterruptedException {
-        motor = new HighMotor(hardwareMap.get(DcMotorEx.class,shooterMotorUpName), HighMotor.RunMode.Velocity,true,true  ,false);
+        motor = new HighMotor(hardwareMap.get(DcMotorEx.class,shooterMotorUpName), HighMotor.RunMode.Velocity,false,true  ,false);
         motor.setVelocityPIDCoefficients(kp,ki,kd,kf);
         motor.setWheelDiameter(0.096);
         motor.setEncoderResolution(28);

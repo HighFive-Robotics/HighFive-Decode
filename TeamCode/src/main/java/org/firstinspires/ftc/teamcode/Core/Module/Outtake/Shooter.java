@@ -15,24 +15,24 @@ public class Shooter extends HighModule {
     public static double encoderResolution  ,kp = 0.001, kd = 0,ki = 0.002,kf = 0.00016;
 
     public Shooter(HardwareMap hwMap){
-        motorUp = HighMotor.Builder.startBuilding()
-                .setMotor(hwMap.get(DcMotorEx.class, shooterMotorUpName))
+        motorDown = HighMotor.Builder.startBuilding()
+                .setMotor(hwMap.get(DcMotorEx.class, shooterMotorDownName))
                 .setRunMode(HighMotor.RunMode.Velocity)
-                .setReverseMotor(true)
+                .setReverseMotor(false)
                 .setEncoder(true , false)
                 .setEncoderResolution(28)
                 .setWheelDiameter(0.072)
                 .setVelocityPIDCoefficients(kp,ki,kd,kf,1)
                 .build();
-        motorDown = HighMotor.Builder.startBuilding()
-                .setMotor(hwMap.get(DcMotorEx.class, shooterMotorDownName))
+        motorUp = HighMotor.Builder.startBuilding()
+                .setMotor(hwMap.get(DcMotorEx.class, shooterMotorUpName))
                 .setRunMode(HighMotor.RunMode.Standard)
                 .setReverseMotor(false)
                 .build();
     }
 
     public void setTargetVelocity(double velocity){
-        motorUp.setTarget(velocity);
+        motorDown.setTarget(velocity);
     }
 
     @Override
@@ -40,7 +40,7 @@ public class Shooter extends HighModule {
 
         motorUp.update();
         //motorUp.setTarget(motorUp.getPower());
-        motorDown.setPower(motorUp.getPower());
+        motorUp.setPower(motorDown.getPower());
         motorDown.update();
     }
 }

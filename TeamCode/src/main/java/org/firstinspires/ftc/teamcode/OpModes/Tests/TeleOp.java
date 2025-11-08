@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -10,6 +11,7 @@ import org.firstinspires.ftc.teamcode.Core.Robot;
 
 import java.util.HashMap;
 
+@Config
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
 public class TeleOp extends LinearOpMode {
 
@@ -53,6 +55,8 @@ public class TeleOp extends LinearOpMode {
             telemetry.addData("Power intake:" , robot.intake.motorIntake.power);
             telemetry.addData("Shooter 1:" , robot.shooter.motorUp.getPower());
             telemetry.addData("Shooter 2:" , robot.shooter.motorDown.getPower());
+            telemetry.addData("Up:" , robot.shooter.motorUp.getCurrentPosition());
+            telemetry.addData("Down:" , robot.shooter.motorDown.getCurrentPosition());
             robot.update();
             telemetry.update();
         }
