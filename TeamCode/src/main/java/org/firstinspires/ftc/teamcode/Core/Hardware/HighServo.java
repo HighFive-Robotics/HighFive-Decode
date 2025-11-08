@@ -366,10 +366,10 @@ public class HighServo {
     public interface RunModeStep{
         public Builder setContinousRotationRunMode();
         public MotionProfilerRunMode setMotionProfilerRunMode();
-        public StandardRunMode setStandardRunMode();
+        public Builder setStandardRunMode();
     }
     public interface StandardRunMode{
-        public StandardRunMode setAnalogInput(AnalogInput analogInput);
+        public Builder setAnalogInput(AnalogInput analogInput);
         public Builder setAnalogInputCoefficients(double error, double minVoltage, double maxVoltage, double minPosition, double maxPosition);;
     }
     public interface MotionProfilerRunMode{
@@ -424,7 +424,7 @@ public class HighServo {
         }
 
         @Override
-        public StandardRunMode setAnalogInput(AnalogInput analogInput) {
+        public Builder setAnalogInput(AnalogInput analogInput) {
             servo.analogInput = analogInput;
             servo.useAnalogInput = true;
             return null;
