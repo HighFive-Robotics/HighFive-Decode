@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
+import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.shooterMotorUpName;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -19,7 +21,7 @@ public class HighMotorVelo extends LinearOpMode {
     Telemetry graph;
     @Override
     public void runOpMode() throws InterruptedException {
-        motor = new HighMotor(hardwareMap.get(DcMotorEx.class,"SM"), HighMotor.RunMode.Velocity,true,true  ,false);
+        motor = new HighMotor(hardwareMap.get(DcMotorEx.class,shooterMotorUpName), HighMotor.RunMode.Velocity,true,true  ,false);
         motor.setVelocityPIDCoefficients(kp,ki,kd,kf);
         motor.setWheelDiameter(0.096);
         motor.setEncoderResolution(28);

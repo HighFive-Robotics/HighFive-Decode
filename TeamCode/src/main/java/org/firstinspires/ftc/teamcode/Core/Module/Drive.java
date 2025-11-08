@@ -22,10 +22,10 @@ public class Drive extends HighModule {
     double driveMultiplier = 1;
     public Drive(HardwareMap hardwareMap){
         this.hardwareMap = hardwareMap;
-        LFM = new HighMotor(hardwareMap.get(DcMotorEx.class, leftFrontMotorName), HighMotor.RunMode.Standard, false,true);
-        LBM = new HighMotor(hardwareMap.get(DcMotorEx.class, leftBackMotorName), HighMotor.RunMode.Standard,false,true);
-        RFM = new HighMotor(hardwareMap.get(DcMotorEx.class, rightFrontMotorName), HighMotor.RunMode.Standard,true,true);
-        RBM = new HighMotor(hardwareMap.get(DcMotorEx.class, rightBackMotorName), HighMotor.RunMode.Standard, true, true);
+        LFM = new HighMotor(hardwareMap.get(DcMotorEx.class, leftFrontMotorName), HighMotor.RunMode.Standard, true,true);
+        LBM = new HighMotor(hardwareMap.get(DcMotorEx.class, leftBackMotorName), HighMotor.RunMode.Standard,true,true);
+        RFM = new HighMotor(hardwareMap.get(DcMotorEx.class, rightFrontMotorName), HighMotor.RunMode.Standard,false,true);
+        RBM = new HighMotor(hardwareMap.get(DcMotorEx.class, rightBackMotorName), HighMotor.RunMode.Standard, false, true);
 
     }
 

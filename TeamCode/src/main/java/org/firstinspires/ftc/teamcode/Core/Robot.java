@@ -70,16 +70,14 @@ public class Robot extends HighModule {
     @Override
     public void update() {
 
+        shooter.update();
+        intake.update();
         if (isAuto) {
             drive.update();
             camera.update();
         } else {
             teleOpDrive.update();
         }
-
-        shooter.update();
-        intake.update();
-
         for (LynxModule hub : allHubs) {
             hub.clearBulkCache();
         }

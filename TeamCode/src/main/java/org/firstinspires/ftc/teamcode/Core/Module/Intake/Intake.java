@@ -6,7 +6,7 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighModule;
 
 
 public class Intake extends HighModule {
-    MotorIntake motorIntake;
+    public MotorIntake motorIntake;
     //Joint joint;
     public enum IntakeActions{
         Collect,

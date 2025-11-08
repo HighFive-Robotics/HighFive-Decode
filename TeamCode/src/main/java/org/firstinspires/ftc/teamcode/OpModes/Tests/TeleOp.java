@@ -49,6 +49,10 @@ public class TeleOp extends LinearOpMode {
                 robot.intake.setAction(Intake.IntakeActions.Wait);
             }
 
+            telemetry.addData("State intake:" , robot.intake.motorIntake.getState());
+            telemetry.addData("Power intake:" , robot.intake.motorIntake.power);
+            telemetry.addData("Shooter 1:" , robot.shooter.motorUp.getPower());
+            telemetry.addData("Shooter 2:" , robot.shooter.motorDown.getPower());
             robot.update();
             telemetry.update();
         }

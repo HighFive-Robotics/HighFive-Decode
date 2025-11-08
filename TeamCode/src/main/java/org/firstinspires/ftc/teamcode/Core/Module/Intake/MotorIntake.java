@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Core.Module.Intake;
 
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.intakeMotorName;
+import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.rightBackMotorName;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -23,11 +24,13 @@ public class MotorIntake extends HighModule {
     States state = States.Wait;
 
     public MotorIntake(HardwareMap hwMap){
-        motor = HighMotor.Builder.startBuilding()
+        motor = new HighMotor(hwMap.get(DcMotorEx.class, intakeMotorName), HighMotor.RunMode.Standard, true, true);
+
+        /*motor = HighMotor.Builder.startBuilding()
                 .setMotor(hwMap.get(DcMotorEx.class, intakeMotorName))
                 .setRunMode(HighMotor.RunMode.Standard)
                 .setReverseMotor(true)
-                .build();
+                .build();*/
     }
 
     public void setPower(double power) {

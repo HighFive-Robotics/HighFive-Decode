@@ -1,16 +1,21 @@
 package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
+import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.intakeMotorName;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Core.Hardware.HighMotor;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighServo;
 
 @TeleOp
 public class ServoTest extends LinearOpMode {
 
     HighServo s1,s2,s3,s4,s5,s6;
+    HighMotor motor;
     private enum ServoNames{
         zaza1,
         zaza2,
@@ -48,6 +53,9 @@ public class ServoTest extends LinearOpMode {
                 .setServo(hardwareMap.get(Servo.class, "S6"))
                 .setStandardRunMode()
                 .build();
+
+        motor = new HighMotor(hardwareMap.get(DcMotorEx.class, intakeMotorName), HighMotor.RunMode.Standard, true, true);
+
 
         waitForStart();
 
@@ -136,6 +144,13 @@ public class ServoTest extends LinearOpMode {
                 timer.reset();
             }
 
+            motor.setTarget(0.0);
+            if(gamepad1.x){
+                motor.setTarget(0.5);
+            }
+            if(gamepad1.y){
+                motor.setTarget(-0.5);
+            }
 
             telemetry.addData("servo", Zaza);
             telemetry.update();
