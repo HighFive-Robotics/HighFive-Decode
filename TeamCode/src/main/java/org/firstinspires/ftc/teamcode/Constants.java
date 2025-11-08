@@ -56,6 +56,9 @@ public class Constants {
         public static String rightBackMotorName = "RBM";
         public static String pinPointName = "odo";
         public static String webcamName = "Webcam 1";
+        public static String intakeMotorName = "IM";
+        public static String shooterMotorUpName = "OMT";
+        public static String shooterMotorDownName = "OMB";
     }
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);

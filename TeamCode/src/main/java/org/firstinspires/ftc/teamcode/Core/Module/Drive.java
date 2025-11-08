@@ -1,5 +1,5 @@
 
-package org.firstinspires.ftc.teamcode.Core;
+package org.firstinspires.ftc.teamcode.Core.Module;
 
 
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.leftBackMotorName;
@@ -11,11 +11,11 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.Core.Hardware.HighModuleSimple;
+import org.firstinspires.ftc.teamcode.Core.Hardware.HighModule;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighMotor;
 
 
-public class Drive implements HighModuleSimple {
+public class Drive extends HighModule {
 
     public HighMotor LFM, RFM, RBM, LBM;
     HardwareMap hardwareMap;

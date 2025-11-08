@@ -44,6 +44,7 @@ public class HighServo {
     private boolean useAnalogInput = false, atTarget = false;
     private double error = epsilon, voltage, minPosition = 0, maxPosition = 1, minVoltage = 0, maxVoltage = 3.3;
     private double power, lastPower = -2;
+    public boolean inInit= true;
 
     public ElapsedTime timer = new ElapsedTime();
     public double time = -1;
@@ -115,6 +116,7 @@ public class HighServo {
      * @param isAutonomous knows if the servo should init or not
      */
     private void setInitialPosition(double position, boolean isAutonomous) {
+        inInit = false;
         targetPosition = position;
         if (isAutonomous) {
             this.currentPosition = position;
@@ -291,9 +293,11 @@ public class HighServo {
                 lastPosition = targetPositionMotionProfile;
                 break;
             case Standard:
-                if (Math.abs(targetPosition - lastPosition) >= epsilon) {
-                    servo.setPosition(targetPosition);
-                    lastPosition = targetPosition;
+                if(!inInit) {
+                    if (Math.abs(targetPosition - lastPosition) >= epsilon) {
+                        servo.setPosition(targetPosition);
+                        lastPosition = targetPosition;
+                    }
                 }
                 break;
             case ContinuousRotation:

@@ -17,31 +17,24 @@
 
 package org.firstinspires.ftc.teamcode.Core.Hardware;
 
-public interface HighModule{
+public abstract class HighModule{
+    public double power;
+    public double target, position, voltage;
+    public void setTarget(double target) {
 
-    /**
-     *
-     * @param target
-     */
-    public void setTarget(double target);
+    }
 
-    /**
-     *
-     * @param target
-     * @param time
-     */
-    public void setTarget(double target, double time);
+    public void setTarget(double target, double time) {
 
-    public boolean atTarget();
+    }
 
-    /**
-     *
-     * @return
-     */
-    public double getTarget();
+    public boolean atTarget() {
+        return false;
+    }
 
-    /**
-     *
-     */
-    public void update();
+    public double getTarget() {
+        return 0;
+    }
+
+    public abstract void update();
 }
