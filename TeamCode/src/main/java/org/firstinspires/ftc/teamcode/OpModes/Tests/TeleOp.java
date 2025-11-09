@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
 import org.firstinspires.ftc.teamcode.Core.Robot;
@@ -19,6 +21,9 @@ public class TeleOp extends LinearOpMode {
     Robot robot;
     public HashMap<String , ElapsedTime> timers = new HashMap<>();
 
+    Telemetry graph;
+
+
     @Override
     public void runOpMode() throws InterruptedException {
         robot = new Robot(hardwareMap , new Pose(0,0,0) , false , Constants.Color.Blue , telemetry);
@@ -30,6 +35,7 @@ public class TeleOp extends LinearOpMode {
         timers.get("cross").reset();
         timers.get("rightTrigger").reset();
         timers.get("leftTrigger").reset();
+        graph =FtcDashboard.getInstance().getTelemetry();
         waitForStart();
 
         while (opModeIsActive()) {
@@ -57,8 +63,11 @@ public class TeleOp extends LinearOpMode {
             telemetry.addData("Shooter 2:" , robot.shooter.motorDown.getPower());
             telemetry.addData("Up:" , robot.shooter.motorUp.getCurrentPosition());
             telemetry.addData("Down:" , robot.shooter.motorDown.getCurrentPosition());
+            graph.addData("Current Velo" , robot.shooter.motorUp.getVelocity());
+            graph.addData("Target Velo" , velobelo);
             robot.update();
             telemetry.update();
+            graph.update();
         }
     }
 }

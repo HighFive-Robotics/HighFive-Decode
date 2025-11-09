@@ -451,7 +451,7 @@ public class HighMotor {
         this.tolerance = tolerance;
         pidfController.setTolerance(tolerance);
         squidController.setTolerance(tolerance);
-        pidfVelocity.setTolerance(tolerance);
+        pidfVelocity.setTolerance(tolerance,tolerance);
     }
 
     /**
@@ -860,7 +860,7 @@ public class HighMotor {
                 }
                 break;
             case Velocity:
-                currentVelocity = getVelocity();
+                currentVelocity = getVelocity() * reverseEncoderMultiplier;
                 power = pidfVelocity.calculate(currentVelocity);
                 if (Math.abs(power - lastPower) >= epsilon) {
                     motor.setPower(power);

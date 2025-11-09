@@ -28,7 +28,6 @@ public class HighMotorVelo extends LinearOpMode {
         motor.setTolerance(20);
         dashboard = FtcDashboard.getInstance();
         graph = dashboard.getTelemetry();
-
         waitForStart();
         while (opModeIsActive()){
             motor.setTarget(target);
