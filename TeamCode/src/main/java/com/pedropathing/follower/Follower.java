@@ -464,7 +464,7 @@ public class Follower {
 
         if (manualDrive) {
             if(isFieldCentric){
-                double robotHeading = poseTracker.getPose().getHeading() + teleOpHeadingOffset;
+                double robotHeading = getHeading() + teleOpHeadingOffset;
                 drivetrain.runFieldCentricDrive(gamepad,robotHeading);
             }else {
                 previousClosestPose = closestPose;
