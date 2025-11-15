@@ -65,7 +65,6 @@ public class TeleOpWow extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            robot.teleOpDrive.driveFieldCentric(gamepad1, 0);
 
             if(gamepad1.left_trigger >= 0.8){
                 robot.intake.setAction(Intake.IntakeActions.Spit);
