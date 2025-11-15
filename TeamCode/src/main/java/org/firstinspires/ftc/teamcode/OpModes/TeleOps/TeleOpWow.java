@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.Core.Module.Outtake.BlockerOuttake;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
 import java.util.HashMap;
+import java.util.Optional;
 
 @Config
 @TeleOp(name = "💥TeleOp💥")
@@ -35,7 +36,7 @@ public class TeleOpWow extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        robot = new Robot(hardwareMap , new Pose(0,0,0) , false , Constants.Color.Blue , telemetry);
+        robot = new Robot(hardwareMap , new Pose(0,0,0) , false , Constants.Color.Blue , telemetry,gamepad1);
         timers.put("leftStick1" , new ElapsedTime());
         timers.put("rightStick1" , new ElapsedTime());
         timers.put("rightBumper1" , new ElapsedTime());
@@ -131,6 +132,9 @@ public class TeleOpWow extends LinearOpMode {
             if(gamepad2.triangle && timers.get("triangle2").milliseconds() >= 250){
                 robot.shooter.setTargetVelocity(bigVelo);
                 timers.get("triangle2").reset();
+            }
+            if(gamepad1.ps){
+                robot.drive.resetTeleOpHeading();
             }
 
             telemetry.addData("State intake:" , robot.intake.motorIntake.getState());

@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Core;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -43,16 +44,16 @@ public class Robot extends HighModule {
         None
     }
 
-    public Robot(HardwareMap hardwareMap, Pose startPose, boolean isAuto, Constants.Color allianceColor, Telemetry telemetry) {
+    public Robot(HardwareMap hardwareMap, Pose startPose, boolean isAuto, Constants.Color allianceColor, Telemetry telemetry , Gamepad gamepad) {
         this.telemetry = telemetry;
         this.hardwareMap = hardwareMap;
         this.isAuto = isAuto;
+        drive = Constants.createFollower(hardwareMap);
         if (isAuto) {
-            drive = Constants.createFollower(hardwareMap);
             drive.setStartingPose(startPose);
             camera = new Camera(hardwareMap);
         } else {
-            teleOpDrive = new Drive(hardwareMap);
+            drive.startFieldCentricDrive(gamepad,true,0);
         }
         lift = new Lift(hardwareMap);
         shooter = new Shooter(hardwareMap);

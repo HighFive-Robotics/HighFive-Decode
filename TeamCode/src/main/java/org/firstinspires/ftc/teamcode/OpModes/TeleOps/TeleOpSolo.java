@@ -28,7 +28,7 @@ public class TeleOpSolo extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        robot = new Robot(hardwareMap , new Pose(0,0,0) , false , Constants.Color.Blue , telemetry);
+        robot = new Robot(hardwareMap , new Pose(0,0,0) , false , Constants.Color.Blue , telemetry,gamepad1);
         timers.put("circle" , new ElapsedTime());
         timers.put("cross" , new ElapsedTime());
         timers.put("rightTrigger" , new ElapsedTime());
