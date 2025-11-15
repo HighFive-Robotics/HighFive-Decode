@@ -59,10 +59,12 @@ public class Follower {
     public boolean useCentripetal = true;
     public boolean useHeading = true;
     public boolean useDrive = true;
+    public boolean isFieldCentric = false;
     private Timer zeroVelocityDetectedTimer = null;
     public boolean fieldCentric = true;
     private Gamepad gamepad;
     private Runnable resetFollowing = null;
+    private double teleOpHeadingOffset=0;
 
     /**
      * This creates a new Follower given a HardwareMap.
@@ -354,6 +356,14 @@ public class Follower {
         update();
         drivetrain.startTeleopDrive(useBrakeMode);
     }
+    public void startFieldCentricDrive(Gamepad gamepad ,boolean useBreakMode,double teleOpHeadingOffset){
+        breakFollowing();
+        manualDrive = true;
+        isFieldCentric = true;
+        this.teleOpHeadingOffset = teleOpHeadingOffset;
+        this.gamepad = gamepad;
+        drivetrain.startTeleopDrive(useBreakMode);
+    }
 
     public void startTeleOpDrive(boolean useBrakeMode) {
         startTeleopDrive(useBrakeMode);
@@ -435,7 +445,11 @@ public class Follower {
     }
 
     public void updateErrorAndVectors() {updateErrors(); updateVectors();}
-
+    public void resetTeleOpHeading() {
+        // Set the offset to the negative of the current heading,
+        // so that (currentHeading + offset) = 0.
+        this.teleOpHeadingOffset = -poseTracker.getPose().getHeading();
+    }
 
     /**
      * This calls an update to the PoseTracker, which updates the robot's current position estimate.
@@ -449,11 +463,16 @@ public class Follower {
 
 
         if (manualDrive) {
-            previousClosestPose = closestPose;
-            closestPose = new PathPoint();
-            updateErrorAndVectors();
-            drivetrain.runDrive(getCentripetalForceCorrection(), getTeleopHeadingVector(), getTeleopDriveVector(), poseTracker.getPose().getHeading());
-            return;
+            if(isFieldCentric){
+                double robotHeading = poseTracker.getPose().getHeading() + teleOpHeadingOffset;
+                drivetrain.runFieldCentricDrive(gamepad,robotHeading);
+            }else {
+                previousClosestPose = closestPose;
+                closestPose = new PathPoint();
+                updateErrorAndVectors();
+                drivetrain.runDrive(getCentripetalForceCorrection(), getTeleopHeadingVector(), getTeleopDriveVector(), poseTracker.getPose().getHeading());
+                return;
+            }
         }
 
         if (currentPath == null) {

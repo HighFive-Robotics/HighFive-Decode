@@ -2,6 +2,7 @@ package com.pedropathing;
 
 import com.pedropathing.math.Vector;
 import com.pedropathing.math.MathFunctions;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 public abstract class Drivetrain {
     /**
@@ -46,6 +47,8 @@ public abstract class Drivetrain {
      */
     public abstract double[] calculateDrive(Vector correctivePower, Vector headingPower, Vector pathingPower, double robotHeading);
 
+
+    public abstract void runFieldCentricDrive(Gamepad gamepad, double robotHeading);
     /**
      * This sets the maximum power scaling for the drivetrain. This is used to limit the maximum
      * power that can be applied to the motors, which is useful for preventing damage to the
