@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighMotor;
 @Config
 public class MotorIntake extends HighModule {
 
-    public static double powerWait = 0, powerCollect = 1, powerSpit = -1, powerTransfer = 0.5;
+    public static double powerWait = 0, powerCollect = 1, powerSpit = -1, powerTransfer = 1;
     HighMotor motor, inactiveMotor;
 
     public enum States {
@@ -26,13 +26,13 @@ public class MotorIntake extends HighModule {
     States state = States.Wait;
 
     public MotorIntake(HardwareMap hwMap){
-        motor = new HighMotor(hwMap.get(DcMotorEx.class, intakeMotorName), HighMotor.RunMode.Standard, true, true);
+        //motor = new HighMotor(hwMap.get(DcMotorEx.class, intakeMotorName), HighMotor.RunMode.Standard, true, true);
 
-        /*motor = HighMotor.Builder.startBuilding()
+        motor = HighMotor.Builder.startBuilding()
                 .setMotor(hwMap.get(DcMotorEx.class, intakeMotorName))
                 .setRunMode(HighMotor.RunMode.Standard)
                 .setReverseMotor(true)
-                .build();*/
+                .build();
     }
 
     public void setPower(double power) {

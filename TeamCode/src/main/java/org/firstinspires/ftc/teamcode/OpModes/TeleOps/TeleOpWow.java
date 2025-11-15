@@ -84,7 +84,7 @@ public class TeleOpWow extends LinearOpMode {
                 timers.get("leftStick1").reset();
             }
 
-            if(gamepad1.left_stick_button && timers.get("rightStick1").milliseconds() >= 250){
+            if(gamepad1.right_stick_button && timers.get("rightStick1").milliseconds() >= 250){
                 robot.intake.joint.setState(Joint.States.Pass);
                 timers.get("rightStick1").reset();
             }

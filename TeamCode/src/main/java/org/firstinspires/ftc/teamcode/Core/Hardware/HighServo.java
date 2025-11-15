@@ -159,6 +159,9 @@ public class HighServo {
                 break;
             case Standard:
                 targetPosition = position;
+                if(!inInit){
+                    setInitialPosition(position,true);
+                }
                 break;
         }
         atTarget = false;

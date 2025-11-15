@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighServo;
 @Config
 public class Joint extends HighModule {
 
-    public static double targetBlock = 0, targetPass = 0, targetPark = 0;
+    public static double targetBlock = 0, targetPass = 0.3, targetPark = 0;
 
     HighServo servo;
     States state;

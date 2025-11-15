@@ -12,8 +12,8 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighServo;
 @Config
 public class BlockerOuttake extends HighModule {
     HighServo servo;
-    public static double ClosedPosition = 0.6;
-    public static double OpenPosition = 0.1;
+    public static double ClosedPosition = 0.1;
+    public static double OpenPosition = 0.6;
 
     public enum States {
         Open,

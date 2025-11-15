@@ -25,11 +25,7 @@ public class Intake extends HighModule {
     public Intake(HardwareMap hwMap ,double initPosition, boolean isAuto){
         motorIntake = new MotorIntake(hwMap);
         joint = new Joint(hwMap, initPosition, isAuto);
-        if(isAuto) {
-            sorter = new Sorter(hwMap, Sorter.Position, true);
-        }else {
-            joint = new Joint(hwMap);
-        }
+        sorter = new Sorter(hwMap, Sorter.Position, true);
     }
     public void setAction(IntakeActions action){
         switch (action){
