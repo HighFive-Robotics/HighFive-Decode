@@ -77,12 +77,9 @@ public class Robot extends HighModule {
         shooter.update();
         intake.update();
         lift.update();
-
+        drive.update();
         if (isAuto) {
-            drive.update();
             camera.update();
-        } else {
-            teleOpDrive.update();
         }
         for (LynxModule hub : allHubs) {
             hub.clearBulkCache();
