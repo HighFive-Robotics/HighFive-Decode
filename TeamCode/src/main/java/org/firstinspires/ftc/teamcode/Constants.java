@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.pinPointName;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.rightBackMotorName;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.rightFrontMotorName;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.control.FilteredPIDFCoefficients;
 import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.follower.Follower;
@@ -49,6 +50,7 @@ public class Constants {
     public static double PurpleValuesHSV[] = {215F,0.40F,5F};
     public static double Treshold[] = {17.5F, 0.2F, 5F};
 
+
     public static class DeviceNames {
         public static String leftFrontMotorName = "LFM";
         public static String leftBackMotorName = "LBM";
@@ -57,8 +59,14 @@ public class Constants {
         public static String pinPointName = "odo";
         public static String webcamName = "Webcam 1";
         public static String intakeMotorName = "IM";
+        public static String intakeJointServoName = "IJ";
         public static String shooterMotorUpName = "OMT";
         public static String shooterMotorDownName = "OMB";
+        public static String blockerServoName = "BO";
+        public static String sorterServoName = "S";
+        public static String liftServoLB = "SLB";
+        public static String liftServoRB = "SRB";
+        public static String liftServoRF = "SRF";
     }
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);

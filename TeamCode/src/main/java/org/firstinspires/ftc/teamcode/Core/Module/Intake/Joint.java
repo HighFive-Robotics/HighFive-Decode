@@ -1,11 +1,15 @@
 package org.firstinspires.ftc.teamcode.Core.Module.Intake;
 
+import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.intakeJointServoName;
+
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighModule;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighServo;
 
+@Config
 public class Joint extends HighModule {
 
     public static double targetBlock = 0, targetPass = 0, targetPark = 0;
@@ -20,13 +24,13 @@ public class Joint extends HighModule {
     }
     public Joint(HardwareMap hwMap){
         servo = HighServo.Builder.startBuilding()
-                .setServo(hwMap.get(Servo.class, "DADAD"))
+                .setServo(hwMap.get(Servo.class, intakeJointServoName))
                 .setStandardRunMode()
                 .build();
     }
     public Joint(HardwareMap hwMap, double initPosition, boolean isAuto){
         servo = HighServo.Builder.startBuilding()
-                .setServo(hwMap.get(Servo.class, "DADAD"))
+                .setServo(hwMap.get(Servo.class, intakeJointServoName))
                 .setStandardRunMode()
                 .setInitPosition(initPosition, isAuto)
                 .build();

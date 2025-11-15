@@ -13,8 +13,9 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighMotor;
 @Config
 public class Shooter extends HighModule {
     public HighMotor motorUp , motorDown;
+    public BlockerOuttake blocker;
     public double velocity;
-    public static double encoderResolution  ,kp = 0.002 , kd = 0.00002,ki = 0.002,kf = 0.00010;
+    public static double kp = 0.002 , kd = 0.00002,ki = 0.002,kf = 0.00010;
 
     public Shooter(HardwareMap hwMap){
         motorUp = HighMotor.Builder.startBuilding()
@@ -25,13 +26,15 @@ public class Shooter extends HighModule {
                 .setEncoderResolution(28)
                 .setWheelDiameter(0.072)
                 .setVelocityPIDCoefficients(kp,ki,kd,kf)
+                .setUseZeroPowerBehaviour(false)
                 .build();
         motorDown = HighMotor.Builder.startBuilding()
                 .setMotor(hwMap.get(DcMotorEx.class, shooterMotorDownName))
                 .setRunMode(HighMotor.RunMode.Standard)
                 .setReverseMotor(true)
+                .setUseZeroPowerBehaviour(false)
                 .build();
-        motorUp.setTolerance(40);
+        blocker = new BlockerOuttake(hwMap,blocker.ClosedPosition,true);
     }
 
     public void setTargetVelocity(double velocity){
@@ -42,8 +45,10 @@ public class Shooter extends HighModule {
     public void update() {
 
         motorUp.update();
+        motorUp.setVelocityPIDCoefficients(kp,ki,kd,kf);
         //motorUp.setTarget(motorUp.getPower());
         motorDown.setPower(motorUp.getPower());
         motorDown.update();
+        blocker.update();
     }
 }

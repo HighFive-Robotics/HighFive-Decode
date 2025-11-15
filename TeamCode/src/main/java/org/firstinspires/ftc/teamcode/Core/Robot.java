@@ -11,8 +11,9 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighModule;
 import org.firstinspires.ftc.teamcode.Core.Module.Camera.Camera;
-import org.firstinspires.ftc.teamcode.Core.Module.Drive;
+import org.firstinspires.ftc.teamcode.Core.Module.Others.Drive;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
+import org.firstinspires.ftc.teamcode.Core.Module.Others.Lift;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Shooter;
 
 import java.util.List;
@@ -31,6 +32,7 @@ public class Robot extends HighModule {
     public Camera camera;
     public Shooter shooter;
     public Intake intake;
+    public Lift lift;
 
     boolean isAuto;
 
@@ -52,6 +54,7 @@ public class Robot extends HighModule {
         } else {
             teleOpDrive = new Drive(hardwareMap);
         }
+        lift = new Lift(hardwareMap);
         shooter = new Shooter(hardwareMap);
         intake = new Intake(hardwareMap);
         allHubs = hardwareMap.getAll(LynxModule.class);
@@ -72,6 +75,8 @@ public class Robot extends HighModule {
 
         shooter.update();
         intake.update();
+        lift.update();
+
         if (isAuto) {
             drive.update();
             camera.update();

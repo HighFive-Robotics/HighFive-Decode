@@ -1,21 +1,23 @@
-package org.firstinspires.ftc.teamcode.OpModes.Tests;
+package org.firstinspires.ftc.teamcode.OpModes.TeleOps;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
+import org.firstinspires.ftc.teamcode.Core.Module.Outtake.BlockerOuttake;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
 import java.util.HashMap;
 
 @Config
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp
-public class TeleOp extends LinearOpMode {
+@TeleOp(name = "TeleOp Solo")
+public class TeleOpSolo extends LinearOpMode {
 
     public static double velobelo = 4;
     Robot robot;
@@ -31,10 +33,16 @@ public class TeleOp extends LinearOpMode {
         timers.put("cross" , new ElapsedTime());
         timers.put("rightTrigger" , new ElapsedTime());
         timers.put("leftTrigger" , new ElapsedTime());
+        timers.put("leftBumper" , new ElapsedTime());
+        timers.put("rightBumper" , new ElapsedTime());
+        timers.put("square" , new ElapsedTime());
         timers.get("circle").reset();
         timers.get("cross").reset();
         timers.get("rightTrigger").reset();
         timers.get("leftTrigger").reset();
+        timers.get("leftBumper").reset();
+        timers.get("rightBumper").reset();
+        timers.get("square").reset();
         graph =FtcDashboard.getInstance().getTelemetry();
         waitForStart();
 
@@ -57,13 +65,33 @@ public class TeleOp extends LinearOpMode {
                 robot.intake.setAction(Intake.IntakeActions.Wait);
             }
 
+            if(gamepad1.right_bumper && timers.get("rightBumper").milliseconds() >= 250){
+                robot.shooter.blocker.setState(BlockerOuttake.States.Open);
+                timers.get("rightBumper").reset();
+            }
+            if(gamepad1.left_bumper && timers.get("leftBumper").milliseconds() >= 250){
+                robot.shooter.blocker.setState(BlockerOuttake.States.Close);
+                timers.get("leftBumper").reset();
+            }
+
+            if(gamepad1.square && timers.get("square").milliseconds() >= 250){
+                robot.shooter.setTargetVelocity(-1);
+                timers.get("square").reset();
+            }
+
+            if(gamepad1.triangle && gamepad1.dpad_up){
+                robot.lift.setPower(1);
+            } else {
+                robot.lift.setPower(0);
+            }
+
             telemetry.addData("State intake:" , robot.intake.motorIntake.getState());
             telemetry.addData("Power intake:" , robot.intake.motorIntake.power);
             telemetry.addData("Shooter 1:" , robot.shooter.motorUp.getPower());
             telemetry.addData("Shooter 2:" , robot.shooter.motorDown.getPower());
             telemetry.addData("Up:" , robot.shooter.motorUp.getCurrentPosition());
             telemetry.addData("Down:" , robot.shooter.motorDown.getCurrentPosition());
-            graph.addData("Current Velo" , robot.shooter.motorUp.getVelocity());
+            graph.addData("Current Velo" , robot.shooter.motorUp.getCurrentVelocity());
             graph.addData("Target Velo" , velobelo);
             robot.update();
             telemetry.update();

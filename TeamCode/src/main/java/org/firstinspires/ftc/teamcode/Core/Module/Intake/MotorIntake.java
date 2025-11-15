@@ -3,12 +3,14 @@ package org.firstinspires.ftc.teamcode.Core.Module.Intake;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.intakeMotorName;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.rightBackMotorName;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighModule;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighMotor;
 
+@Config
 public class MotorIntake extends HighModule {
 
     public static double powerWait = 0, powerCollect = 1, powerSpit = -1, powerTransfer = 0.5;

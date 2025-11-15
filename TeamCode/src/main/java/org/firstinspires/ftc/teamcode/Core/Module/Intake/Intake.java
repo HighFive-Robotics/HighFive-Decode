@@ -7,7 +7,9 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighModule;
 
 public class Intake extends HighModule {
     public MotorIntake motorIntake;
-    //Joint joint;
+    public Joint joint;
+    public Sorter sorter;
+
     public enum IntakeActions{
         Collect,
         Spit,
@@ -17,19 +19,17 @@ public class Intake extends HighModule {
     }
     public Intake(HardwareMap hwMap){
         motorIntake = new MotorIntake(hwMap);
-        /*if(isAuto) {
-            joint = new Joint(hwMap, initPosition, true);
-        }else {
-            joint = new Joint(hwMap);
-        }*/
+        joint = new Joint(hwMap);
+        sorter = new Sorter(hwMap, Sorter.Position, false);
     }
     public Intake(HardwareMap hwMap ,double initPosition, boolean isAuto){
         motorIntake = new MotorIntake(hwMap);
-        /*if(isAuto) {
-            joint = new Joint(hwMap, initPosition, true);
+        joint = new Joint(hwMap, initPosition, isAuto);
+        if(isAuto) {
+            sorter = new Sorter(hwMap, Sorter.Position, true);
         }else {
             joint = new Joint(hwMap);
-        }*/
+        }
     }
     public void setAction(IntakeActions action){
         switch (action){
@@ -45,13 +45,14 @@ public class Intake extends HighModule {
             case Park:
                 motorIntake.setState(MotorIntake.States.Wait);
                 motorIntake.disable();
-                //joint.setState(Joint.States.Park);
+                joint.setState(Joint.States.Park);
                 break;
         }
     }
     @Override
     public void update() {
         motorIntake.update();
-       // joint.update();
+        joint.update();
+        sorter.update();
     }
 }

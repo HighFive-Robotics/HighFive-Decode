@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.Core.Module.Drive;
+import org.firstinspires.ftc.teamcode.Core.Module.Others.Drive;
 
 @TeleOp(name = "Overall Tests")
 public class ShooterCalibration extends LinearOpMode {

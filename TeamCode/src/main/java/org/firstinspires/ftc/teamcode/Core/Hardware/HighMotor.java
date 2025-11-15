@@ -398,7 +398,7 @@ public class HighMotor {
 //        }else {
 //            return motor.getVelocity();
 //        }
-        return motor.getVelocity();
+        return motor.getVelocity() * reverseEncoderMultiplier;
     }
 
     // PID and Squid stuff
@@ -823,7 +823,9 @@ public class HighMotor {
         double VelocityPower = pidfVelocity.calculate(currentVelocity, target);
         return Range.clip(VelocityPower, -maxPIDPower, maxPIDPower);
     }
-
+    public double getCurrentVelocity(){
+        return (this.getVelocity()/encoderResolution)*wheelDiameter;
+    }
     /**
      * This method updates the motor control logic depending on the current runMode.
      * If we use an encoder, the current motor position is read and adjusted
@@ -860,7 +862,7 @@ public class HighMotor {
                 }
                 break;
             case Velocity:
-                currentVelocity = getVelocity() * reverseEncoderMultiplier;
+                currentVelocity = getVelocity();
                 power = pidfVelocity.calculate(currentVelocity);
                 if (Math.abs(power - lastPower) >= epsilon) {
                     motor.setPower(power);
