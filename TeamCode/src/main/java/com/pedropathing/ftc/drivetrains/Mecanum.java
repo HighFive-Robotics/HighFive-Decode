@@ -93,6 +93,7 @@ public class Mecanum extends Drivetrain {
 
     public void runFieldCentricDrive(Gamepad gamepad, double robotHeading) {
         double[] wheelPowers;
+        robotHeading = -robotHeading;
         double forward = -gamepad.left_stick_y * driveMultiplier;
         double strafe = gamepad.left_stick_x * driveMultiplier;
         double turn = gamepad.right_stick_x * driveMultiplier;
