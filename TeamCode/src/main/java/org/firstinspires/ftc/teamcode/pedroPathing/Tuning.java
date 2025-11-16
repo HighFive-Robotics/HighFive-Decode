@@ -8,6 +8,7 @@ import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.graphManager;
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.stopRobot;
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.telemetryM;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.bylazar.configurables.PanelsConfigurables;
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.configurables.annotations.IgnoreConfigurable;
@@ -32,25 +33,20 @@ import org.firstinspires.ftc.teamcode.Constants;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * This is the Tuning class. It contains a selection menu for various tuning OpModes.
- *
- * @author Baron Henderson - 20077 The Indubitables
- * @version 1.0, 6/26/2025
- */
-@Configurable
+
+@Config
 @TeleOp(name = "Tuning", group = "Pedro Pathing")
 public class Tuning extends SelectableOpMode {
     public static Follower follower;
 
-    @IgnoreConfigurable
+    
     static PoseHistory poseHistory;
 
-    @IgnoreConfigurable
+    
     static TelemetryManager telemetryM;
-    @IgnoreConfigurable
+    
     static GraphManager graphManager;
-    @IgnoreConfigurable
+    
     static ArrayList<String> changes = new ArrayList<>();
 
     public Tuning() {
@@ -184,7 +180,7 @@ class LocalizationTest extends OpMode {
  * @version 1.0, 5/6/2024
  */
 class ForwardTuner extends OpMode {
-    public static double DISTANCE = 48;
+    public static double DISTANCE = 95;
 
     @Override
     public void init() {
@@ -231,7 +227,7 @@ class ForwardTuner extends OpMode {
  * @version 2.0, 6/26/2025
  */
 class LateralTuner extends OpMode {
-    public static double DISTANCE = 48;
+    public static double DISTANCE = 95;
 
     @Override
     public void init() {
@@ -532,9 +528,10 @@ class LateralVelocityTuner extends OpMode {
  * @author Harrison Womack - 10158 Scott's Bots
  * @version 1.0, 3/13/2024
  */
+@Config
 class ForwardZeroPowerAccelerationTuner extends OpMode {
     private final ArrayList<Double> accelerations = new ArrayList<>();
-    public static double VELOCITY = 30;
+    public static double VELOCITY = 60;
 
     private double previousVelocity;
     private long previousTimeNano;
@@ -636,9 +633,10 @@ class ForwardZeroPowerAccelerationTuner extends OpMode {
  * @author Baron Henderson - 20077 The Indubitables
  * @version 1.0, 3/13/2024
  */
+@Config
 class LateralZeroPowerAccelerationTuner extends OpMode {
     private final ArrayList<Double> accelerations = new ArrayList<>();
-    public static double VELOCITY = 30;
+    public static double VELOCITY =40;
     private double previousVelocity;
     private long previousTimeNano;
     private boolean stopping;

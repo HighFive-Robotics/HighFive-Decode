@@ -74,9 +74,9 @@ public class TeleOpWow extends LinearOpMode {
                 robot.intake.setAction(Intake.IntakeActions.Wait);
             }
 
-            if(gamepad1.right_bumper && timers.get("rightBumper").milliseconds() >= 250){
+            if(gamepad1.right_bumper && timers.get("rightBumper1").milliseconds() >= 250){
                 gamepad2.rumble(150);
-                timers.get("rightBumper").reset();
+                timers.get("rightBumper1").reset();
             }
 
             if(gamepad1.left_stick_button && timers.get("leftStick1").milliseconds() >= 250){
@@ -143,6 +143,9 @@ public class TeleOpWow extends LinearOpMode {
             telemetry.addData("Up:" , robot.shooter.motorUp.getCurrentPosition());
             telemetry.addData("Down:" , robot.shooter.motorDown.getCurrentPosition());
             graph.addData("Current Velo" , robot.shooter.motorUp.getCurrentVelocity());
+            telemetry.addData("Current Velo" , robot.shooter.motorUp.getCurrentVelocity());
+            graph.addData("Current Velo From Current" , robot.shooter.motorUp.getVelocityFromCurrent(Constants.Globals.voltage));
+            telemetry.addData("Current Velo From Current" , robot.shooter.motorUp.getVelocityFromCurrent(Constants.Globals.voltage));
             telemetry.update();
             graph.update();
             robot.update();

@@ -60,8 +60,8 @@ public class ShooterCalibration extends LinearOpMode {
             }
             if(gamepad1.x && timer.milliseconds() >= 250){
                 if(!pressX){
-                    mD.setPower(0.76);
-                    mU.setPower(0.76);
+                    mD.setPower(1);
+                    mU.setPower(1);
                 }else {
                     mD.setPower(0);
                     mU.setPower(0);
@@ -78,6 +78,7 @@ public class ShooterCalibration extends LinearOpMode {
             //Current Possitions
             telemetry.addData("OMT pos" ,-1*mU.getCurrentPosition());
             telemetry.addData("OMT velobelo" ,-1*mU.getVelocity());
+            telemetry.addData("OMT velobelo" ,-1*(mU.getVelocity()/28)*0.072);
             telemetry.addData("OMB pos" , mD.getCurrentPosition());
             telemetry.addData("LBM pos" , teleopDrive.LBM.getCurrentPosition());
             telemetry.addData("LFM pos" , teleopDrive.LFM.getCurrentPosition());

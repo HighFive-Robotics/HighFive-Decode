@@ -73,7 +73,7 @@ public class Robot extends HighModule {
 
     @Override
     public void update() {
-
+        Constants.Globals.voltage = hardwareMap.voltageSensor.iterator().next().getVoltage();
         shooter.update();
         intake.update();
         lift.update();

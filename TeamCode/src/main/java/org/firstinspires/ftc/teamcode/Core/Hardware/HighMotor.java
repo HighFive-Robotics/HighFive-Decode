@@ -38,7 +38,26 @@ public class HighMotor {
         Time,
         Velocity
     }
+    public enum MotorRPM{
+        RPM6000(9.2,12,0.25,5400);
+        double stallCurrent , nominalVoltage, noLoadCurrent ,kE , nominalResistance , noLoadSpeed;
+        MotorRPM(double stallCurrent , double nominalVoltage,double noLoadCurrent,double noLoadSpeed){
+            this.stallCurrent = stallCurrent;
+            this.nominalVoltage = nominalVoltage;
+            this.noLoadCurrent = noLoadCurrent;
+            this.noLoadSpeed = noLoadSpeed;
 
+            nominalResistance = (nominalVoltage / (stallCurrent));
+            kE = (nominalVoltage - (noLoadCurrent * nominalResistance))/noLoadSpeed;
+        }
+
+        public double getNominalResistance() {
+            return nominalResistance;
+        }
+        public double getkE(){
+            return kE;
+        }
+    }
     public enum FeedForwardType{
         Arm, /// if we want to use feedforward for an arm
         Lift  ///if we want to use feedforward for a lift
@@ -63,6 +82,7 @@ public class HighMotor {
     private double currentPosition = 0, maxPIDPower = 1, kF = 0, initialAngle = 0, ticksPerDegree = 0;
     private double currentVelocity, encoderResolution = 1, wheelDiameter = 0;
     private double time=-1;
+    public MotorRPM motorRPM;
     public HighMotor(){}
     /**
      * This constructor can be used for any runMode.
@@ -370,7 +390,13 @@ public class HighMotor {
         this.power = Range.clip(power, -1.0, 1.0);
         timer.reset();
     }
+    public double getVelocityFromCurrent(double voltage){
+        double velocity;
+        velocity = (voltage -(motor.getCurrent(CurrentUnit.AMPS)*motorRPM.getNominalResistance()))/motorRPM.getkE();
+        velocity = (velocity*Math.PI*wheelDiameter)/60;
 
+        return velocity;
+    }
     /**
      *
      * @return this method returns the power
@@ -1107,10 +1133,17 @@ public class HighMotor {
             motor.setWheelDiameter(wheelDiameter);
             return this;
         }
-
+        public Builder setMotorRPM(HighMotor.MotorRPM motorRPM){
+            motor.setMotorRPM(motorRPM);
+            return this;
+        }
         public HighMotor build() {
 
             return this.motor;
         }
+    }
+
+    private void setMotorRPM(MotorRPM motorRPM) {
+        this.motorRPM = motorRPM;
     }
 }

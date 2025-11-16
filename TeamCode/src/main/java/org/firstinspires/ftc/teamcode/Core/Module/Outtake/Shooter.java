@@ -24,6 +24,7 @@ public class Shooter extends HighModule {
                 .setReverseMotor(false)
                 .setEncoder(true , true)
                 .setEncoderResolution(28)
+                .setMotorRPM(HighMotor.MotorRPM.RPM6000)
                 .setWheelDiameter(0.072)
                 .setVelocityPIDCoefficients(kp,ki,kd,kf)
                 .setUseZeroPowerBehaviour(false)
