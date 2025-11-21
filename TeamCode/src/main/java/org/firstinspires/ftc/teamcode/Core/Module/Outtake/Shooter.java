@@ -29,6 +29,7 @@ public class Shooter extends HighModule {
                 .setVelocityPIDCoefficients(kp,ki,kd,kf)
                 .setUseZeroPowerBehaviour(false)
                 .build();
+        motorUp.setTolerance(0.1);
         motorDown = HighMotor.Builder.startBuilding()
                 .setMotor(hwMap.get(DcMotorEx.class, shooterMotorDownName))
                 .setRunMode(HighMotor.RunMode.Standard)
@@ -40,6 +41,11 @@ public class Shooter extends HighModule {
 
     public void setTargetVelocity(double velocity){
         motorUp.setTarget(velocity);
+    }
+
+    @Override
+    public boolean atTarget(){
+        return Math.abs(motorUp.getTarget() - motorUp.getCurrentVelocity()) <= motorUp.getTolerance();
     }
 
     @Override

@@ -30,7 +30,7 @@ public class Robot extends HighModule {
 
     public IMU imu;
 
-    public Camera camera;
+    //public Camera camera;
     public Shooter shooter;
     public Intake intake;
     public Lift lift;
@@ -51,9 +51,28 @@ public class Robot extends HighModule {
         drive = Constants.createFollower(hardwareMap);
         if (isAuto) {
             drive.setStartingPose(startPose);
-            camera = new Camera(hardwareMap);
+            //camera = new Camera(hardwareMap);
         } else {
             drive.startFieldCentricDrive(gamepad,true,0);
+        }
+        lift = new Lift(hardwareMap);
+        shooter = new Shooter(hardwareMap);
+        intake = new Intake(hardwareMap);
+        allHubs = hardwareMap.getAll(LynxModule.class);
+        for (LynxModule hub : allHubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
+
+    }
+
+    public Robot(HardwareMap hardwareMap, Pose startPose, boolean isAuto, Constants.Color allianceColor, Telemetry telemetry) {
+        this.telemetry = telemetry;
+        this.hardwareMap = hardwareMap;
+        this.isAuto = isAuto;
+        drive = Constants.createFollower(hardwareMap);
+        if (isAuto) {
+            drive.setStartingPose(startPose);
+           // camera = new Camera(hardwareMap);
         }
         lift = new Lift(hardwareMap);
         shooter = new Shooter(hardwareMap);
@@ -79,7 +98,7 @@ public class Robot extends HighModule {
         lift.update();
         drive.update();
         if (isAuto) {
-            camera.update();
+            //camera.update();
         }
         for (LynxModule hub : allHubs) {
             hub.clearBulkCache();
