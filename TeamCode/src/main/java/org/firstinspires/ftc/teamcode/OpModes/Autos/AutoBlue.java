@@ -18,12 +18,12 @@ public class AutoBlue extends LinearOpMode {
 
     public Pose startPose = new Pose(16, 112, Math.toRadians(0));
     private final Pose shootPose = new Pose(45, 102.5, Math.toRadians(-40));
-    private final Pose spike1Pose = new Pose(55, 87.5, Math.toRadians(180));
-    private final Pose collect1Pose = new Pose(22, 87.5, Math.toRadians(180));
-    private final Pose spike2Pose = new Pose(55, 62.5, Math.toRadians(180));
-    private final Pose collect2Pose = new Pose(16, 62.5, Math.toRadians(180));
-    private final Pose spike3Pose = new Pose(55, 37.5, Math.toRadians(180));
-    private final Pose collect3Pose = new Pose(16, 37.5, Math.toRadians(180));
+    private final Pose spike1Pose = new Pose(55, 85, Math.toRadians(180));
+    private final Pose collect1Pose = new Pose(22, 85, Math.toRadians(180));
+    private final Pose spike2Pose = new Pose(55, 58, Math.toRadians(180));
+    private final Pose collect2Pose = new Pose(16, 58, Math.toRadians(180));
+    private final Pose spike3Pose = new Pose(55, 35, Math.toRadians(180));
+    private final Pose collect3Pose = new Pose(16, 35, Math.toRadians(180));
 
     private final ElapsedTime timer = new ElapsedTime(), autoTimer = new ElapsedTime();
 
@@ -82,21 +82,14 @@ public class AutoBlue extends LinearOpMode {
         while (opModeIsActive()) {
             switch (state) {
                 case 1:
-                    robot.shooter.setTargetVelocity(-1);
+                    robot.drive.followPath(preloadPath, true);
+                    robot.shooter.setTargetVelocity(3.5);
                     timer.reset();
-                    state++;
-                    break;
-                case 2:
-                    if(timer.milliseconds() >= 700){
-                        robot.drive.followPath(preloadPath, true);
-                        timer.reset();
-                        state++;
-                    }
+                    state = 3;
                     break;
                 case 3:
                     if(robot.isDone()){
                         robot.intake.setAction(Intake.IntakeActions.Wait);
-                        robot.shooter.setTargetVelocity(3.5);
                         timer.reset();
                         state = 5;
                         cycles = 0;
@@ -114,7 +107,7 @@ public class AutoBlue extends LinearOpMode {
                     }
                     break;
                 case 6: //TODO FailSafe
-                    if(timer.milliseconds() >= 550){
+                    if(timer.milliseconds() >= 300){
                         robot.intake.setAction(Intake.IntakeActions.Wait);
                         timer.reset();
                         state = 5;
@@ -122,7 +115,7 @@ public class AutoBlue extends LinearOpMode {
                     break;
                 case 7:
                     if(timer.milliseconds()>= 300){
-                        robot.intake.motorIntake.setPower(0.4);
+                        robot.intake.setAction(Intake.IntakeActions.Collect);
                         robot.drive.followPath(goForSpike1, true);
                         robot.shooter.setTargetVelocity(-1);
                         state++;
@@ -137,13 +130,14 @@ public class AutoBlue extends LinearOpMode {
                     break;
                 case 9:
                     if(robot.isDone()){
+                        robot.drive.setMaxPower(1);
                         robot.drive.followPath(shootFromSpike1, true);
                         state++;
                     }
                     break;
                 case 10:
                     if(robot.isDone()){
-                        robot.intake.setAction(Intake.IntakeActions.Spit);
+                        robot.intake.motorIntake.setPower(-0.7);
                         timer.reset();
                         state++;
                     }
@@ -169,7 +163,7 @@ public class AutoBlue extends LinearOpMode {
                     }
                     break;
                 case 13: //TODO FailSafe
-                    if(timer.milliseconds() >= 550){
+                    if(timer.milliseconds() >= 300){
                         robot.intake.setAction(Intake.IntakeActions.Wait);
                         timer.reset();
                         state = 12;
@@ -177,7 +171,7 @@ public class AutoBlue extends LinearOpMode {
                     break;
                 case 14:
                     if(timer.milliseconds()>= 300){
-                        robot.intake.motorIntake.setPower(0.4);
+                        robot.intake.setAction(Intake.IntakeActions.Collect);
                         robot.drive.followPath(goForSpike2, true);
                         robot.shooter.setTargetVelocity(-1);
                         state++;
@@ -192,13 +186,14 @@ public class AutoBlue extends LinearOpMode {
                     break;
                 case 16:
                     if(robot.isDone()){
+                        robot.drive.setMaxPower(1);
                         robot.drive.followPath(shootFromSpike2, true);
                         state++;
                     }
                     break;
                 case 17:
                     if(robot.isDone()){
-                        robot.intake.setAction(Intake.IntakeActions.Spit);
+                        robot.intake.motorIntake.setPower(-0.7);
                         timer.reset();
                         state++;
                     }
@@ -224,7 +219,7 @@ public class AutoBlue extends LinearOpMode {
                     }
                     break;
                 case 20: //TODO FailSafe
-                    if(timer.milliseconds() >= 550){
+                    if(timer.milliseconds() >= 300){
                         robot.intake.setAction(Intake.IntakeActions.Wait);
                         timer.reset();
                         state = 19;
@@ -232,7 +227,7 @@ public class AutoBlue extends LinearOpMode {
                     break;
                 case 21:
                     if(robot.isDone()){
-                        robot.intake.motorIntake.setPower(0.4);
+                        robot.intake.setAction(Intake.IntakeActions.Collect);
                         robot.drive.setMaxPower(0.5);
                         robot.drive.followPath(goForSpike3, true);
                         robot.shooter.setTargetVelocity(-1);
@@ -241,6 +236,7 @@ public class AutoBlue extends LinearOpMode {
                     break;
                 case 22:
                     if(robot.isDone()){
+                        robot.drive.setMaxPower(1);
                         robot.drive.followPath(collectSpike3, true);
                         state++;
                     }
@@ -253,7 +249,7 @@ public class AutoBlue extends LinearOpMode {
                     break;
                 case 24:
                     if(robot.isDone()){
-                        robot.intake.setAction(Intake.IntakeActions.Spit);
+                        robot.intake.motorIntake.setPower(-0.7);
                         timer.reset();
                         state++;
                     }
@@ -301,7 +297,7 @@ public class AutoBlue extends LinearOpMode {
             telemetry.addData("shooter power", robot.shooter.motorUp.getPower());
             telemetry.update();
 
-            if(autoTimer.milliseconds() >= 27500 && state != 28){
+            if(autoTimer.milliseconds() >= 27500 && state != 28 && state != 15){
                 state = 28;
             }
             robot.update();
