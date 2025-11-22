@@ -11,10 +11,35 @@ import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
-@Autonomous(name = "IDK NO WORK")
+@Autonomous
 public class AutoIDK extends LinearOpMode {
+    private enum States {
+        DriveToPreload,
+        ResetForShootPreload,
+        ShootSequencePreload,
+        DriveToSpike1,
+        CollectSpike1,
+        DriveToShoot1,
+        ResetForShoot1,
+        ShootSequence1,
+        DriveToSpike2,
+        CollectSpike2,
+        DriveToShoot2,
+        ResetForShoot2,
+        ShootSequence2,
+        DriveToSpike3,
+        CollectSpike3,
+        DriveToShoot3,
+        ResetForShoot3,
+        ShootSequence3,
+        DriveToPark,
+        Park
+    }
+
     public Robot robot;
-    private int state = 0;
+    public States state;
+    private int cycles = 0;
+    private int shootingState = 0;
 
     public Pose startPose = new Pose(16, 112, Math.toRadians(0));
     private final Pose shootPose = new Pose(45, 102.5, Math.toRadians(-40));
@@ -25,9 +50,11 @@ public class AutoIDK extends LinearOpMode {
     private final Pose spike3Pose = new Pose(55, 35, Math.toRadians(180));
     private final Pose collect3Pose = new Pose(16, 35, Math.toRadians(180));
 
-    private final ElapsedTime pathTimer = new ElapsedTime();
-    private final ElapsedTime actionTimer = new ElapsedTime();
     private final ElapsedTime opModeTimer = new ElapsedTime();
+    private final ElapsedTime stateTimer = new ElapsedTime();
+
+    private final double velocity = 3.5;
+    private final double reverseVelocity = -1;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -93,241 +120,208 @@ public class AutoIDK extends LinearOpMode {
         waitForStart();
 
         opModeTimer.reset();
-        pathTimer.reset();
-        actionTimer.reset();
+        stateTimer.reset();
+        state = States.DriveToPreload;
 
         while (opModeIsActive()) {
-            robot.update();
 
             switch (state) {
-                case 0:
+                case DriveToPreload:
                     robot.drive.followPath(preloadPath, true);
-                    robot.shooter.setTargetVelocity(3.5);
-                    pathTimer.reset();
-                    state = 1;
+                    robot.shooter.setTargetVelocity(velocity);
+                    stateTimer.reset();
+                    state = States.ResetForShootPreload;
                     break;
-
-                case 1:
-                    if (robot.isDone()|| pathTimer.seconds() > 3.0) {
+                case ResetForShootPreload:
+                    if (robot.isDone() || stateTimer.milliseconds() > 3000) {
                         robot.intake.setAction(Intake.IntakeActions.Wait);
-                        actionTimer.reset();
-                        state = 2;
+                        stateTimer.reset();
+                        cycles = 0;
+                        shootingState = 0;
+                        state = States.ShootSequencePreload;
                     }
                     break;
-
-                case 2:
-                    if (robot.shooter.atTarget() && actionTimer.milliseconds() >= 250) {
-                        robot.intake.setAction(Intake.IntakeActions.Collect);
-                        actionTimer.reset();
-                        state = 3;
-                    } else if (actionTimer.seconds() > 1.5) {
-                        robot.intake.setAction(Intake.IntakeActions.Collect);
-                        actionTimer.reset();
-                        state = 3;
-                    }
-                    break;
-
-                case 3:
-                    if (actionTimer.milliseconds() >= 300) {
-                        robot.intake.setAction(Intake.IntakeActions.Collect);
+                case ShootSequencePreload:
+                    if (runShootingSequence()) {
                         robot.drive.setMaxPower(1);
+                        robot.intake.setAction(Intake.IntakeActions.Collect);
+                        stateTimer.reset();
+                        state = States.DriveToSpike1;
+                    }
+                    break;
+                case DriveToSpike1:
+                    if (stateTimer.milliseconds() >= 100) {
                         robot.drive.followPath(goForSpike1, true);
-                        robot.shooter.setTargetVelocity(-1);
-                        pathTimer.reset();
-                        state = 4;
+                        robot.shooter.setTargetVelocity(reverseVelocity);
+                        stateTimer.reset();
+                        state = States.CollectSpike1;
                     }
                     break;
-
-                case 4:
-                    if ((robot.isDone()|| pathTimer.seconds() > 3.0) && actionTimer.milliseconds() >= 250) {
-                        robot.drive.followPath(collectSpike1, true);
+                case CollectSpike1:
+                    if (robot.isDone() || stateTimer.milliseconds() > 3000) {
                         robot.drive.setMaxPower(0.5);
-                        pathTimer.reset();
-                        state = 5;
+                        robot.drive.followPath(collectSpike1, true);
+                        stateTimer.reset();
+                        state = States.DriveToShoot1;
                     }
                     break;
-
-                case 5:
-                    if (robot.isDone()|| pathTimer.seconds() > 3.0) {
+                case DriveToShoot1:
+                    if (robot.isDone() || stateTimer.milliseconds() > 3000) {
                         robot.drive.setMaxPower(1);
                         robot.drive.followPath(shootFromSpike1, true);
-                        pathTimer.reset();
-                        state = 6;
+                        stateTimer.reset();
+                        state = States.ResetForShoot1;
                     }
                     break;
-
-                case 6:
-                    if (robot.isDone()|| pathTimer.seconds() > 3.0) {
-                        robot.intake.motorIntake.setPower(-0.7);
-                        actionTimer.reset();
-                        state = 7;
-                    }
-                    break;
-
-                case 7:
-                    if (actionTimer.milliseconds() >= 250) {
+                case ResetForShoot1:
+                    if (robot.isDone() || stateTimer.milliseconds() > 3000) {
                         robot.intake.setAction(Intake.IntakeActions.Wait);
-                        robot.shooter.setTargetVelocity(3.5);
-                        actionTimer.reset();
-                        state = 8;
+                        robot.shooter.setTargetVelocity(velocity);
+                        stateTimer.reset();
+                        cycles = 0;
+                        shootingState = 0;
+                        state = States.ShootSequence1;
                     }
                     break;
-
-                case 8:
-                    if (robot.shooter.atTarget() && actionTimer.milliseconds() >= 250) {
+                case ShootSequence1:
+                    if (runShootingSequence()) {
+                        robot.drive.setMaxPower(1);
                         robot.intake.setAction(Intake.IntakeActions.Collect);
-                        actionTimer.reset();
-                        state = 9;
-                    } else if (actionTimer.seconds() > 1.5) {
-                        robot.intake.setAction(Intake.IntakeActions.Collect);
-                        actionTimer.reset();
-                        state = 9;
+                        stateTimer.reset();
+                        state = States.DriveToSpike2;
                     }
                     break;
-
-                case 9:
-                    if (actionTimer.milliseconds() >= 300) {
-                        robot.intake.setAction(Intake.IntakeActions.Collect);
+                case DriveToSpike2:
+                    if (stateTimer.milliseconds() >= 100) {
                         robot.drive.followPath(goForSpike2, true);
-                        robot.shooter.setTargetVelocity(-1);
-                        pathTimer.reset();
-                        state = 10;
+                        robot.shooter.setTargetVelocity(reverseVelocity);
+                        stateTimer.reset();
+                        state = States.CollectSpike2;
                     }
                     break;
-
-                case 10:
-                    if ((robot.isDone()|| pathTimer.seconds() > 3.0) && actionTimer.milliseconds() >= 250) {
-                        robot.drive.followPath(collectSpike2, true);
+                case CollectSpike2:
+                    if (robot.isDone() || stateTimer.milliseconds() > 3000) {
                         robot.drive.setMaxPower(0.5);
-                        pathTimer.reset();
-                        state = 11;
+                        robot.drive.followPath(collectSpike2, true);
+                        stateTimer.reset();
+                        state = States.DriveToShoot2;
                     }
                     break;
-
-                case 11:
-                    if (robot.isDone()|| pathTimer.seconds() > 3.0) {
+                case DriveToShoot2:
+                    if (robot.isDone() || stateTimer.milliseconds() > 3000) {
                         robot.drive.setMaxPower(1);
                         robot.drive.followPath(shootFromSpike2, true);
-                        pathTimer.reset();
-                        state = 12;
+                        stateTimer.reset();
+                        state = States.ResetForShoot2;
                     }
                     break;
-
-                case 12:
-                    if (robot.isDone()|| pathTimer.seconds() > 3.0) {
-                        robot.intake.motorIntake.setPower(-0.7);
-                        actionTimer.reset();
-                        state = 13;
-                    }
-                    break;
-
-                case 13:
-                    if (actionTimer.milliseconds() >= 250) {
+                case ResetForShoot2:
+                    if (robot.isDone() || stateTimer.milliseconds() > 3000) {
                         robot.intake.setAction(Intake.IntakeActions.Wait);
-                        robot.shooter.setTargetVelocity(3.5);
-                        actionTimer.reset();
-                        state = 14;
+                        robot.shooter.setTargetVelocity(velocity);
+                        stateTimer.reset();
+                        cycles = 0;
+                        shootingState = 0;
+                        state = States.ShootSequence2;
                     }
                     break;
-
-                case 14:
-                    if (robot.shooter.atTarget() && actionTimer.milliseconds() >= 250) {
+                case ShootSequence2:
+                    if (runShootingSequence()) {
+                        robot.drive.setMaxPower(1);
                         robot.intake.setAction(Intake.IntakeActions.Collect);
-                        actionTimer.reset();
-                        state = 15;
-                    } else if (actionTimer.seconds() > 1.5) {
-                        robot.intake.setAction(Intake.IntakeActions.Collect);
-                        actionTimer.reset();
-                        state = 15;
+                        stateTimer.reset();
+                        state = States.DriveToSpike3;
                     }
                     break;
-
-                case 15:
-                    if (robot.isDone()|| pathTimer.seconds() > 2.0) {
-                        robot.intake.setAction(Intake.IntakeActions.Collect);
-                        robot.drive.setMaxPower(0.5);
+                case DriveToSpike3:
+                    if (stateTimer.milliseconds() >= 100) {
                         robot.drive.followPath(goForSpike3, true);
-                        robot.shooter.setTargetVelocity(-1);
-                        pathTimer.reset();
-                        state = 16;
+                        robot.shooter.setTargetVelocity(reverseVelocity);
+                        stateTimer.reset();
+                        state = States.CollectSpike3;
                     }
                     break;
-
-                case 16:
-                    if (robot.isDone()|| pathTimer.seconds() > 3.0) {
-                        robot.drive.setMaxPower(1);
+                case CollectSpike3:
+                    if (robot.isDone() || stateTimer.milliseconds() > 3000) {
+                        robot.drive.setMaxPower(0.5);
                         robot.drive.followPath(collectSpike3, true);
-                        pathTimer.reset();
-                        state = 17;
+                        stateTimer.reset();
+                        state = States.DriveToShoot3;
                     }
                     break;
-
-                case 17:
-                    if (robot.isDone()|| pathTimer.seconds() > 3.0) {
-                        robot.drive.followPath(shootFromSpike3, true);
-                        pathTimer.reset();
-                        state = 18;
-                    }
-                    break;
-
-                case 18:
-                    if (robot.isDone()|| pathTimer.seconds() > 3.0) {
-                        robot.intake.motorIntake.setPower(-0.7);
-                        actionTimer.reset();
-                        state = 19;
-                    }
-                    break;
-
-                case 19:
-                    if (actionTimer.milliseconds() >= 250) {
-                        robot.intake.setAction(Intake.IntakeActions.Wait);
-                        robot.shooter.setTargetVelocity(3.5);
-                        actionTimer.reset();
-                        state = 20;
-                    }
-                    break;
-
-                case 20:
-                    if (robot.shooter.atTarget() && actionTimer.milliseconds() >= 250) {
-                        robot.intake.setAction(Intake.IntakeActions.Collect);
-                        actionTimer.reset();
-                        state = 21;
-                    } else if (actionTimer.seconds() > 1.5) {
-                        robot.intake.setAction(Intake.IntakeActions.Collect);
-                        actionTimer.reset();
-                        state = 21;
-                    }
-                    break;
-
-                case 21:
-                    if (robot.isDone()|| pathTimer.seconds() > 2.0) {
+                case DriveToShoot3:
+                    if (robot.isDone() || stateTimer.milliseconds() > 3000) {
                         robot.drive.setMaxPower(1);
+                        robot.drive.followPath(shootFromSpike3, true);
+                        stateTimer.reset();
+                        state = States.ResetForShoot3;
+                    }
+                    break;
+                case ResetForShoot3:
+                    if (robot.isDone() || stateTimer.milliseconds() > 3000) {
+                        robot.intake.setAction(Intake.IntakeActions.Wait);
+                        robot.shooter.setTargetVelocity(velocity);
+                        stateTimer.reset();
+                        cycles = 0;
+                        shootingState = 0;
+                        state = States.ShootSequence3;
+                    }
+                    break;
+                case ShootSequence3:
+                    if (runShootingSequence()) {
+                        robot.drive.setMaxPower(1);
+                        stateTimer.reset();
+                        state = States.DriveToPark;
+                    }
+                    break;
+                case DriveToPark:
+                    if (stateTimer.milliseconds() >= 100) {
                         robot.drive.followPath(goToPark, true);
-                        pathTimer.reset();
-                        state = 22;
+                        robot.shooter.setTargetVelocity(0);
+                        stateTimer.reset();
+                        state = States.Park;
                     }
                     break;
-
-                case 22:
-                    if (robot.isDone()|| pathTimer.seconds() > 3.0) {
+                case Park:
+                    if (robot.isDone() || stateTimer.milliseconds() > 4000) {
                         robot.drive.breakFollowing();
-                        state = 99;
                     }
                     break;
-
-                case 99:
-                    break;
             }
-
-            if(opModeTimer.seconds() > 28 && state != 21 && state != 22 && state != 99) {
-                state = 21;
+            if (opModeTimer.milliseconds() > 27000 && state != States.DriveToPark && state != States.Park) {
+                state = States.DriveToPark;
+                stateTimer.reset();
             }
-
             telemetry.addData("State", state);
-            telemetry.addData("Path Timer", pathTimer.seconds());
-            telemetry.addData("Action Timer", actionTimer.seconds());
+            telemetry.addData("Cycles", cycles);
+            telemetry.addData("Shooter Velocity", robot.shooter.motorUp.getCurrentVelocity());
             telemetry.addData("Robot Pose", robot.drive.getPose());
             telemetry.update();
+            robot.update();
         }
+    }
+
+    public boolean runShootingSequence() {
+        switch (shootingState) {
+            case 0:
+                if (robot.shooter.atTarget() && stateTimer.milliseconds() > 250) {
+                    robot.intake.setAction(Intake.IntakeActions.Collect);
+                    stateTimer.reset();
+                    shootingState = 1;
+                }
+                break;
+            case 1:
+                if (stateTimer.milliseconds() > 1200 || robot.shooter.getVelocityError() >= 0.7) {
+                    robot.intake.setAction(Intake.IntakeActions.Wait);
+                    stateTimer.reset();
+                    shootingState = 0;
+                    cycles++;
+                    if (cycles >= 3) {
+                        return true;
+                    }
+                }
+                break;
+        }
+        return false;
     }
 }
