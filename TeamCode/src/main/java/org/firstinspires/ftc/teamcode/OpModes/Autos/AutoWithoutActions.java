@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
 @Autonomous
-public class AutoBlue extends LinearOpMode {
+public class AutoWithoutActions extends LinearOpMode {
     public Robot robot;
     private int state = 1, cycles = 0;
 
@@ -174,7 +174,7 @@ public class AutoBlue extends LinearOpMode {
                     }
                     break;
                 case 14:
-                    if(timer.milliseconds()>= 300){
+                    if(robot.isDone()){
                         robot.intake.setAction(Intake.IntakeActions.Collect);
                         robot.drive.followPath(goForSpike2, true);
                         robot.shooter.setTargetVelocity(-1);
@@ -182,117 +182,117 @@ public class AutoBlue extends LinearOpMode {
                         state++;
                     }
                     break;
-                case 15:
-                    if(robot.isDone() && timer.milliseconds() >= 250){
-                        robot.drive.followPath(collectSpike2, true);
-                        robot.drive.setMaxPower(0.5);
-                        state++;
-                    }
-                    break;
-                case 16:
-                    if(robot.isDone()){
-                        robot.drive.setMaxPower(1);
-                        robot.drive.followPath(shootFromSpike2, true);
-                        state++;
-                    }
-                    break;
-                case 17:
-                    if(robot.isDone()){
-                        robot.intake.motorIntake.setPower(-0.7);
-                        timer.reset();
-                        state++;
-                    }
-                    break;
-                case 18:
-                    if(timer.milliseconds() >= 250){
-                        robot.intake.setAction(Intake.IntakeActions.Wait);
-                        robot.shooter.setTargetVelocity(3.5);
-                        timer.reset();
-                        state++;
-                        cycles = 0;
-                    }
-                    break;
-                case 19:
-                    if(robot.shooter.atTarget() && timer.milliseconds() >= 250){
-                        robot.intake.setAction(Intake.IntakeActions.Collect);
-                        timer.reset();
-                        state++;
-                        cycles++;
-                        if(cycles == 4){
-                            state = 21;
-                        }
-                    }
-                    break;
-                case 20: //TODO FailSafe
-                    if(timer.milliseconds() >= 1200 || robot.shooter.motorUp.getCurrentVelocity() <= 3){
-                        robot.intake.setAction(Intake.IntakeActions.Wait);
-                        timer.reset();
-                        state = 19;
-                    }
-                    break;
-                case 21:
-                    if(robot.isDone()){
-                        robot.intake.setAction(Intake.IntakeActions.Collect);
-                        robot.drive.setMaxPower(0.5);
-                        robot.drive.followPath(goForSpike3, true);
-                        robot.shooter.setTargetVelocity(-1);
-                        state++;
-                    }
-                    break;
-                case 22:
-                    if(robot.isDone()){
-                        robot.drive.setMaxPower(1);
-                        robot.drive.followPath(collectSpike3, true);
-                        state++;
-                    }
-                    break;
-                case 23:
-                    if(robot.isDone()){
-                        robot.drive.followPath(shootFromSpike3, true);
-                        state++;
-                    }
-                    break;
-                case 24:
-                    if(robot.isDone()){
-                        robot.intake.motorIntake.setPower(-0.7);
-                        timer.reset();
-                        state++;
-                    }
-                    break;
-                case 25:
-                    if(timer.milliseconds() >= 250){
-                        robot.intake.setAction(Intake.IntakeActions.Wait);
-                        robot.shooter.setTargetVelocity(3.5);
-                        timer.reset();
-                        state++;
-                        cycles = 0;
-                    }
-                    break;
-                case 26:
-                    if(robot.shooter.atTarget() && timer.milliseconds() >= 250){
-                        robot.intake.setAction(Intake.IntakeActions.Collect);
-                        timer.reset();
-                        state++;
-                        cycles++;
-                        if(cycles == 4){
-                            state = 28;
-                        }
-                    }
-                    break;
-                case 27: //TODO FailSafe
-                    if(timer.milliseconds() >= 1200 || robot.shooter.getVelocityError() >= 0.7){
-                        robot.intake.setAction(Intake.IntakeActions.Wait);
-                        timer.reset();
-                        state = 26;
-                    }
-                    break;
-                case 28:
-                    if(robot.isDone()){
-                        robot.drive.setMaxPower(1);
-                        robot.drive.followPath(goToPark, true);
-                        state++;
-                    }
-                    break;
+//                case 15:
+//                    if(robot.isDone() && timer.milliseconds() >= 250){
+//                        robot.drive.followPath(collectSpike2, true);
+//                        robot.drive.setMaxPower(0.5);
+//                        state++;
+//                    }
+//                    break;
+//                case 16:
+//                    if(robot.isDone()){
+//                        robot.drive.setMaxPower(1);
+//                        robot.drive.followPath(shootFromSpike2, true);
+//                        state++;
+//                    }
+//                    break;
+//                case 17:
+//                    if(robot.isDone()){
+//                        robot.intake.motorIntake.setPower(-0.7);
+//                        timer.reset();
+//                        state++;
+//                    }
+//                    break;
+//                case 18:
+//                    if(timer.milliseconds() >= 250){
+//                        robot.intake.setAction(Intake.IntakeActions.Wait);
+//                        robot.shooter.setTargetVelocity(3.5);
+//                        timer.reset();
+//                        state++;
+//                        cycles = 0;
+//                    }
+//                    break;
+//                case 19:
+//                    if(robot.shooter.atTarget() && timer.milliseconds() >= 250){
+//                        robot.intake.setAction(Intake.IntakeActions.Collect);
+//                        timer.reset();
+//                        state++;
+//                        cycles++;
+//                        if(cycles == 4){
+//                            state = 21;
+//                        }
+//                    }
+//                    break;
+//                case 20: //TODO FailSafe
+//                    if(timer.milliseconds() >= 1200 || robot.shooter.motorUp.getCurrentVelocity() <= 3){
+//                        robot.intake.setAction(Intake.IntakeActions.Wait);
+//                        timer.reset();
+//                        state = 19;
+//                    }
+//                    break;
+//                case 21:
+//                    if(robot.isDone()){
+//                        robot.intake.setAction(Intake.IntakeActions.Collect);
+//                        robot.drive.setMaxPower(0.5);
+//                        robot.drive.followPath(goForSpike3, true);
+//                        robot.shooter.setTargetVelocity(-1);
+//                        state++;
+//                    }
+//                    break;
+//                case 22:
+//                    if(robot.isDone()){
+//                        robot.drive.setMaxPower(1);
+//                        robot.drive.followPath(collectSpike3, true);
+//                        state++;
+//                    }
+//                    break;
+//                case 23:
+//                    if(robot.isDone()){
+//                        robot.drive.followPath(shootFromSpike3, true);
+//                        state++;
+//                    }
+//                    break;
+//                case 24:
+//                    if(robot.isDone()){
+//                        robot.intake.motorIntake.setPower(-0.7);
+//                        timer.reset();
+//                        state++;
+//                    }
+//                    break;
+//                case 25:
+//                    if(timer.milliseconds() >= 250){
+//                        robot.intake.setAction(Intake.IntakeActions.Wait);
+//                        robot.shooter.setTargetVelocity(3.5);
+//                        timer.reset();
+//                        state++;
+//                        cycles = 0;
+//                    }
+//                    break;
+//                case 26:
+//                    if(robot.shooter.atTarget() && timer.milliseconds() >= 250){
+//                        robot.intake.setAction(Intake.IntakeActions.Collect);
+//                        timer.reset();
+//                        state++;
+//                        cycles++;
+//                        if(cycles == 4){
+//                            state = 28;
+//                        }
+//                    }
+//                    break;
+//                case 27: //TODO FailSafe
+//                    if(timer.milliseconds() >= 1200 || robot.shooter.getVelocityError() >= 0.7){
+//                        robot.intake.setAction(Intake.IntakeActions.Wait);
+//                        timer.reset();
+//                        state = 26;
+//                    }
+//                    break;
+//                case 28:
+//                    if(robot.isDone()){
+//                        robot.drive.setMaxPower(1);
+//                        robot.drive.followPath(goToPark, true);
+//                        state++;
+//                    }
+//                    break;
 
             }
             telemetry.addData("state", state);

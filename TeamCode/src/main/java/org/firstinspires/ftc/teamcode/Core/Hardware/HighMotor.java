@@ -459,6 +459,9 @@ public class HighMotor {
     public boolean atTarget() {
         return Math.abs(target - currentPosition) <= tolerance;
     }
+    public boolean atTargetVelocity(){
+        return pidfController.atSetPoint();
+    }
 
     /**
      *
@@ -477,7 +480,7 @@ public class HighMotor {
         this.tolerance = tolerance;
         pidfController.setTolerance(tolerance);
         squidController.setTolerance(tolerance);
-        pidfVelocity.setTolerance(tolerance,tolerance);
+        pidfVelocity.setTolerance((tolerance/wheelDiameter)*encoderResolution,(tolerance/wheelDiameter)*encoderResolution);
     }
 
     /**

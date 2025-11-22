@@ -15,7 +15,8 @@ public class Shooter extends HighModule {
     public HighMotor motorUp , motorDown;
     public BlockerOuttake blocker;
     public double velocity;
-    public static double kp = 0.002 , kd = 0.00002,ki = 0.002,kf = 0.00010;
+    public static double kp = 0.0007, kd = 5e-8,ki = 0.005,kf = 0.00022;
+    public static double encoderResolution=28;
 
     public Shooter(HardwareMap hwMap){
         motorUp = HighMotor.Builder.startBuilding()
@@ -47,7 +48,9 @@ public class Shooter extends HighModule {
     public boolean atTarget(){
         return Math.abs(motorUp.getTarget() - motorUp.getCurrentVelocity()) <= motorUp.getTolerance();
     }
-
+    public double getVelocityError(){
+        return Math.abs(motorUp.getTarget() - motorUp.getCurrentVelocity());
+    }
     @Override
     public void update() {
 

@@ -124,8 +124,7 @@ public class VelocityPID {
      * @return Whether the error is within the acceptable bounds.
      */
     public boolean atSetPoint() {
-        return Math.abs(getPositionError()) <= errorTolerance_p &&
-                Math.abs(getVelocityError()) <= errorTolerance_v;
+        return Math.abs(getVelocityError()) <= errorTolerance_v;
     }
 
     /**

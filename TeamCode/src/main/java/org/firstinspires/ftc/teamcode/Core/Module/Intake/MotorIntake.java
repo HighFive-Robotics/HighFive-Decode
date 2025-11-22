@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighMotor;
 public class MotorIntake extends HighModule {
 
     public static double powerWait = 0, powerCollect = 1, powerSpit = -1, powerTransfer = 1;
-    HighMotor motor, inactiveMotor;
+    public HighMotor motor, inactiveMotor;
 
     public enum States {
         Collect,

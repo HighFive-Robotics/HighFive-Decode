@@ -12,6 +12,7 @@ public class Intake extends HighModule {
 
     public enum IntakeActions{
         Collect,
+        CollectLowPower,
         Spit,
         Transfer,
         Wait,
@@ -42,6 +43,9 @@ public class Intake extends HighModule {
                 motorIntake.setState(MotorIntake.States.Wait);
                 motorIntake.disable();
                 joint.setState(Joint.States.Park);
+                break;
+            case CollectLowPower:
+                motorIntake.setPower(0.7);
                 break;
         }
     }
