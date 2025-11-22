@@ -107,7 +107,7 @@ public class AutoBlue extends LinearOpMode {
                     }
                     break;
                 case 6: //TODO FailSafe
-                    if(timer.milliseconds() >= 300){
+                    if(timer.milliseconds() >= 600 || robot.shooter.motorUp.getCurrentVelocity() <= 3){
                         robot.intake.setAction(Intake.IntakeActions.Wait);
                         timer.reset();
                         state = 5;
@@ -163,7 +163,7 @@ public class AutoBlue extends LinearOpMode {
                     }
                     break;
                 case 13: //TODO FailSafe
-                    if(timer.milliseconds() >= 300){
+                    if(timer.milliseconds() >= 600 || robot.shooter.motorUp.getCurrentVelocity() <= 3){
                         robot.intake.setAction(Intake.IntakeActions.Wait);
                         timer.reset();
                         state = 12;
@@ -219,7 +219,7 @@ public class AutoBlue extends LinearOpMode {
                     }
                     break;
                 case 20: //TODO FailSafe
-                    if(timer.milliseconds() >= 300){
+                    if(timer.milliseconds() >= 600 || robot.shooter.motorUp.getCurrentVelocity() <= 3){
                         robot.intake.setAction(Intake.IntakeActions.Wait);
                         timer.reset();
                         state = 19;
@@ -275,7 +275,7 @@ public class AutoBlue extends LinearOpMode {
                     }
                     break;
                 case 27: //TODO FailSafe
-                    if(timer.milliseconds() >= 550){
+                    if(timer.milliseconds() >= 600 || robot.shooter.motorUp.getCurrentVelocity() <= 3){
                         robot.intake.setAction(Intake.IntakeActions.Wait);
                         timer.reset();
                         state = 26;
