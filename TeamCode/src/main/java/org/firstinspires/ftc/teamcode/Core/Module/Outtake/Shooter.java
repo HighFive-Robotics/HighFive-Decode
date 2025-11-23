@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighMotor;
 public class Shooter extends HighModule {
     public HighMotor motorUp , motorDown;
     public BlockerOuttake blocker;
-    public double velocity;
+    public double velocity, tolerance;
     public static double kp = 0.0007, kd = 5e-8,ki = 0.005,kf = 0.00022;
     public static double encoderResolution=28;
 
@@ -38,22 +38,24 @@ public class Shooter extends HighModule {
                 .setUseZeroPowerBehaviour(false)
                 .build();
         blocker = new BlockerOuttake(hwMap,blocker.ClosedPosition,true);
+        tolerance = motorUp.getTolerance();
     }
 
     public void setTargetVelocity(double velocity){
+        this.target = velocity;
         motorUp.setTarget(velocity);
     }
 
     @Override
     public boolean atTarget(){
-        return Math.abs(motorUp.getTarget() - motorUp.getCurrentVelocity()) <= motorUp.getTolerance();
+        return Math.abs(target- velocity) <= tolerance;
     }
     public double getVelocityError(){
-        return Math.abs(motorUp.getTarget() - motorUp.getCurrentVelocity());
+        return Math.abs(target - velocity);
     }
     @Override
     public void update() {
-
+        velocity = motorUp.getCurrentVelocity();
         motorUp.update();
         motorUp.setVelocityPIDCoefficients(kp,ki,kd,kf);
         //motorUp.setTarget(motorUp.getPower());

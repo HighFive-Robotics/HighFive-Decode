@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.OpModes.Autos;
 
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
-import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -12,8 +11,8 @@ import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
-@Autonomous
-public class AutoIDK extends LinearOpMode {
+@Autonomous(name = "AutoRedClose BAMBAM")
+public class AutoRedClose extends LinearOpMode {
     private enum States {
         DriveToPreload,
         ResetForShootPreload,
@@ -34,7 +33,7 @@ public class AutoIDK extends LinearOpMode {
         ResetForShoot3,
         ShootSequence3,
         DriveToPark,
-        DriveToAux, Park
+        Park
     }
 
     public Robot robot;
@@ -44,11 +43,10 @@ public class AutoIDK extends LinearOpMode {
 
     public Pose startPose = new Pose(16, 112, Math.toRadians(0));
     private final Pose shootPose = new Pose(45, 102.5, Math.toRadians(-42));
-    private final Pose spike1Pose = new Pose(55, 83.5, Math.toRadians(180));
-    private final Pose collect1Pose = new Pose(22, 83.5, Math.toRadians(180));
+    private final Pose spike1Pose = new Pose(55, 85, Math.toRadians(180));
+    private final Pose collect1Pose = new Pose(22, 85, Math.toRadians(180));
     private final Pose spike2Pose = new Pose(55, 58, Math.toRadians(180));
     private final Pose collect2Pose = new Pose(12, 58, Math.toRadians(180));
-    private final Pose auxPose = new Pose(17 ,58 , Math.toRadians(180));
     private final Pose spike3Pose = new Pose(55, 35, Math.toRadians(180));
     private final Pose collect3Pose = new Pose(12, 35, Math.toRadians(180));
 
@@ -62,15 +60,14 @@ public class AutoIDK extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         robot = new Robot(hardwareMap, startPose, true, Constants.Color.Blue, telemetry, gamepad1);
-
         PathChain preloadPath = robot.drive.pathBuilder()
-                .addPath(new BezierLine(startPose, new Pose(45, 102.5, Math.toRadians(-38))))
-                .setLinearHeadingInterpolation(startPose.getHeading(), Math.toRadians(-38))
+                .addPath(new BezierLine(startPose, shootPose))
+                .setLinearHeadingInterpolation(startPose.getHeading(), shootPose.getHeading())
                 .build();
 
         PathChain goForSpike1 = robot.drive.pathBuilder()
                 .addPath(new BezierLine(shootPose, spike1Pose))
-                .setLinearHeadingInterpolation(-38, spike1Pose.getHeading())
+                .setLinearHeadingInterpolation(shootPose.getHeading(), spike1Pose.getHeading())
                 .build();
 
         PathChain collectSpike1 = robot.drive.pathBuilder()
@@ -92,15 +89,11 @@ public class AutoIDK extends LinearOpMode {
                 .addPath(new BezierLine(spike2Pose, collect2Pose))
                 .setLinearHeadingInterpolation(spike2Pose.getHeading(), collect2Pose.getHeading())
                 .build();
-        PathChain goToAux = robot.drive.pathBuilder()
-                .addPath(new BezierLine(collect2Pose , auxPose))
-                .setConstantHeadingInterpolation(collect2Pose.getHeading())
-                .build();
-        PathChain shootFromSpike2 = robot.drive.pathBuilder()
-                .addPath(new BezierLine(auxPose, shootPose))
-                .setLinearHeadingInterpolation(auxPose.getHeading(), shootPose.getHeading())
-                .build();
 
+        PathChain shootFromSpike2 = robot.drive.pathBuilder()
+                .addPath(new BezierLine(collect2Pose, shootPose))
+                .setLinearHeadingInterpolation(collect2Pose.getHeading(), shootPose.getHeading())
+                .build();
 
         PathChain goForSpike3 = robot.drive.pathBuilder()
                 .addPath(new BezierLine(shootPose, spike3Pose))
@@ -124,6 +117,7 @@ public class AutoIDK extends LinearOpMode {
 
         telemetry.addLine("Ready");
         telemetry.update();
+
         waitForStart();
         opModeTimer.reset();
         stateTimer.reset();
@@ -132,7 +126,6 @@ public class AutoIDK extends LinearOpMode {
         while (opModeIsActive()) {
             switch (state) {
                 case DriveToPreload:
-                    robot.drive.setMaxPower(0.8);
                     robot.drive.followPath(preloadPath, true);
                     robot.shooter.setTargetVelocity(velocity);
                     stateTimer.reset();
@@ -140,7 +133,6 @@ public class AutoIDK extends LinearOpMode {
                     break;
                 case ResetForShootPreload:
                     if (robot.isDone() || stateTimer.milliseconds() > 5000) {
-                        robot.drive.setMaxPower(1);
                         robot.intake.setAction(Intake.IntakeActions.Wait);
                         stateTimer.reset();
                         actionTimer.reset();
@@ -219,17 +211,12 @@ public class AutoIDK extends LinearOpMode {
                         robot.drive.setMaxPower(0.5);
                         robot.drive.followPath(collectSpike2, true);
                         stateTimer.reset();
-                        state = States.DriveToAux;
-                    }
-                    break;
-                case DriveToAux:
-                    if(robot.isDone()){
-                        robot.drive.setMaxPower(1);
-                        robot.drive.followPath(goToAux, false);
                         state = States.DriveToShoot2;
                     }
+                    break;
                 case DriveToShoot2:
                     if (robot.isDone() || stateTimer.milliseconds() > 5000) {
+                        robot.drive.setMaxPower(1);
                         robot.drive.followPath(shootFromSpike2, true);
                         stateTimer.reset();
                         state = States.ResetForShoot2;
