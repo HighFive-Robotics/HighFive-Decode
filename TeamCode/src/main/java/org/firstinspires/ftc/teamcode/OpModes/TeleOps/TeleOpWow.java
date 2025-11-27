@@ -26,7 +26,7 @@ public class TeleOpWow extends LinearOpMode {
     public static double littleVelo = 4 , bigVelo = 7.5 , negativeVelo = -2;
 
 
-    public boolean intakeDriver2 = false;
+    public boolean intakeDriver2 = false, rumbled = false;
     Robot robot;
 
     public HashMap<String , ElapsedTime> timers = new HashMap<>();
@@ -40,6 +40,7 @@ public class TeleOpWow extends LinearOpMode {
         timers.put("leftStick1" , new ElapsedTime());
         timers.put("rightStick1" , new ElapsedTime());
         timers.put("rightBumper1" , new ElapsedTime());
+        timers.put("leftBumper1" , new ElapsedTime());
         timers.put("rightBumper2" , new ElapsedTime());
         timers.put("leftBumper2" , new ElapsedTime());
         timers.put("leftTrigger2" , new ElapsedTime());
@@ -48,10 +49,12 @@ public class TeleOpWow extends LinearOpMode {
         timers.put("circle2" , new ElapsedTime());
         timers.put("cross2" , new ElapsedTime());
         timers.put("triangle2" , new ElapsedTime());
+        timers.put("rumble" , new ElapsedTime());
 
         timers.get("leftStick1").reset();
         timers.get("rightStick1").reset();
         timers.get("rightBumper1").reset();
+        timers.get("leftBumper1").reset();
         timers.get("rightBumper2").reset();
         timers.get("leftBumper2").reset();
         timers.get("leftTrigger2").reset();
@@ -60,6 +63,7 @@ public class TeleOpWow extends LinearOpMode {
         timers.get("cross2").reset();
         timers.get("square2").reset();
         timers.get("triangle2").reset();
+        timers.get("rumble").reset();
 
         graph = FtcDashboard.getInstance().getTelemetry();
         waitForStart();
@@ -72,6 +76,11 @@ public class TeleOpWow extends LinearOpMode {
                 robot.intake.setAction(Intake.IntakeActions.Collect);
             } else if(!intakeDriver2) {
                 robot.intake.setAction(Intake.IntakeActions.Wait);
+            }
+
+            if(gamepad1.left_bumper && timers.get("leftBumper1").milliseconds() >= 250){
+                robot.setAction(Robot.Actions.PrepareForShooting);
+                timers.get("leftBumper1").reset();
             }
 
             if(gamepad1.right_bumper && timers.get("rightBumper1").milliseconds() >= 250){
@@ -97,8 +106,10 @@ public class TeleOpWow extends LinearOpMode {
 
             if(gamepad2.right_bumper && timers.get("rightBumper2").milliseconds() >= 250){
                 intakeDriver2 = true;
-                robot.intake.motorIntake.setState(MotorIntake.States.Transfer);
+                robot.setAction(Robot.Actions.Shoot);
                 timers.get("rightBumper2").reset();
+                timers.get("rumble").reset();
+                rumbled = true;
             }
 
             if(gamepad2.left_bumper && timers.get("leftBumper2").milliseconds() >= 250){
@@ -127,13 +138,26 @@ public class TeleOpWow extends LinearOpMode {
             if(gamepad2.cross && timers.get("cross2").milliseconds() >= 250){
                 robot.shooter.setTargetVelocity(littleVelo);
                 timers.get("cross2").reset();
+                timers.get("rumble").reset();
+                rumbled = true;
             }
             if(gamepad2.triangle && timers.get("triangle2").milliseconds() >= 250){
                 robot.shooter.setTargetVelocity(bigVelo);
                 timers.get("triangle2").reset();
+                timers.get("rumble").reset();
+                rumbled = true;
             }
             if(gamepad1.ps){
                 robot.drive.resetTeleOpHeading();
+            }
+
+            if(robot.intake.getLastAction() == Intake.IntakeActions.Wait){
+                intakeDriver2 = false;
+            }
+
+            if(robot.shooter.atTarget() && robot.shooter.getTarget() >= 2 && rumbled && timers.get("rumble").milliseconds() >= 500){
+                gamepad2.rumble(200);
+                rumbled = false;
             }
 
             telemetry.addData("State intake:" , robot.intake.motorIntake.getState());
@@ -146,6 +170,10 @@ public class TeleOpWow extends LinearOpMode {
             telemetry.addData("Current Velo" , robot.shooter.motorUp.getCurrentVelocity());
             graph.addData("Current Velo From Current" , robot.shooter.motorUp.getVelocityFromCurrent(Constants.Globals.voltage));
             telemetry.addData("Current Velo From Current" , robot.shooter.motorUp.getVelocityFromCurrent(Constants.Globals.voltage));
+            telemetry.addData("Rumble" , rumbled);
+            telemetry.addData("target > 2" , robot.shooter.getTarget() > 2);
+            telemetry.addData("at target" , robot.shooter.atTarget() );
+            telemetry.addData("rumbled" , timers.get("rumble").milliseconds());
             telemetry.update();
             graph.update();
             robot.update();

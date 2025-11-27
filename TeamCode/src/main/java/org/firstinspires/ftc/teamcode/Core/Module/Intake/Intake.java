@@ -10,6 +10,8 @@ public class Intake extends HighModule {
     public Joint joint;
     public Sorter sorter;
 
+    IntakeActions action;
+
     public enum IntakeActions{
         Collect,
         CollectLowPower,
@@ -29,6 +31,7 @@ public class Intake extends HighModule {
         sorter = new Sorter(hwMap, Sorter.Position, true);
     }
     public void setAction(IntakeActions action){
+        this.action = action;
         switch (action){
             case Collect:
                 motorIntake.setState(MotorIntake.States.Collect);
@@ -49,6 +52,11 @@ public class Intake extends HighModule {
                 break;
         }
     }
+
+    public IntakeActions getLastAction(){
+        return action;
+    }
+
     @Override
     public void update() {
         motorIntake.update();

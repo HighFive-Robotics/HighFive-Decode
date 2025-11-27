@@ -53,6 +53,11 @@ public class Shooter extends HighModule {
     public double getVelocityError(){
         return Math.abs(target - velocity);
     }
+
+    @Override
+    public double getTarget(){
+        return target;
+    }
     @Override
     public void update() {
         velocity = motorUp.getCurrentVelocity();

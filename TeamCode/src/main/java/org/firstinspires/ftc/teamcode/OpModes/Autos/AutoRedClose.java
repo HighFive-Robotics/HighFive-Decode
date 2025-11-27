@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
-@Autonomous(name = "AutoRedClose BAMBAM")
+@Autonomous(name = "🔴🔝AutoBlueClose🔝🔴")
 public class AutoRedClose extends LinearOpMode {
     private enum States {
         DriveToPreload,
@@ -33,7 +33,7 @@ public class AutoRedClose extends LinearOpMode {
         ResetForShoot3,
         ShootSequence3,
         DriveToPark,
-        Park
+        DriveToAux, Park
     }
 
     public Robot robot;
@@ -41,14 +41,16 @@ public class AutoRedClose extends LinearOpMode {
     private int cycles = 0;
     private int shootingState = 0;
 
-    public Pose startPose = new Pose(16, 112, Math.toRadians(0));
-    private final Pose shootPose = new Pose(45, 102.5, Math.toRadians(-42));
-    private final Pose spike1Pose = new Pose(55, 85, Math.toRadians(180));
-    private final Pose collect1Pose = new Pose(22, 85, Math.toRadians(180));
-    private final Pose spike2Pose = new Pose(55, 58, Math.toRadians(180));
-    private final Pose collect2Pose = new Pose(12, 58, Math.toRadians(180));
-    private final Pose spike3Pose = new Pose(55, 35, Math.toRadians(180));
-    private final Pose collect3Pose = new Pose(12, 35, Math.toRadians(180));
+    public Pose startPose = new Pose(16, 112, Math.toRadians(0)).mirror();
+    private final Pose shootPose = new Pose(45, 102.5, Math.toRadians(-42)).mirror();
+    private final Pose shootPosePreload = new Pose(45, 102.5, Math.toRadians(-38)).mirror();
+    private final Pose spike1Pose = new Pose(55, 83.5, Math.toRadians(180)).mirror();
+    private final Pose collect1Pose = new Pose(22, 83.5, Math.toRadians(180)).mirror();
+    private final Pose spike2Pose = new Pose(55, 55, Math.toRadians(180)).mirror();
+    private final Pose collect2Pose = new Pose(12, 55, Math.toRadians(180)).mirror();
+    private final Pose auxPose = new Pose(24 ,55 , Math.toRadians(180)).mirror();
+    private final Pose spike3Pose = new Pose(55, 34, Math.toRadians(180)).mirror();
+    private final Pose collect3Pose = new Pose(12, 34, Math.toRadians(180)).mirror();
 
     private final ElapsedTime opModeTimer = new ElapsedTime();
     private final ElapsedTime stateTimer = new ElapsedTime();
@@ -60,14 +62,15 @@ public class AutoRedClose extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         robot = new Robot(hardwareMap, startPose, true, Constants.Color.Blue, telemetry, gamepad1);
+
         PathChain preloadPath = robot.drive.pathBuilder()
-                .addPath(new BezierLine(startPose, shootPose))
-                .setLinearHeadingInterpolation(startPose.getHeading(), shootPose.getHeading())
+                .addPath(new BezierLine(startPose, shootPosePreload))
+                .setLinearHeadingInterpolation(startPose.getHeading(), shootPosePreload.getHeading())
                 .build();
 
         PathChain goForSpike1 = robot.drive.pathBuilder()
                 .addPath(new BezierLine(shootPose, spike1Pose))
-                .setLinearHeadingInterpolation(shootPose.getHeading(), spike1Pose.getHeading())
+                .setLinearHeadingInterpolation(shootPosePreload.getHeading(), spike1Pose.getHeading())
                 .build();
 
         PathChain collectSpike1 = robot.drive.pathBuilder()
@@ -89,11 +92,15 @@ public class AutoRedClose extends LinearOpMode {
                 .addPath(new BezierLine(spike2Pose, collect2Pose))
                 .setLinearHeadingInterpolation(spike2Pose.getHeading(), collect2Pose.getHeading())
                 .build();
-
-        PathChain shootFromSpike2 = robot.drive.pathBuilder()
-                .addPath(new BezierLine(collect2Pose, shootPose))
-                .setLinearHeadingInterpolation(collect2Pose.getHeading(), shootPose.getHeading())
+        PathChain goToAux = robot.drive.pathBuilder()
+                .addPath(new BezierLine(collect2Pose , auxPose))
+                .setConstantHeadingInterpolation(collect2Pose.getHeading())
                 .build();
+        PathChain shootFromSpike2 = robot.drive.pathBuilder()
+                .addPath(new BezierLine(auxPose, shootPose))
+                .setLinearHeadingInterpolation(auxPose.getHeading(), shootPose.getHeading())
+                .build();
+
 
         PathChain goForSpike3 = robot.drive.pathBuilder()
                 .addPath(new BezierLine(shootPose, spike3Pose))
@@ -117,7 +124,6 @@ public class AutoRedClose extends LinearOpMode {
 
         telemetry.addLine("Ready");
         telemetry.update();
-
         waitForStart();
         opModeTimer.reset();
         stateTimer.reset();
@@ -126,6 +132,7 @@ public class AutoRedClose extends LinearOpMode {
         while (opModeIsActive()) {
             switch (state) {
                 case DriveToPreload:
+                    robot.drive.setMaxPower(0.8);
                     robot.drive.followPath(preloadPath, true);
                     robot.shooter.setTargetVelocity(velocity);
                     stateTimer.reset();
@@ -133,6 +140,7 @@ public class AutoRedClose extends LinearOpMode {
                     break;
                 case ResetForShootPreload:
                     if (robot.isDone() || stateTimer.milliseconds() > 5000) {
+                        robot.drive.setMaxPower(1);
                         robot.intake.setAction(Intake.IntakeActions.Wait);
                         stateTimer.reset();
                         actionTimer.reset();
@@ -211,12 +219,17 @@ public class AutoRedClose extends LinearOpMode {
                         robot.drive.setMaxPower(0.5);
                         robot.drive.followPath(collectSpike2, true);
                         stateTimer.reset();
-                        state = States.DriveToShoot2;
+                        state = States.DriveToAux;
                     }
                     break;
+                case DriveToAux:
+                    if(robot.isDone()){
+                        robot.drive.setMaxPower(1);
+                        robot.drive.followPath(goToAux, false);
+                        state = States.DriveToShoot2;
+                    }
                 case DriveToShoot2:
                     if (robot.isDone() || stateTimer.milliseconds() > 5000) {
-                        robot.drive.setMaxPower(1);
                         robot.drive.followPath(shootFromSpike2, true);
                         stateTimer.reset();
                         state = States.ResetForShoot2;

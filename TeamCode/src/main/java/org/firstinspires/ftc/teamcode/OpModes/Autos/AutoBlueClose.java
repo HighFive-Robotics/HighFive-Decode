@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.OpModes.Autos;
 
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
-import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -12,8 +11,8 @@ import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
-@Autonomous
-public class AutoIDK extends LinearOpMode {
+@Autonomous(name = "🔵🔝AutoBlueClose🔝🔵")
+public class AutoBlueClose extends LinearOpMode {
     private enum States {
         DriveToPreload,
         ResetForShootPreload,
@@ -44,6 +43,7 @@ public class AutoIDK extends LinearOpMode {
 
     public Pose startPose = new Pose(16, 112, Math.toRadians(0));
     private final Pose shootPose = new Pose(45, 102.5, Math.toRadians(-42));
+    private final Pose shootPosePreload = new Pose(45, 102.5, Math.toRadians(-38));
     private final Pose spike1Pose = new Pose(55, 83.5, Math.toRadians(180));
     private final Pose collect1Pose = new Pose(22, 83.5, Math.toRadians(180));
     private final Pose spike2Pose = new Pose(55, 58, Math.toRadians(180));
@@ -64,13 +64,12 @@ public class AutoIDK extends LinearOpMode {
         robot = new Robot(hardwareMap, startPose, true, Constants.Color.Blue, telemetry, gamepad1);
 
         PathChain preloadPath = robot.drive.pathBuilder()
-                .addPath(new BezierLine(startPose, new Pose(45, 102.5, Math.toRadians(-38))))
-                .setLinearHeadingInterpolation(startPose.getHeading(), Math.toRadians(-38))
+                .addPath(new BezierLine(startPose, shootPosePreload))
+                .setLinearHeadingInterpolation(startPose.getHeading(), shootPosePreload.getHeading())
                 .build();
-
         PathChain goForSpike1 = robot.drive.pathBuilder()
                 .addPath(new BezierLine(shootPose, spike1Pose))
-                .setLinearHeadingInterpolation(-38, spike1Pose.getHeading())
+                .setLinearHeadingInterpolation(shootPosePreload.getHeading(), spike1Pose.getHeading())
                 .build();
 
         PathChain collectSpike1 = robot.drive.pathBuilder()

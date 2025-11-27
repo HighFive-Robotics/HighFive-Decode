@@ -11,7 +11,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighModule;
-import org.firstinspires.ftc.teamcode.Core.Module.Camera.Camera;
 import org.firstinspires.ftc.teamcode.Core.Module.Others.Drive;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
 import org.firstinspires.ftc.teamcode.Core.Module.Others.Lift;
@@ -20,6 +19,8 @@ import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Shooter;
 import java.util.List;
 
 public class Robot extends HighModule {
+
+    ElapsedTime timerShoot = new ElapsedTime(), timerIntake = new ElapsedTime();
 
     Telemetry telemetry;
     public Actions lastAction = Actions.None;
@@ -36,8 +37,12 @@ public class Robot extends HighModule {
     public Lift lift;
 
     boolean isAuto;
+    boolean stopShoot = false, stopIntake = false;
 
     public enum Actions {
+        Shoot,
+        PrepareForShooting,
+
         WaitToBeFedUp,
         ColorGreen,//Doesn't work
         ColorPurple,//Doesn't work
@@ -84,7 +89,21 @@ public class Robot extends HighModule {
 
     }
 
-    ElapsedTime failSafeTimer = new ElapsedTime();
+    public void setAction(Actions action){
+        lastAction = action;
+        switch (action){
+            case Shoot:
+                intake.setAction(Intake.IntakeActions.Collect);
+                stopShoot = true;
+                timerShoot.reset();
+                break;
+            case PrepareForShooting:
+                intake.motorIntake.setPower(-0.7);
+                stopIntake = true;
+                timerIntake.reset();
+                break;
+        }
+    }
 
     public boolean isDone() {
         return !drive.isBusy();
@@ -93,6 +112,17 @@ public class Robot extends HighModule {
     @Override
     public void update() {
         Constants.Globals.voltage = hardwareMap.voltageSensor.iterator().next().getVoltage();
+
+        if(stopShoot && (timerShoot.milliseconds() > 1200 || shooter.getVelocityError() >= 0.7)){
+            stopShoot = false;
+            intake.setAction(Intake.IntakeActions.Wait);
+        }
+
+        if(stopIntake && timerIntake.milliseconds() >= 450){
+            stopIntake = false;
+            intake.setAction(Intake.IntakeActions.Wait);
+        }
+
         shooter.update();
         intake.update();
         lift.update();
