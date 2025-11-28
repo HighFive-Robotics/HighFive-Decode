@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Core;
 
+import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
+
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -58,7 +60,11 @@ public class Robot extends HighModule {
             drive.setStartingPose(startPose);
             //camera = new Camera(hardwareMap);
         } else {
-            drive.startFieldCentricDrive(gamepad,true,0);
+            if(autoColor == Constants.Color.Blue) {
+                drive.startFieldCentricDrive(gamepad, true, Math.PI + startPose.getHeading());
+            } else {
+                drive.startFieldCentricDrive(gamepad, true, startPose.getHeading());
+            }
         }
         lift = new Lift(hardwareMap);
         shooter = new Shooter(hardwareMap);

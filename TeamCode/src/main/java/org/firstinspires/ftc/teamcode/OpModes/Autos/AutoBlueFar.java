@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.OpModes.Autos;
 
+import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
+import static org.firstinspires.ftc.teamcode.Constants.Globals.finalAutoPose;
+
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
@@ -32,7 +35,7 @@ public class AutoBlueFar extends LinearOpMode {
         DriveToShoot3,
         ResetForShoot3,
         ShootSequence3,
-        DriveToPark,
+        CollectArtefacts,
         DriveToAux, Park
     }
 
@@ -41,33 +44,38 @@ public class AutoBlueFar extends LinearOpMode {
     private int cycles = 0;
     private int shootingState = 0;
 
-    public Pose startPose = new Pose(65, 12, Math.toRadians(-90));
-    private final Pose shootPose = new Pose(62, 22, Math.toRadians(-63.5));
-
-    private final Pose collect1Pose = new Pose(20, 40, Math.toRadians(180));
+    public Pose startPose = new Pose(60, 8, Math.toRadians(90));
+    private final Pose shootPose = new Pose(58, 100, Math.toRadians(-30));
+    private final Pose preCollect1Pose = new Pose(40, 60, Math.toRadians(-90));
+   // private final Pose collect1Pose = new Pose(20, 22.5, Math.toRadians(-45));
 
     private final ElapsedTime opModeTimer = new ElapsedTime();
     private final ElapsedTime stateTimer = new ElapsedTime();
     private final ElapsedTime actionTimer = new ElapsedTime();
 
-    private final double velocity = 5.5;
+    private final double velocity = 3.6;
     private final double reverseVelocity = -1;
 
     @Override
     public void runOpMode() throws InterruptedException {
         robot = new Robot(hardwareMap, startPose, true, Constants.Color.Blue, telemetry, gamepad1);
+        autoColor = Constants.Color.Blue;
+        robot.drive.resetTeleOpHeading();
+        robot.drive.setConstants(Constants.FConstants);
+
         PathChain preloadPath = robot.drive.pathBuilder()
                 .addPath(new BezierLine(startPose, shootPose))
                 .setLinearHeadingInterpolation(startPose.getHeading(), shootPose.getHeading())
                 .build();
-        PathChain goToPark = robot.drive.pathBuilder()
-                .addPath(new BezierLine(shootPose, collect1Pose))
-                .setLinearHeadingInterpolation(shootPose.getHeading(), collect1Pose.getHeading())
+        PathChain goToCollect = robot.drive.pathBuilder()
+                .addPath(new BezierLine(shootPose, preCollect1Pose))
+                .setLinearHeadingInterpolation(shootPose.getHeading(), preCollect1Pose.getHeading())
                 .build();
 
         telemetry.addLine("Ready");
         telemetry.update();
         waitForStart();
+        robot.shooter.setTargetVelocity(reverseVelocity);
         opModeTimer.reset();
         stateTimer.reset();
         actionTimer.reset();
@@ -75,16 +83,19 @@ public class AutoBlueFar extends LinearOpMode {
         while (opModeIsActive()) {
             switch (state) {
                 case DriveToPreload:
-                    robot.drive.setMaxPower(0.5);
-                    robot.drive.followPath(preloadPath, true);
-                    robot.shooter.setTargetVelocity(velocity);
-                    stateTimer.reset();
-                    state = States.ResetForShootPreload;
+                    if(stateTimer.milliseconds() >= 300){
+                        robot.drive.followPath(preloadPath, true);
+                        stateTimer.reset();
+                        state = States.ResetForShootPreload;
+                        robot.intake.setAction(Intake.IntakeActions.Collect);
+                        actionTimer.reset();
+                    }
                     break;
                 case ResetForShootPreload:
-                    if (robot.isDone() || stateTimer.milliseconds() > 5000) {
+                    if (robot.isDone()) {
                         robot.drive.setMaxPower(1);
-                        robot.intake.setAction(Intake.IntakeActions.Wait);
+                        robot.intake.setAction(Intake.IntakeActions.Spit);
+                        robot.shooter.setTargetVelocity(velocity);
                         stateTimer.reset();
                         actionTimer.reset();
                         cycles = 0;
@@ -97,25 +108,27 @@ public class AutoBlueFar extends LinearOpMode {
                         robot.drive.setMaxPower(1);
                         robot.intake.setAction(Intake.IntakeActions.Collect);
                         stateTimer.reset();
-                        state = States.DriveToPark;
+                        state = States.CollectArtefacts;
                     }
+
                     break;
-                case DriveToPark:
+                case CollectArtefacts:
                     if (stateTimer.milliseconds() >= 100) {
-                        robot.drive.followPath(goToPark, true);
+                        robot.drive.followPath(goToCollect, true);
                         robot.shooter.setTargetVelocity(0);
                         stateTimer.reset();
-                        state = States.Park;
+                       // state = States.Park;
                     }
                     break;
                 case Park:
                     if (robot.isDone() || stateTimer.milliseconds() > 4000) {
                         robot.drive.breakFollowing();
+                        finalAutoPose = robot.drive.getPose();
                     }
                     break;
             }
-            if (opModeTimer.milliseconds() > 27000 && state != States.DriveToPark && state != States.Park) {
-                state = States.DriveToPark;
+            if (opModeTimer.milliseconds() > 27000 && state != States.CollectArtefacts && state != States.Park) {
+                state = States.CollectArtefacts;
                 stateTimer.reset();
             }
             telemetry.addData("State", state);

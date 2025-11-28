@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.OpModes.Autos;
 
+import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
+import static org.firstinspires.ftc.teamcode.Constants.Globals.finalAutoPose;
+
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
@@ -62,6 +65,9 @@ public class AutoBlueClose extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         robot = new Robot(hardwareMap, startPose, true, Constants.Color.Blue, telemetry, gamepad1);
+        autoColor = Constants.Color.Blue;
+        robot.drive.resetTeleOpHeading();
+        robot.drive.setConstants(Constants.FConstants);
 
         PathChain preloadPath = robot.drive.pathBuilder()
                 .addPath(new BezierLine(startPose, shootPosePreload))
@@ -304,6 +310,7 @@ public class AutoBlueClose extends LinearOpMode {
                 case Park:
                     if (robot.isDone() || stateTimer.milliseconds() > 4000) {
                         robot.drive.breakFollowing();
+                        finalAutoPose = robot.drive.getPose();
                     }
                     break;
             }

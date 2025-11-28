@@ -4,7 +4,7 @@ import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.pinPointName;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.rightBackMotorName;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.rightFrontMotorName;
 
-import com.acmerobotics.dashboard.config.Config;
+import com.pedropathing.geometry.Pose;
 import com.pedropathing.control.FilteredPIDFCoefficients;
 import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.follower.Follower;
@@ -23,6 +23,8 @@ public class Constants {
 
     public static class Globals{
         public static double voltage = 12.0;
+        public static Pose finalAutoPose = new Pose();
+        public static Color autoColor;
     }
 
     public enum Case {

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.OpModes.TeleOps;
 
+import static org.firstinspires.ftc.teamcode.Constants.Globals.finalAutoPose;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.geometry.Pose;
@@ -36,7 +38,8 @@ public class TeleOpWow extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        robot = new Robot(hardwareMap , new Pose(0,0,0) , false , Constants.Color.Blue , telemetry,gamepad1);
+        robot = new Robot(hardwareMap ,finalAutoPose, false , Constants.Color.Blue , telemetry,gamepad1);
+        finalAutoPose = new Pose();
         timers.put("leftStick1" , new ElapsedTime());
         timers.put("rightStick1" , new ElapsedTime());
         timers.put("rightBumper1" , new ElapsedTime());

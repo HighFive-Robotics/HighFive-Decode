@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.OpModes.Autos;
 
+import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
+import static org.firstinspires.ftc.teamcode.Constants.Globals.finalAutoPose;
+
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
@@ -11,7 +14,7 @@ import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
-@Autonomous(name = "🔴🔝AutoBlueClose🔝🔴")
+@Autonomous(name = "🔴🔝AutoRedClose🔝🔴")
 public class AutoRedClose extends LinearOpMode {
     private enum States {
         DriveToPreload,
@@ -61,7 +64,10 @@ public class AutoRedClose extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        robot = new Robot(hardwareMap, startPose, true, Constants.Color.Blue, telemetry, gamepad1);
+        robot = new Robot(hardwareMap, startPose, true, Constants.Color.Red, telemetry, gamepad1);
+        autoColor = Constants.Color.Red;
+        robot.drive.resetTeleOpHeading();
+        robot.drive.setConstants(Constants.FConstants);
 
         PathChain preloadPath = robot.drive.pathBuilder()
                 .addPath(new BezierLine(startPose, shootPosePreload))
@@ -305,6 +311,7 @@ public class AutoRedClose extends LinearOpMode {
                 case Park:
                     if (robot.isDone() || stateTimer.milliseconds() > 4000) {
                         robot.drive.breakFollowing();
+                        finalAutoPose = robot.drive.getPose();
                     }
                     break;
             }
