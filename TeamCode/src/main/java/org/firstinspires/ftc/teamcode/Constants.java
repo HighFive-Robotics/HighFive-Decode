@@ -54,6 +54,7 @@ public class Constants {
         public static String webcamName = "Webcam 1";
         public static String intakeMotorName = "IM";
         public static String intakeJointServoName = "IJ";
+        public static String intakeSensorName = "IS";
         public static String shooterMotorUpName = "OMT";
         public static String shooterMotorDownName = "OMB";
         public static String blockerServoName = "BO";

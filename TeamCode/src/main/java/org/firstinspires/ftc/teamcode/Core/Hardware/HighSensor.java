@@ -12,6 +12,7 @@ import static org.firstinspires.ftc.teamcode.Constants.Intake.ColorSensorConstan
 import static org.firstinspires.ftc.teamcode.Constants.Intake.ColorSensorConstants.targetPurpleRGB;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -24,15 +25,15 @@ import java.util.Arrays;
 
 @Config
 public class HighSensor extends HighModule{
-    ColorRangeSensor sensor;
+    RevColorSensorV3 sensor;
     private final LowPassFilter redFilter, blueFilter, greenFilter;
     double filterParameter = 0.8;
-    float[] hsvValues = new float[4];
-    float[] rgbValues = new float[4];
+    float[] hsvValues = new float[3];
+    float[] rgbValues = new float[3];
     double greenError = 0, purpleError = 0;
 
     public HighSensor(HardwareMap hardwareMap, String name) {
-        sensor = hardwareMap.get(ColorRangeSensor.class, name);
+        sensor = hardwareMap.get(RevColorSensorV3.class, name);
 
         redFilter = new LowPassFilter(filterParameter, sensor.red());
         greenFilter = new LowPassFilter(filterParameter, sensor.green());
@@ -104,8 +105,15 @@ public class HighSensor extends HighModule{
     }
 
     public void telemetry(Telemetry telemetry) {
-        telemetry.addData("Color in RGB", Arrays.toString(this.RGB()));
+        telemetry.addData("Color in RGB", Arrays.toString(rgbValues));
+        telemetry.addData("Color in Red", (sensor.red()));
+        telemetry.addData("Color in Green", (sensor.green()));
+        telemetry.addData("Color in Blue", (sensor.blue()));
         telemetry.addData("Color in HSV", Arrays.toString(this.hsvValues));
+        telemetry.addData("Error Green", greenError);
+        telemetry.addData("Target Green", Arrays.toString(targetGreenRGB));
+        telemetry.addData("Error Purple", purpleError);
+        telemetry.addData("Target Purple", Arrays.toString(targetPurpleRGB));
         telemetry.addData("Color known", this.getColor());
     }
 }
