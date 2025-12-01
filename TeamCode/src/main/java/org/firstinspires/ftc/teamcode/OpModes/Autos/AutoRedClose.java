@@ -189,7 +189,7 @@ public class AutoRedClose extends LinearOpMode {
                     break;
                 case ResetForShoot1:
                     if (robot.isDone() || stateTimer.milliseconds() > 5000) {
-                        robot.intake.motorIntake.setPower(-0.7);
+                        robot.intake.intakeMotor.setPower(-0.7);
                         stateTimer.reset();
                         actionTimer.reset();
                         cycles = 0;
@@ -243,7 +243,7 @@ public class AutoRedClose extends LinearOpMode {
                     break;
                 case ResetForShoot2:
                     if (robot.isDone() || stateTimer.milliseconds() > 5000) {
-                        robot.intake.motorIntake.setPower(-0.7);
+                        robot.intake.intakeMotor.setPower(-0.7);
                         stateTimer.reset();
                         actionTimer.reset();
                         cycles = 0;
@@ -285,7 +285,7 @@ public class AutoRedClose extends LinearOpMode {
                     break;
                 case ResetForShoot3:
                     if (robot.isDone() || stateTimer.milliseconds() > 5000) {
-                        robot.intake.motorIntake.setPower(-0.7);
+                        robot.intake.intakeMotor.setPower(-0.7);
                         stateTimer.reset();
                         actionTimer.reset();
                         cycles = 0;

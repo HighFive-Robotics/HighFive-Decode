@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.Core.Module.Camera;
 
+import static org.firstinspires.ftc.teamcode.Constants.CameraConstants.xOffset;
+import static org.firstinspires.ftc.teamcode.Constants.CameraConstants.yOffset;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.webcamName;
-import static org.firstinspires.ftc.teamcode.Constants.randomizedCase;
+import static org.firstinspires.ftc.teamcode.Constants.Globals.randomizedCase;
 
 import android.util.Size;
 
@@ -28,7 +30,6 @@ import java.util.ArrayList;
 @Config
 public class Camera extends HighModule{
 
-    public static double xOffset = 0, yOffset = 0;
     public AprilTagProcessor aprilTagProcessor;
     public ArrayList<AprilTagDetection> detections = new ArrayList<>();
     ElapsedTime timer = new ElapsedTime();
@@ -61,15 +62,15 @@ public class Camera extends HighModule{
             for(int i = 0; i < detections.size(); i++) {
                 switch (getAprilTagID(i)){
                     case 21:
-                        randomizedCase = Constants.Case.Left;
+                        randomizedCase = Constants.Case.GPP;
                         i=detections.size();
                         break;
                     case 22:
-                        randomizedCase = Constants.Case.Middle;
+                        randomizedCase = Constants.Case.PGP;
                         i=detections.size();
                         break;
                     case 23:
-                        randomizedCase = Constants.Case.Right;
+                        randomizedCase = Constants.Case.PPG;
                         i=detections.size();
                         break;
                     default:

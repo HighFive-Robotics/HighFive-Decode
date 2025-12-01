@@ -30,7 +30,7 @@ import org.firstinspires.ftc.teamcode.Core.Algorithms.AsymmetricMotionProfiler;
 public class HighServo {
 
     public enum RunMode {
-        MotionProfiler,//Must use the method setMotionProfilerCoefficients();
+        MotionProfiler,
         Standard,
         ContinuousRotation
     }

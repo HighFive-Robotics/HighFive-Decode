@@ -27,7 +27,6 @@ public class Robot extends HighModule {
     Telemetry telemetry;
     public Actions lastAction = Actions.None;
     public Follower drive;
-    public Drive teleOpDrive;
     public List<LynxModule> allHubs;
     protected HardwareMap hardwareMap;
 
@@ -104,7 +103,7 @@ public class Robot extends HighModule {
                 timerShoot.reset();
                 break;
             case PrepareForShooting:
-                intake.motorIntake.setPower(-0.7);
+                intake.intakeMotor.setPower(-0.7);
                 stopIntake = true;
                 timerIntake.reset();
                 break;

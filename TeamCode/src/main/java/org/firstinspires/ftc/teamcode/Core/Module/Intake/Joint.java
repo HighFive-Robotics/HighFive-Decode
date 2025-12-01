@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.Core.Module.Intake;
 
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.intakeJointServoName;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.JointPositions.targetBlock;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.JointPositions.targetPark;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.JointPositions.targetPass;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -11,8 +14,6 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighServo;
 
 @Config
 public class Joint extends HighModule {
-
-    public static double targetBlock = 0, targetPass = 0.3, targetPark = 0;
 
     HighServo servo;
     States state;

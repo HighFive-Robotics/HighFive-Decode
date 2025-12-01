@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.pinPointName;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.rightBackMotorName;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.rightFrontMotorName;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.control.FilteredPIDFCoefficients;
 import com.pedropathing.control.PIDFCoefficients;
@@ -17,24 +18,23 @@ import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-
 public class Constants {
 
+    @Config
     public static class Globals{
         public static double voltage = 12.0;
         public static Pose finalAutoPose = new Pose();
         public static Color autoColor;
+        public static Case randomizedCase = Case.None;
+        public static Color[] targetColors = {Color.None,Color.None,Color.None};
     }
 
     public enum Case {
-        Left,
-        Middle,
-        Right,
+        GPP,
+        PGP,
+        PPG,
         None
     }
-
-    public static Case randomizedCase = Case.None;
 
     public enum Color {
         Blue,
@@ -44,14 +44,6 @@ public class Constants {
         Purple,
         None
     }
-
-    public static Color[][] targetColors = {{Color.Green, Color.Purple,Color.Purple},{Color.Purple,Color.Green,Color.Purple},{ Color.Purple,Color.Purple,Color.Green}};
-    public static Color[] mixerColors = {Color.None,Color.None,Color.None};
-    public static Color currentColor = Color.None;
-    public static double GreenValuesHSV[] = {160F,0.75F,20F};
-    public static double PurpleValuesHSV[] = {215F,0.40F,5F};
-    public static double Treshold[] = {17.5F, 0.2F, 5F};
-
 
     public static class DeviceNames {
         public static String leftFrontMotorName = "LFM";
@@ -69,6 +61,43 @@ public class Constants {
         public static String liftServoLB = "SLB";
         public static String liftServoRB = "SRB";
         public static String liftServoRF = "SRF";
+    }
+
+    public static class Intake{
+        @Config
+        public static class IntakePowers{
+            public static double powerWait = 0, powerCollect = 1, powerSpit = -1, powerTransfer = 1;
+        }
+
+        @Config
+        public static class ColorSensorConstants{
+            public static Color currentColor = Color.None;
+            public static float[] targetGreenRGB = {0F, 255F, 0F};
+            public static float[] targetPurpleRGB = {255F, 0F, 255F};
+
+            //We don't use this anymore
+            public static float[] GreenValuesHSV = {160F,0.75F,20F};
+            public static float[] PurpleValuesHSV = {215F,0.40F,5F};
+            public static float[] Treshold = {17.5F, 0.2F, 5F};
+        }
+
+        @Config
+        public static class SorterConstants{
+            public static double Position = 0.5;
+
+            public static Color[][] targetColors = {{Color.Green, Color.Purple,Color.Purple},{Color.Purple,Color.Green,Color.Purple},{ Color.Purple,Color.Purple,Color.Green}};
+            public static Color[] sorterColors = {Color.None,Color.None,Color.None};
+        }
+
+        @Config
+        public static class JointPositions {
+            public static double targetBlock = 0, targetPass = 0.3, targetPark = 0;
+        }
+    }
+
+    @Config
+    public static class CameraConstants{
+        public static double xOffset = 0, yOffset = 0;
     }
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);

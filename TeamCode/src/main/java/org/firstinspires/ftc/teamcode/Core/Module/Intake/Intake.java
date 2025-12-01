@@ -1,12 +1,14 @@
 package org.firstinspires.ftc.teamcode.Core.Module.Intake;
 
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.Position;
+
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighModule;
 
 
 public class Intake extends HighModule {
-    public MotorIntake motorIntake;
+    public IntakeMotor intakeMotor;
     public Joint joint;
     public Sorter sorter;
 
@@ -21,34 +23,34 @@ public class Intake extends HighModule {
         Park
     }
     public Intake(HardwareMap hwMap){
-        motorIntake = new MotorIntake(hwMap);
+        intakeMotor = new IntakeMotor(hwMap);
         joint = new Joint(hwMap);
-        sorter = new Sorter(hwMap, Sorter.Position, false);
+        sorter = new Sorter(hwMap, Position, false);
     }
     public Intake(HardwareMap hwMap ,double initPosition, boolean isAuto){
-        motorIntake = new MotorIntake(hwMap);
+        intakeMotor = new IntakeMotor(hwMap);
         joint = new Joint(hwMap, initPosition, isAuto);
-        sorter = new Sorter(hwMap, Sorter.Position, true);
+        sorter = new Sorter(hwMap, Position, true);
     }
     public void setAction(IntakeActions action){
         this.action = action;
         switch (action){
             case Collect:
-                motorIntake.setState(MotorIntake.States.Collect);
+                intakeMotor.setState(IntakeMotor.States.Collect);
                 break;
             case Wait:
-                motorIntake.setState(MotorIntake.States.Wait);
+                intakeMotor.setState(IntakeMotor.States.Wait);
                 break;
             case Spit:
-                motorIntake.setState(MotorIntake.States.Spit);
+                intakeMotor.setState(IntakeMotor.States.Spit);
                 break;
             case Park:
-                motorIntake.setState(MotorIntake.States.Wait);
-                motorIntake.disable();
+                intakeMotor.setState(IntakeMotor.States.Wait);
+                intakeMotor.disable();
                 joint.setState(Joint.States.Park);
                 break;
             case CollectLowPower:
-                motorIntake.setPower(0.7);
+                intakeMotor.setPower(0.7);
                 break;
         }
     }
@@ -59,7 +61,7 @@ public class Intake extends HighModule {
 
     @Override
     public void update() {
-        motorIntake.update();
+        intakeMotor.update();
         joint.update();
         sorter.update();
     }

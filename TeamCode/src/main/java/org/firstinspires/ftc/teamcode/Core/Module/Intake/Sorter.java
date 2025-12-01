@@ -12,7 +12,6 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighServo;
 @Config
 public class Sorter extends HighModule {
     HighServo servo;
-    public static double Position = 0.5;
 
     public Sorter(HardwareMap hwMap, double initPosition, boolean isAuto) {
         servo = HighServo.Builder.startBuilding()

@@ -13,12 +13,10 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Joint;
-import org.firstinspires.ftc.teamcode.Core.Module.Intake.MotorIntake;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.BlockerOuttake;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
 import java.util.HashMap;
-import java.util.Optional;
 
 @Config
 @TeleOp(name = "💥TeleOp💥")
@@ -163,8 +161,8 @@ public class TeleOpWow extends LinearOpMode {
                 rumbled = false;
             }
 
-            telemetry.addData("State intake:" , robot.intake.motorIntake.getState());
-            telemetry.addData("Power intake:" , robot.intake.motorIntake.power);
+            telemetry.addData("State intake:" , robot.intake.intakeMotor.getState());
+            telemetry.addData("Power intake:" , robot.intake.intakeMotor.power);
             telemetry.addData("Shooter 1:" , robot.shooter.motorUp.getPower());
             telemetry.addData("Shooter 2:" , robot.shooter.motorDown.getPower());
             telemetry.addData("Up:" , robot.shooter.motorUp.getCurrentPosition());

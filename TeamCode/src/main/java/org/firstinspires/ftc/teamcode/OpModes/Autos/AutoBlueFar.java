@@ -95,7 +95,7 @@ public class AutoBlueFar extends LinearOpMode {
                 case ResetForShootPreload:
                     if (robot.isDone()) {
                         robot.drive.setMaxPower(1);
-                        robot.intake.motorIntake.setPower(-0.7);
+                        robot.intake.intakeMotor.setPower(-0.7);
                         stateTimer.reset();
                         actionTimer.reset();
                         cycles = 0;

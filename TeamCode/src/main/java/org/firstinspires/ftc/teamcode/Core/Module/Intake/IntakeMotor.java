@@ -1,7 +1,10 @@
 package org.firstinspires.ftc.teamcode.Core.Module.Intake;
 
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.intakeMotorName;
-import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.rightBackMotorName;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.IntakePowers.powerCollect;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.IntakePowers.powerSpit;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.IntakePowers.powerTransfer;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.IntakePowers.powerWait;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -11,9 +14,8 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighModule;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighMotor;
 
 @Config
-public class MotorIntake extends HighModule {
+public class IntakeMotor extends HighModule {
 
-    public static double powerWait = 0, powerCollect = 1, powerSpit = -1, powerTransfer = 1;
     public HighMotor motor, inactiveMotor;
 
     public enum States {
@@ -25,7 +27,7 @@ public class MotorIntake extends HighModule {
 
     States state = States.Wait;
 
-    public MotorIntake(HardwareMap hwMap){
+    public IntakeMotor(HardwareMap hwMap){
         //motor = new HighMotor(hwMap.get(DcMotorEx.class, intakeMotorName), HighMotor.RunMode.Standard, true, true);
 
         motor = HighMotor.Builder.startBuilding()
