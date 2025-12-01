@@ -173,23 +173,16 @@ public class VelocityPID {
         return calculate(measuredValue);
     }
 
-    /**
-     * Calculates the next output of the PIDF controller. Updates the setpoint first.
-     * @param pv The current measured velocity.
-     * @param sp The new target velocity (setpoint).
-     * @return The calculated control output.
-     */
-    public double calculate(double pv, double sp) {
-        setSetPoint(sp);
-        return calculate(pv);
-    }
 
+    public double calculate(double pv) {
+        return calculate(pv,12);
+    }
     /**
      * Calculates the control value using the velocity PIDF algorithm with EMA filtering and anti-windup.
      * @param pv The current measurement of the process variable (current velocity).
      * @return The calculated control output, clamped between output bounds.
      */
-    public double calculate(double pv) {
+    public double calculate(double pv, double voltage) {
 
         double currentTimeStamp = timer.seconds();
         if (lastTimeStampSeconds < 0) {
@@ -247,7 +240,7 @@ public class VelocityPID {
         }
 
         currentOutput = Range.clip(currentOutput, minOutput, maxOutput);
-
+        currentOutput = Range.clip(currentOutput*(12/voltage), minOutput, maxOutput);
         prevOutput = currentOutput;
 
         return currentOutput;

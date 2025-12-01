@@ -82,6 +82,7 @@ public class HighMotor {
     private double currentPosition = 0, maxPIDPower = 1, kF = 0, initialAngle = 0, ticksPerDegree = 0;
     private double currentVelocity, encoderResolution = 1, wheelDiameter = 0;
     private double time=-1;
+    private boolean useVCforVelo=false;
     public MotorRPM motorRPM;
     public HighMotor(){}
     /**
@@ -849,7 +850,7 @@ public class HighMotor {
 
     public double getPowerVelocity(double currentVelocity) {
         this.currentVelocity = currentVelocity;
-        double VelocityPower = pidfVelocity.calculate(currentVelocity, target);
+        double VelocityPower = pidfVelocity.calculate(currentVelocity);
         return Range.clip(VelocityPower, -maxPIDPower, maxPIDPower);
     }
     public double getCurrentVelocity(){
@@ -892,7 +893,8 @@ public class HighMotor {
                 break;
             case Velocity:
                 currentVelocity = getVelocity();
-                power = pidfVelocity.calculate(currentVelocity);
+                if(useVCforVelo) power = pidfVelocity.calculate(currentVelocity, Constants.Globals.voltage);
+                else power = pidfVelocity.calculate(currentVelocity);
                 if (Math.abs(power - lastPower) >= epsilon) {
                     motor.setPower(power);
                     lastPower = power;
@@ -979,6 +981,9 @@ public class HighMotor {
                 telemetry.addData("Target time: ", time);
                 break;
         }
+    }
+    public void setUseVCforVelo(boolean useVCforVelo){
+        this.useVCforVelo = useVCforVelo;
     }
     /*
        |
@@ -1131,7 +1136,10 @@ public class HighMotor {
             motor.setEncoderResolution(encoderResolution);
             return this;
         }
-
+        public Builder useVoltageComensationForVelocity(boolean useVCforVelo){
+            motor.setUseVCforVelo(useVCforVelo);
+            return this;
+        }
         public Builder setWheelDiameter(double wheelDiameter) {
             motor.setWheelDiameter(wheelDiameter);
             return this;

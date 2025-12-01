@@ -27,6 +27,7 @@ public class Shooter extends HighModule {
                 .setEncoderResolution(28)
                 .setMotorRPM(HighMotor.MotorRPM.RPM6000)
                 .setWheelDiameter(0.072)
+                .useVoltageComensationForVelocity(true)
                 .setVelocityPIDCoefficients(kp,ki,kd,kf)
                 .setUseZeroPowerBehaviour(false)
                 .build();
