@@ -144,12 +144,12 @@ public class ServoTest extends LinearOpMode {
                 timer.reset();
             }
 
-            motor.setTarget(0.0);
-            if(gamepad1.x){
-                motor.setTarget(0.5);
+            motor.setPower(0.0);
+            if(gamepad1.square){
+                motor.setPower(0.5);
             }
-            if(gamepad1.y){
-                motor.setTarget(-0.5);
+            if(gamepad1.triangle){
+                motor.setPower(-0.5);
             }
 
             telemetry.addData("servo", Zaza);
@@ -160,6 +160,7 @@ public class ServoTest extends LinearOpMode {
             s4.update();
             s5.update();
             s6.update();
+            motor.update();
         }
     }
 }

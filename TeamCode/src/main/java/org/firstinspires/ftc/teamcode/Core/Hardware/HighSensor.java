@@ -10,6 +10,7 @@ import static org.firstinspires.ftc.teamcode.Constants.Intake.ColorSensorConstan
 import static org.firstinspires.ftc.teamcode.Constants.Intake.ColorSensorConstants.currentColor;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.ColorSensorConstants.targetGreenRGB;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.ColorSensorConstants.targetPurpleRGB;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.ColorSensorConstants.tolerance;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
@@ -45,9 +46,9 @@ public class HighSensor extends HighModule{
     }
 
     private void updateColor() {
-        rgbValues[0] = (float) redFilter.getValue(sensor.red());
-        rgbValues[1] = (float) greenFilter.getValue(sensor.green());
-        rgbValues[2] = (float) blueFilter.getValue(sensor.blue());
+        rgbValues[0] = (float) redFilter.getValue(sensor.red()) / 16;
+        rgbValues[1] = (float) greenFilter.getValue(sensor.green()) / 16;
+        rgbValues[2] = (float) blueFilter.getValue(sensor.blue()) / 16;
     }
 
     private void updateSetColorHSV() {
@@ -61,9 +62,9 @@ public class HighSensor extends HighModule{
     }
 
     private void updateSetColorRGB() {
-        if(greenError < purpleError && greenError <= 5){
+        if(greenError < purpleError && greenError <= tolerance){
             currentColor = Green;
-        } else if(purpleError < greenError && purpleError <= 5){
+        } else if(purpleError < greenError && purpleError <= tolerance){
             currentColor = Purple;
         } else {
             currentColor = None;

@@ -32,7 +32,8 @@ public class HighServo {
     public enum RunMode {
         MotionProfiler,
         Standard,
-        ContinuousRotation
+        ContinuousRotation,
+        PID
     }
 
     public Servo servo;
@@ -150,6 +151,7 @@ public class HighServo {
      * @param position gives the wanted position of the servo
      */
     public void setPosition(double position) {
+        inInit = false;
         switch (runMode) {
             case MotionProfiler:
                 lastPosition = targetPosition;
@@ -159,9 +161,7 @@ public class HighServo {
                 break;
             case Standard:
                 targetPosition = position;
-                if(!inInit){
-                    setInitialPosition(position,true);
-                }
+                setInitialPosition(position,true);
                 break;
         }
         atTarget = false;

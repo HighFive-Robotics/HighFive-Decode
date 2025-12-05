@@ -72,9 +72,10 @@ public class Constants {
 
         @Config
         public static class ColorSensorConstants{
+            public static double tolerance = 100;
             public static Color currentColor = Color.None;
-            public static float[] targetGreenRGB = {0F, 255F, 0F};
-            public static float[] targetPurpleRGB = {255F, 0F, 255F};
+            public static float[] targetGreenRGB = {30F, 155F, 100F};
+            public static float[] targetPurpleRGB = {90F, 120F, 180F};
 
             //We don't use this anymore
             public static float[] GreenValuesHSV = {160F,0.75F,20F};
@@ -85,6 +86,8 @@ public class Constants {
         @Config
         public static class SorterConstants{
             public static double Position = 0.5;
+            public static double ticksPerRotation = 8192;
+            public static double targetSlot1 = 0, targetSlot2 = 120, targetSlot3 = 240;
 
             public static Color[][] targetColors = {{Color.Green, Color.Purple,Color.Purple},{Color.Purple,Color.Green,Color.Purple},{ Color.Purple,Color.Purple,Color.Green}};
             public static Color[] sorterColors = {Color.None,Color.None,Color.None};
