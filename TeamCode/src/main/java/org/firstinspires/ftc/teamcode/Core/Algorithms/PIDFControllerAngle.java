@@ -21,17 +21,12 @@ public class PIDFControllerAngle {
     private double lastTimeStamp;
     private double period;
 
-    private double multiplier = 1;
-    public Telemetry telemetry;
 
     /**
      * The base constructor for the PIDF controller
      */
     public PIDFControllerAngle(double kp, double ki, double kd, double kf) {
         this(kp, ki, kd, kf, 0, 0);
-    }
-    public void setTelemetry(Telemetry telemetry){
-        this.telemetry = telemetry;
     }
 
     /**
@@ -59,14 +54,6 @@ public class PIDFControllerAngle {
         period = 0;
 
         errorVal_p = setPoint - measuredValue;
-        if (errorVal_p < -180) {errorVal_p += 360;
-            multiplier = 1;
-        }
-        if (errorVal_p > 180) {errorVal_p -= 360;
-            multiplier = -1;
-        }
-
-        errorVal_p = multiplier * errorVal_p;
         reset();
     }
 
@@ -113,18 +100,15 @@ public class PIDFControllerAngle {
     public void setSetPoint(double sp) {
         setPoint = sp;
         errorVal_p = setPoint - measuredValue;
-        errorVal_v = (errorVal_p - prevErrorVal) / period;
-
         double error = errorVal_p;
         while (error < -180) {
             error =error + 360;
-            multiplier =1;
         }
         while (error > 180) {
             error = error -360;
-            multiplier =-1;
         }
         errorVal_p = error;
+        errorVal_v = (errorVal_p - prevErrorVal) / period;
     }
 
     /**
@@ -210,24 +194,24 @@ public class PIDFControllerAngle {
             errorVal_p = setPoint - pv;
             measuredValue = pv;
         }
+        double error = errorVal_p;
+        while (error < -180) {
+            error =error + 360;
+
+        }
+        while (error > 180) {
+            error = error -360;
+
+        }
 
         if (Math.abs(period) > 1E-6) {
             errorVal_v = (errorVal_p - prevErrorVal) / period;
         } else {
             errorVal_v = 0;
         }
-        double error = errorVal_p;
-        while (error < -180) {
-            error =error + 360;
-            multiplier =1;
-        }
-        while (error > 180) {
-            error = error -360;
-            multiplier =-1;
-        }
-        errorVal_p = error;
 
-        errorVal_p = multiplier * error;
+
+        errorVal_p = error;
 
         /*
         if total error is the integral from 0 to t of e(t')dt', and

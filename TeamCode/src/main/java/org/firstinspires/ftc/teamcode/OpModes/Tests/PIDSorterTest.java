@@ -39,7 +39,8 @@ public class PIDSorterTest extends LinearOpMode {
                 .setEncoderResolution(ticksPerRotation)
                 .setEncoder(encoder)
                 .build();
-        servo.pidfController.setTelemetry(telemetry);
+        encoder.resetPosition();
+        servo.pidfController.setTolerance(2);
         waitForStart();
         while(opModeIsActive()){
             servo.setPIDCoefficients(kP,kI,kD);
