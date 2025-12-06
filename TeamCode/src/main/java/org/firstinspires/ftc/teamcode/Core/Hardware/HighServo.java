@@ -17,6 +17,8 @@
 
 package org.firstinspires.ftc.teamcode.Core.Hardware;
 
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.ticksPerRotation;
+
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -25,6 +27,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Core.Algorithms.AsymmetricMotionProfiler;
+import org.firstinspires.ftc.teamcode.Core.Algorithms.PIDFControllerAngle;
 
 
 public class HighServo {
@@ -33,20 +36,30 @@ public class HighServo {
         MotionProfiler,
         Standard,
         ContinuousRotation,
-        PID
+        PIDAngle
+    }
+
+    public enum FeedForwardType{
+        Arm, /// if we want to use feedforward for an arm
+        Lift  ///if we want to use feedforward for a lift
     }
 
     public Servo servo;
     public CRServo CRServo;
     public AnalogInput analogInput;
     private final AsymmetricMotionProfiler motionProfiler = new AsymmetricMotionProfiler(1, 1, 1);
+    public final PIDFControllerAngle pidfController = new PIDFControllerAngle(0,0,0,0);
+    public FeedForwardType feedForwardType;
+    public HighEncoder encoder;
     private double targetPosition, targetPositionMotionProfile, currentPosition, lastPosition = -1;
     private final double epsilon = 1e-5;
     private boolean useAnalogInput = false, atTarget = false;
     private double error = epsilon, voltage, minPosition = 0, maxPosition = 1, minVoltage = 0, maxVoltage = 3.3;
     private double power, lastPower = -2;
-    public boolean inInit= true;
-
+    public boolean inInit = true;
+    private double target = 0, tolerance = epsilon;
+    private double currentPositionPID = 0, maxPIDPower = 1, kF = 0, initialAngle = 0, ticksPerDegree = 0;
+    private double encoderResolution = 1;
     public ElapsedTime timer = new ElapsedTime();
     public double time = -1;
 
@@ -63,6 +76,13 @@ public class HighServo {
         this.CRServo = CRServo;
         this.runMode = runMode;
     }
+
+    public HighServo(CRServo CRServo, HighEncoder encoder, RunMode runMode) {
+        this.encoder = encoder;
+        this.CRServo = CRServo;
+        this.runMode = runMode;
+    }
+
     public HighServo(){
 
     }
@@ -232,8 +252,8 @@ public class HighServo {
     /**
      * @return this method returns the current position
      */
-    public double getPosition() {
-        return currentPosition;
+    public double getCurrentPositionPID() {
+        return currentPositionPID;
     }
 
     /**
@@ -264,6 +284,226 @@ public class HighServo {
      */
     public double getPower() {
         return power;
+    }
+
+    /**
+     *
+     * @return this method returns the target
+     */
+    public double getTargetPID() {
+        return target;
+    }
+
+    /**
+     *
+     * This method sets the target by setting the SetPoint for the PIDFController.
+     *
+     * @param target gives the value of the wanted target
+     */
+    public void setTarget(double target) {
+        this.target = target;
+        pidfController.setSetPoint(target);
+    }
+
+    /**
+     *
+     * @return this method returns true if the motor is at the desired position or false if not*
+     * We return true if the absolute value of the difference between the wanted target and the current
+     * position is smaller then the accepted error (tolerance) or false if not.
+     */
+    public boolean atTargetPID() {
+        return Math.abs(target - currentPositionPID) <= tolerance;
+    }
+
+    public double getTolerance() {
+        return tolerance;
+    }
+
+    /**
+     * This method sets the tolerance (the accepted error).
+     *
+     * @param tolerance gives the value of the tolerance
+     */
+    public void setTolerance(double tolerance) {
+        this.tolerance = tolerance;
+        pidfController.setTolerance(tolerance);
+    }
+
+    /**
+     *
+     * @return this method returns the initial angle of the arm used in feedforward calculations
+     */
+    public double getInitialAngle(){
+        return initialAngle;
+    }
+
+    /**
+     *
+     * @return this method returns how many encoder ticks correspond to one degree of movement.
+     */
+    public double getTicksPerDegree(){
+        return ticksPerDegree;
+    }
+
+    /**
+     * This method sets how many encoder ticks correspond to one degree of movement.
+     */
+    public void setTicksPerDegree(double ticksPerDegree){
+        this.ticksPerDegree = ticksPerDegree;
+    }
+
+    /**
+     * This method sets the maximum power our PID controller is allowed to apply.
+     *
+     * @param maxPIDPower the value of the maximum power our PID controller is allowed to apply
+     */
+    public void setMaxPIDPower(double maxPIDPower){
+        this.maxPIDPower = maxPIDPower;
+    }
+
+    /**
+     *
+     * @return this method returns the feedforward type (Arm or Lift)
+     */
+    public FeedForwardType getFeedForwardType(){
+        return feedForwardType;
+    }
+
+    /**
+     * This method sets the PID coefficients (kP, kI, kD) for the PID controller.
+     * This method is used when we only want to configure the basic proportional,
+     * integral, and derivative gains, and no feedforward (kF = 0).
+     *
+     * @param kP the proportional gain
+     * @param kI the integral gain
+     * @param kD the derivative gain
+     */
+    public void setPIDCoefficients(double kP, double kI, double kD) {
+        pidfController.setPIDF(kP, kI, kD, 0);
+    }
+
+    /**
+     * This method sets the PID coefficients (kP, kI, kD) for the PID controller.
+     * This method is used when we only want to configure the basic proportional,
+     * integral, and derivative gains, and no feedforward (kF = 0).
+     * Also it sets the maximum power that the PID controller is allowed to apply.
+     *
+     * @param kP the proportional gain
+     * @param kI the integral gain
+     * @param kD the derivative gain
+     * @param maxPIDPower the value of the maximum power our PID controller is allowed to apply
+     */
+    public void setPIDCoefficients(double kP, double kI, double kD, double maxPIDPower) {
+        this.maxPIDPower = Math.abs(maxPIDPower);
+        pidfController.setPIDF(kP, kI, kD, 0);
+    }
+
+    /**
+     * Sets the PID coefficients (kP, kI, kD) along with feedforward gain (kF), the feed forward type(Arm or Lift),
+     * initial angle and ticks per degree.
+     *
+     * @param kP the proportional gain
+     * @param kI the integral gain
+     * @param kD the derivative gain
+     * @param kF the feedforward gain
+     * @param feedForwardType the feedforward type(Arm or Lift)
+     * @param initialAngle the initial angle
+     * @param ticksPerDegree gives how many encoder ticks correspond to one degree of movement
+     */
+    public void setPIDCoefficients(double kP, double kI, double kD, double kF, FeedForwardType feedForwardType, double initialAngle, double ticksPerDegree) {
+        this.kF = kF;
+        this.feedForwardType = feedForwardType;
+        this.initialAngle = initialAngle;
+        this.ticksPerDegree = ticksPerDegree;
+        pidfController.setPIDF(kP, kI, kD, 0);
+    }
+
+    /**
+     * Sets the PID coefficients (kP, kI, kD) along with feedforward gain (kF), the feed forward type(Arm or Lift),
+     * initial angle, ticks per degree and the maximum power our PID controller is allowed to apply
+     *
+     *
+     * @param kP the proportional gain
+     * @param kI the integral gain
+     * @param kD the derivative gain
+     * @param kF the feedforward gain
+     * @param feedForwardType the feedforward type(Arm or Lift)
+     */
+    public void setPIDCoefficients(double kP, double kI, double kD, double kF, FeedForwardType feedForwardType) {
+        this.kF = kF;
+        this.feedForwardType = feedForwardType;
+        pidfController.setPIDF(kP, kI, kD, 0);
+    }
+
+    /**
+     * Sets the PID coefficients (kP, kI, kD) along with feedforward gain (kF), the feed forward type(Arm or Lift),
+     * initial angle, ticks per degree and the maximum power our PID controller is allowed to apply
+     *
+     *
+     * @param kP the proportional gain
+     * @param kI the integral gain
+     * @param kD the derivative gain
+     * @param kF the feedforward gain
+     * @param feedForwardType the feedforward type(Arm or Lift)
+     * @param maxPIDPower the value of the maximum power our PID controller is allowed to apply
+     */
+    public void setPIDCoefficients(double kP, double kI, double kD, double kF, FeedForwardType feedForwardType, double maxPIDPower) {
+        this.kF = kF;
+        this.feedForwardType = feedForwardType;
+        this.maxPIDPower = Math.abs(maxPIDPower);
+        pidfController.setPIDF(kP, kI, kD, 0);
+    }
+
+    /**
+     * Sets the PID coefficients (kP, kI, kD) along with feedforward gain (kF), the feed forward type(Arm or Lift),
+     * initial angle, ticks per degree and the maximum power our PID controller is allowed to apply
+     *
+     *
+     * @param kP the proportional gain
+     * @param kI the integral gain
+     * @param kD the derivative gain
+     * @param kF the feedforward gain
+     * @param feedForwardType the feedforward type(Arm or Lift)
+     * @param initialAngle the initial angle
+     * @param ticksPerDegree gives how many encoder ticks correspond to one degree of movement
+     * @param maxPIDPower the value of the maximum power our PID controller is allowed to apply
+     */
+    public void setPIDCoefficients(double kP, double kI, double kD, double kF, FeedForwardType feedForwardType, double initialAngle, double ticksPerDegree , double maxPIDPower) {
+        this.kF = kF;
+        this.feedForwardType = feedForwardType;
+        this.initialAngle = initialAngle;
+        this.ticksPerDegree = ticksPerDegree;
+        this.maxPIDPower = Math.abs(maxPIDPower);
+        pidfController.setPIDF(kP, kI, kD, 0);
+
+    }
+
+    /**
+     * This method resets the PID. This clears any accumulated error.
+     */
+    public void resetPID() {
+        pidfController.reset();
+    }
+
+    /**
+     *
+     * This method calculates the total motor power using a combination of PID control and feedforward compensation.*
+     * First of all we calculate the PID power based on the current position and target. Then we calculate the
+     * feedforward depending on the feedforward type (Arm or Lift).
+     * We calculate the power needed to hold or move the arm/lift based on its angular position.
+     * In the end, the total output( PID power + FeedForward ) is clipped to the maximum allowed PID power.
+     *
+     * @param currentPosition gives the current position
+     * @return this method returns the final power to be applied to the motor, in the range [-maxPIDPower, maxPIDPower]
+     */
+    public double getPowerPID(double currentPosition) {
+        this.currentPosition = currentPosition;
+        double PidPower = pidfController.calculate(currentPosition);
+        return Range.clip(PidPower, -maxPIDPower, maxPIDPower);
+    }
+
+    public void setEncoderResolution(double encoderResolution) {
+        this.encoderResolution = encoderResolution;
     }
 
     /**
@@ -304,6 +544,22 @@ public class HighServo {
                 }
                 break;
             case ContinuousRotation:
+                if (Math.abs(power - lastPower) >= epsilon) {
+                    CRServo.setPower(power);
+                    lastPower = power;
+                }
+                break;
+            case PIDAngle:
+                currentPositionPID = encoder.getPosition();
+                while(currentPositionPID < 0){
+                    currentPositionPID += encoderResolution;
+                }
+                while(currentPositionPID > encoderResolution){
+                    currentPositionPID -= encoderResolution;
+                }
+                currentPositionPID = currentPositionPID / encoderResolution * 360;
+
+                power = pidfController.calculate(currentPositionPID);
                 if (Math.abs(power - lastPower) >= epsilon) {
                     CRServo.setPower(power);
                     lastPower = power;
@@ -374,6 +630,7 @@ public class HighServo {
         public Builder setContinousRotationRunMode();
         public MotionProfilerRunMode setMotionProfilerRunMode();
         public Builder setStandardRunMode();
+        public Builder setPIDRunMode();
     }
     public interface StandardRunMode{
         public Builder setAnalogInput(AnalogInput analogInput);
@@ -425,22 +682,41 @@ public class HighServo {
         }
 
         @Override
+        public Builder setPIDRunMode() {
+            this.servo.runMode = RunMode.PIDAngle;
+            this.servo.feedForwardType = FeedForwardType.Lift;
+            return this;
+        }
+
+        @Override
         public Builder setMotionProfilerCoefficients(double maxVelocity, double acceleration, double deceleration) {
             servo.setMotionProfilerCoefficients(maxVelocity,acceleration,deceleration);
-            return null;
+            return this;
+        }
+        public Builder setEncoder(HighEncoder encoder){
+            servo.encoder = encoder;
+            return this;
+        }
+        public Builder setEncoderResolution(double encoderResolution){
+            servo.setEncoderResolution(encoderResolution);
+            return this;
+        }
+        public Builder setPIDCoefficients(double kP , double kI , double kD , double kF) {
+            servo.pidfController.setPIDF(kP,kI,kD,kF);
+            return this;
         }
 
         @Override
         public Builder setAnalogInput(AnalogInput analogInput) {
             servo.analogInput = analogInput;
             servo.useAnalogInput = true;
-            return null;
+            return this;
         }
 
         @Override
         public Builder setAnalogInputCoefficients(double error, double minVoltage, double maxVoltage, double minPosition, double maxPosition) {
             servo.setAnalogInputCoefficients(error, minVoltage, maxVoltage, minPosition, maxPosition);
-            return null;
+            return this;
         }
         public Builder setInitPosition(double position , boolean isAuto){
             servo.setInitialPosition(position,isAuto);

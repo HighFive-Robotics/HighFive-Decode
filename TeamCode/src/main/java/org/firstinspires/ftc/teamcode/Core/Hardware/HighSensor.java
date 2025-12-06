@@ -93,7 +93,7 @@ public class HighSensor extends HighModule{
     }
 
     public float[] getHSVColorValues(){
-        android.graphics.Color.RGBToHSV((int)rgbValues[0] * 8, (int)rgbValues[1] * 8, (int)rgbValues[2] * 8, hsvValues);
+        android.graphics.Color.RGBToHSV((int)rgbValues[0] / 16, (int)rgbValues[1] / 16, (int)rgbValues[2] / 16, hsvValues);
         return hsvValues;
     }
 

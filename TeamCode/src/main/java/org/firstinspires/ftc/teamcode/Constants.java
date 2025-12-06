@@ -85,6 +85,9 @@ public class Constants {
 
         @Config
         public static class SorterConstants{
+
+            public static double kP = 0, kI = 0, kD = 0;
+
             public static double Position = 0.5;
             public static double ticksPerRotation = 8192;
             public static double targetSlot1 = 0, targetSlot2 = 120, targetSlot3 = 240;
