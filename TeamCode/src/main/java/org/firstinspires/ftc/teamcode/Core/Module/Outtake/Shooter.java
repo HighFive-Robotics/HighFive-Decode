@@ -2,6 +2,14 @@ package org.firstinspires.ftc.teamcode.Core.Module.Outtake;
 
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.shooterMotorDownName;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.shooterMotorUpName;
+import static org.firstinspires.ftc.teamcode.Constants.ShooterConstants.ka;
+import static org.firstinspires.ftc.teamcode.Constants.ShooterConstants.kd;
+import static org.firstinspires.ftc.teamcode.Constants.ShooterConstants.kf;
+import static org.firstinspires.ftc.teamcode.Constants.ShooterConstants.ki;
+import static org.firstinspires.ftc.teamcode.Constants.ShooterConstants.kp;
+import static org.firstinspires.ftc.teamcode.Constants.ShooterConstants.encoderResolution;
+import static org.firstinspires.ftc.teamcode.Constants.ShooterConstants.ks;
+import static org.firstinspires.ftc.teamcode.Constants.ShooterConstants.wheelDiameter;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -15,8 +23,6 @@ public class Shooter extends HighModule {
     public HighMotor motorUp , motorDown;
     public BlockerOuttake blocker;
     public double velocity, tolerance;
-    public static double kp = 0.0007, kd = 5e-8,ki = 0.005,kf = 0.00022;
-    public static double encoderResolution=28;
 
     public Shooter(HardwareMap hwMap){
         motorUp = HighMotor.Builder.startBuilding()
@@ -24,11 +30,11 @@ public class Shooter extends HighModule {
                 .setRunMode(HighMotor.RunMode.Velocity)
                 .setReverseMotor(false)
                 .setEncoder(true , true)
-                .setEncoderResolution(28)
+                .setEncoderResolution(encoderResolution)
                 .setMotorRPM(HighMotor.MotorRPM.RPM6000)
-                .setWheelDiameter(0.072)
+                .setWheelDiameter(wheelDiameter)
                 .useVoltageComensationForVelocity(true)
-                .setVelocityPIDCoefficients(kp,ki,kd,kf)
+                .setVelocityPIDCoefficients(kp,ki,kd,kf,ks,ka,1)
                 .setUseZeroPowerBehaviour(false)
                 .build();
         motorUp.setTolerance(0.1);
@@ -63,8 +69,7 @@ public class Shooter extends HighModule {
     public void update() {
         velocity = motorUp.getCurrentVelocity();
         motorUp.update();
-        motorUp.setVelocityPIDCoefficients(kp,ki,kd,kf);
-        //motorUp.setTarget(motorUp.getPower());
+        motorUp.setVelocityPIDFSA(kp,ki,kd,kf,ks,ka,1);
         motorDown.setPower(motorUp.getPower());
         motorDown.update();
         blocker.update();

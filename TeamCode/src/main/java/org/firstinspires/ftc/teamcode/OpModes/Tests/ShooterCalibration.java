@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Shooter;
 
 @Config
@@ -16,30 +17,31 @@ public class ShooterCalibration extends LinearOpMode {
     public static double i = 0.002;
     public static double d = 0.00002;
     public static double f = 0.00010;
-    public static double encoderResolution= 28;
-
+    public static double s = 0.00010;
+    public static double a = 0.00010;
     private Shooter shooter;
 
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         shooter = new Shooter(hardwareMap);
-        p = Shooter.kp;
-        i = Shooter.ki;
-        d = Shooter.kd;
-        f = Shooter.kf;
-        encoderResolution = Shooter.encoderResolution;
+        p = Constants.ShooterConstants.kp;
+        i = Constants.ShooterConstants.ki;
+        d = Constants.ShooterConstants.kd;
+        f = Constants.ShooterConstants.kf;
+        s = Constants.ShooterConstants.ks;
+        a = Constants.ShooterConstants.ka;
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-        shooter.motorUp.setTolerance(0.15); //  m/s !!!!!!!! Cel putin , sper.
+        shooter.motorUp.setTolerance(0.15);
         waitForStart();
         while (opModeIsActive()) {
-            Shooter.kp = p;
-            Shooter.ki = i;
-            Shooter.kd = d;
-            Shooter.kf = f;
-            Shooter.encoderResolution = encoderResolution;
-            shooter.motorUp.setEncoderResolution(Shooter.encoderResolution);
+            p = Constants.ShooterConstants.kp;
+            i = Constants.ShooterConstants.ki;
+            d = Constants.ShooterConstants.kd;
+            f = Constants.ShooterConstants.kf;
+            s = Constants.ShooterConstants.ks;
+            a = Constants.ShooterConstants.ka;
             shooter.setTargetVelocity(targetVelocity);
             shooter.update();
             double currentVelo = shooter.motorUp.getCurrentVelocity();

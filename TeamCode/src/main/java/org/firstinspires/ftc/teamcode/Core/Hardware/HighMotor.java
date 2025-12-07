@@ -69,7 +69,7 @@ public class HighMotor {
     public DcMotorEx motor;
     public final PIDFController pidfController = new PIDFController(0,0,0,0);
     public final SquidController squidController = new SquidController(0,0,0,0);
-    public final VelocityPID pidfVelocity = new VelocityPID(0,0,0,0, timer);
+    public final VelocityPID pidfVelocity = new VelocityPID(0,0,0,0,0,0,timer);
     private double lastPower = -2, power;
     private double multiplier = 1.0;
     private final double epsilon = 1e-5;
@@ -827,6 +827,10 @@ public class HighMotor {
         this.maxPIDPower = Math.abs(maxPIDPower);
         pidfVelocity.setPIDF(kP, kI, kD, 0);
     }
+    public void setVelocityPIDFSA(double kP, double kI, double kD, double kF,double kS, double kA,double maxPIDPower) {
+        this.maxPIDPower = Math.abs(maxPIDPower);
+        pidfVelocity.setPIDFSA(kP, kI, kD, kF,kS,kA);
+    }
 
 
     /**
@@ -1123,12 +1127,16 @@ public class HighMotor {
         }
 
         public Builder setVelocityPIDCoefficients(double kP, double kI, double kD, double maxPIDPower) {
-            motor.setVelocityPIDCoefficients(kP, kI, kD, maxPIDPower);
+            motor.setVelocityPIDFSA(kP, kI, kD, 0,0,0,maxPIDPower);
             return this;
         }
 
         public Builder setVelocityPIDCoefficients(double kP, double kI, double kD, double kF, double maxPIDPower) {
-            motor.setVelocityPIDCoefficients(kP, kI, kD, kF, maxPIDPower);
+            motor.setVelocityPIDFSA(kP, kI, kD, kF,0,0,maxPIDPower);
+            return this;
+        }
+        public Builder setVelocityPIDCoefficients(double kP, double kI, double kD, double kF,double kS,double kA, double maxPIDPower) {
+            motor.setVelocityPIDFSA(kP, kI, kD, kF,kS,kA,maxPIDPower);
             return this;
         }
 
