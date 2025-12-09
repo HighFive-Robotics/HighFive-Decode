@@ -3,9 +3,11 @@ package org.firstinspires.ftc.teamcode.Core.Algorithms;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import java.util.function.Function;
+
 public class VelocityPID {
 
-    private double kP, kI, kD, kF;
+    private double kP, kI, kD, kF , kS , kA;
 
     private double setPoint;
     private double measuredValue;
@@ -27,6 +29,7 @@ public class VelocityPID {
     private double filterGain = 0.8;
     private double lastFilterEstimate = 0.0;
     private double currentFilterEstimate = 0.0;
+    private Function<Double,Double> gainScheduler = error -> error;
 
     /**
      * Base constructor. Initializes with gains, zero setpoint, and zero measured value.
@@ -35,8 +38,8 @@ public class VelocityPID {
      * @param kd Derivative gain.
      * @param kf Feedforward gain (applied to setpoint changes).
      */
-    public VelocityPID(double kp, double ki, double kd, double kf, ElapsedTime timer) {
-        this(kp, ki, kd, kf, 0, 0, timer);
+    public VelocityPID(double kp, double ki, double kd, double kf,double kS, double kA, ElapsedTime timer) {
+        this(kp, ki, kd, kf,kS,kA ,0, 0, timer);
     }
 
     /**
@@ -49,7 +52,7 @@ public class VelocityPID {
      * @param pv Initial measured value (current velocity).
      * @param timer ElapsedTime object for calculating time differences.
      */
-    public VelocityPID(double kp, double ki, double kd, double kf, double sp, double pv, ElapsedTime timer) {
+    public VelocityPID(double kp, double ki, double kd, double kf,double kS, double kA, double sp, double pv, ElapsedTime timer) {
         kP = kp;
         kI = ki;
         kD = kd;
@@ -208,7 +211,7 @@ public class VelocityPID {
         }
 
         double deltaError = errorVal_p - prevErrorVal;
-        double proportionalTerm = kP * deltaError;
+        double proportionalTerm = kP * gainScheduler.apply(deltaError);
 
         double integralTerm = kI * errorVal_p * periodSeconds;
 
@@ -220,7 +223,11 @@ public class VelocityPID {
         double derivativeTerm = kD * currentFilterEstimate;
 
         double deltaSetPoint = setPoint - prevSetPoint;
-        double feedForwardChange = kF * deltaSetPoint;
+        double staticTerm = kS * Math.signum(deltaSetPoint);
+        double accTerm = kA * (deltaSetPoint/periodSeconds);
+        double stableTerm = kF * deltaSetPoint;
+        double feedForwardChange = stableTerm+staticTerm+accTerm;
+
 
         double deltaOutput = proportionalTerm + integralTerm + derivativeTerm + feedForwardChange;
 
@@ -238,9 +245,10 @@ public class VelocityPID {
             deltaOutput = proportionalTerm + integralTerm + derivativeTerm + feedForwardChange;
             currentOutput = prevOutput + deltaOutput;
         }
-
+        if(pv ==0 && closeToNull(prevOutput,pv)){currentOutput = 0;}
         currentOutput = Range.clip(currentOutput, minOutput, maxOutput);
-        currentOutput = Range.clip(currentOutput*(12/voltage), minOutput, maxOutput);
+        currentOutput = voltage>=13?currentOutput*(12/voltage):currentOutput;
+        currentOutput = Range.clip(currentOutput, minOutput, maxOutput);
         prevOutput = currentOutput;
 
         return currentOutput;
@@ -252,7 +260,16 @@ public class VelocityPID {
         kI = ki;
         kD = kd;
         kF = kf;
-
+        kS = 0;
+        kA = 0;
+    }
+    public void setPIDFSA(double kp, double ki, double kd, double kf,double ks, double ka) {
+        kP = kp;
+        kI = ki;
+        kD = kd;
+        kF = kf;
+        kS = ks;
+        kA = ka;
     }
 
     /**
@@ -291,7 +308,11 @@ public class VelocityPID {
         if (gain < 0 || gain >= 1) throw new IllegalArgumentException("Filter gain must be between 0 (inclusive) and 1 (exclusive)");
         filterGain = gain;
     }
-
+    private boolean closeToNull(double po , double cm){
+        boolean positionalCondition = Math.abs(cm) < 35;
+        boolean previousOutputCondition = Math.abs(po) < 0.15;
+        return positionalCondition && previousOutputCondition;
+    }
     public void setP(double kp) { kP = kp; }
     public void setI(double ki) { kI = ki; }
     public void setD(double kd) { kD = kd; }

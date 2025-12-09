@@ -17,8 +17,6 @@
 
 package org.firstinspires.ftc.teamcode.Core.Hardware;
 
-import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.ticksPerRotation;
-
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -27,7 +25,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Core.Algorithms.AsymmetricMotionProfiler;
-import org.firstinspires.ftc.teamcode.Core.Algorithms.PIDFControllerAngle;
+import org.firstinspires.ftc.teamcode.Core.Algorithms.SQUIDAngle;
 
 
 public class HighServo {
@@ -48,7 +46,7 @@ public class HighServo {
     public CRServo CRServo;
     public AnalogInput analogInput;
     private final AsymmetricMotionProfiler motionProfiler = new AsymmetricMotionProfiler(1, 1, 1);
-    public final PIDFControllerAngle pidfController = new PIDFControllerAngle(0,0,0,0);
+    public final SQUIDAngle pidfController = new SQUIDAngle(0,0,0,0);
     public FeedForwardType feedForwardType;
     public HighEncoder encoder;
     private double targetPosition, targetPositionMotionProfile, currentPosition, lastPosition = -1;
@@ -551,12 +549,8 @@ public class HighServo {
                 break;
             case PIDAngle:
                 currentPositionPID = encoder.getPosition();
-                while(currentPositionPID < 0){
-                    currentPositionPID += encoderResolution;
-                }
-                while(currentPositionPID > encoderResolution){
-                    currentPositionPID -= encoderResolution;
-                }
+                currentPositionPID = currentPositionPID % encoderResolution;
+                if (currentPositionPID < 0) currentPositionPID += encoderResolution;
                 currentPositionPID = currentPositionPID / encoderResolution * 360;
 
                 power = pidfController.calculate(currentPositionPID);

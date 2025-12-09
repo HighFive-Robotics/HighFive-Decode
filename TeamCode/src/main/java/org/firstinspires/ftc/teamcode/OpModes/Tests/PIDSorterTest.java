@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.intakeMotorNa
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.shooterMotorDownName;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.sorterServoName;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kD;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kF;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kI;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kP;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.ticksPerRotation;
@@ -35,23 +36,24 @@ public class PIDSorterTest extends LinearOpMode {
         servo = HighServo.Builder.startBuilding()
                 .setServo(hardwareMap.get(CRServo.class , sorterServoName))
                 .setPIDRunMode()
-                .setPIDCoefficients(kP,kI,kD,0)
+                .setPIDCoefficients(kP,kI,kD,kF)
                 .setEncoderResolution(ticksPerRotation)
                 .setEncoder(encoder)
                 .build();
+
         encoder.resetPosition();
-        servo.pidfController.setTolerance(2);
+        servo.pidfController.setTolerance(1.35);
         waitForStart();
         while(opModeIsActive()){
-            servo.setPIDCoefficients(kP,kI,kD);
-            if(gamepad1.cross){
-                target = 270;
-            }
+            servo.setPIDCoefficients(kP,kI,kD,kF);
             if(gamepad1.square){
-                target=90;
+                target = 0;
+            }
+            if(gamepad1.cross){
+                target=120;
             }
             if(gamepad1.circle){
-                target=0;
+                target=240;
             }
             servo.setTarget(target);
             telemetry.addData("Angle:", servo.getCurrentPositionPID());

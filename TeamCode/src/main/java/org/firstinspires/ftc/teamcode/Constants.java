@@ -86,7 +86,7 @@ public class Constants {
         @Config
         public static class SorterConstants{
 
-            public static double kP = 0, kI = 0, kD = 0;
+            public static double kP = 0.0335, kI = 0.0002, kD = 0.0005, kF=0.0005;
 
             public static double Position = 0.5;
             public static double ticksPerRotation = 8192;
@@ -100,6 +100,14 @@ public class Constants {
     @Config
     public static class CameraConstants{
         public static double xOffset = 0, yOffset = 0;
+    }
+
+    @Config
+    public static class ShooterConstants{
+        public static double kp = 0.0007, kd = 5e-8,ki = 0.005,kf = 0.00022,ks=0,ka=0;
+        public static final double wheelDiameter = 0.072;
+        public static final double encoderResolution = 28;
+
     }
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
