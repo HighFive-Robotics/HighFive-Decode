@@ -2,10 +2,15 @@ package org.firstinspires.ftc.teamcode.Core.Module.Intake;
 
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.shooterMotorDownName;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.sorterServoName;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kD;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kF;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kI;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kP;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.sorterColors;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.targetSlot1;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.targetSlot2;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.targetSlot3;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.ticksPerRotation;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -41,13 +46,16 @@ public class Sorter extends HighModule {
     Slots slot = Slots.Slot2;
     States state = States.Automated;
 
-    public Sorter(HardwareMap hwMap) {
+    public Sorter(HardwareMap hwMap, double offset) {
+        encoder = new HighEncoder(hwMap.get(DcMotorEx.class, shooterMotorDownName), offset, false);
         servo = HighServo.Builder.startBuilding()
                 .setServo(hwMap.get(CRServo.class , sorterServoName))
-                .setContinousRotationRunMode()
+                .setPIDRunMode()
+                .setPIDCoefficients(kP,kI,kD,kF)
+                .setEncoderResolution(ticksPerRotation)
+                .setEncoder(encoder)
                 .build();
-        encoder = new HighEncoder(hwMap.get(DcMotorEx.class, shooterMotorDownName), 0, false);
-        encoder.resetPosition();
+
         servo.setTolerance(2);
         tolerance = servo.getTolerance();
         setSlot(Slots.Slot2);
@@ -98,14 +106,17 @@ public class Sorter extends HighModule {
             case 1:{
                 slotNumber = 2;
                 servo.setTarget(targetSlot2);
+                slot = Slots.Slot2;
             }
             case 2:{
                 slotNumber = 3;
                 servo.setTarget(targetSlot3);
+                slot = Slots.Slot3;
             }
             case 3:{
                 slotNumber = 1;
                 servo.setTarget(targetSlot1);
+                slot = Slots.Slot1;
             }
         }
     }
@@ -115,14 +126,17 @@ public class Sorter extends HighModule {
             case 1:{
                 slotNumber = 3;
                 servo.setTarget(targetSlot3);
+                slot = Slots.Slot3;
             }
             case 2:{
                 slotNumber = 1;
                 servo.setTarget(targetSlot1);
+                slot = Slots.Slot1;
             }
             case 3:{
                 slotNumber = 2;
                 servo.setTarget(targetSlot2);
+                slot = Slots.Slot2;
             }
         }
     }
@@ -144,6 +158,20 @@ public class Sorter extends HighModule {
             }
         }
         return Constants.Color.None;
+    }
+
+    public void setColor(Constants.Color color, Slots slot) {
+        switch (slot){
+            case Slot1:{
+                sorterColors[0] = color;
+            }
+            case Slot2:{
+                sorterColors[1] = color;
+            }
+            case Slot3:{
+                sorterColors[2] = color;
+            }
+        }
     }
 
     public void setState(States state) {

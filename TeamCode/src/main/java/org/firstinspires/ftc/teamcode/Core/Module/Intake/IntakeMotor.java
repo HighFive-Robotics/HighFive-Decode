@@ -28,8 +28,6 @@ public class IntakeMotor extends HighModule {
     States state = States.Wait;
 
     public IntakeMotor(HardwareMap hwMap){
-        //motor = new HighMotor(hwMap.get(DcMotorEx.class, intakeMotorName), HighMotor.RunMode.Standard, true, true);
-
         motor = HighMotor.Builder.startBuilding()
                 .setMotor(hwMap.get(DcMotorEx.class, intakeMotorName))
                 .setRunMode(HighMotor.RunMode.Standard)

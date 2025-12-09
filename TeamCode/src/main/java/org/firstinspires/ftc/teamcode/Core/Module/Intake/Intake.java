@@ -1,10 +1,15 @@
 package org.firstinspires.ftc.teamcode.Core.Module.Intake;
 
+import static org.firstinspires.ftc.teamcode.Constants.Color.None;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.breakBeamIntakeName;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.intakeSensorName;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.artifactNumber;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.greenArtifactNumber;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.purpleArtifactNumber;
 
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighModule;
@@ -17,25 +22,38 @@ public class Intake extends HighModule {
     public HighSensor sensor;
     public DigitalChannel breakBeam;
 
+    ElapsedTime timer = new ElapsedTime();
+
+    public boolean artifactPassThrough = false;
+    public boolean breakBeamCollected = false;
+
     IntakeActions action = IntakeActions.Collect;
+    CollectTypes collectType = CollectTypes.Sorted;
 
     public enum IntakeActions{
         Collect,
-        Transfer,
         Wait,
-        Park
     }
+
+    public enum CollectTypes {
+        Sorted,
+        Normal,
+        Mix
+    }
+
     public Intake(HardwareMap hwMap){
         intakeMotor = new IntakeMotor(hwMap);
-        sorter = new Sorter(hwMap);
+        sorter = new Sorter(hwMap,0);
         sensor = new HighSensor(hwMap, intakeSensorName);
         breakBeam = hwMap.get(DigitalChannel.class, breakBeamIntakeName);
+        breakBeam.setMode(DigitalChannel.Mode.INPUT);
     }
     public Intake(HardwareMap hwMap, Sorter.Slots slot){
         intakeMotor = new IntakeMotor(hwMap);
-        sorter = new Sorter(hwMap);
+        sorter = new Sorter(hwMap,0);
         sensor = new HighSensor(hwMap, intakeSensorName);
         breakBeam = hwMap.get(DigitalChannel.class, breakBeamIntakeName);
+        breakBeam.setMode(DigitalChannel.Mode.INPUT);
         sorter.setSlot(slot);
     }
     public void setAction(IntakeActions action){
@@ -52,15 +70,62 @@ public class Intake extends HighModule {
         return action;
     }
 
-    @Override
-    public void update() {
-        if(sorter.getState() == Sorter.States.Automated){
-            if(action == IntakeActions.Collect && !sorter.isFull){
-                if(sorter.getColor(sorter.getSlot()) != Constants.Color.None){
-                    sorter.setNextSlot();
+    public void updateColor(){
+        breakBeamCollected = breakBeam.getState();
+        if(breakBeamCollected){
+            artifactPassThrough = true;
+            timer.reset();
+        }
+        if(artifactPassThrough){
+            if(sensor.getColor() != None && sorter.getColor(sorter.getSlot()) != None){
+                Constants.Color color = sensor.getColor();
+                sorter.setColor(sensor.getColor(), sorter.getSlot());
+                artifactNumber++;
+                switch(color){
+                    case Purple:{
+                        purpleArtifactNumber++;
+                    }
+                    break;
+                    case Green:{
+                        greenArtifactNumber++;
+                    }
+                    break;
                 }
             }
         }
+
+        if(timer.milliseconds() >= 1000){
+            artifactPassThrough = false;
+        }
+    }
+
+    @Override
+    public void update() {
+        switch (collectType){
+            case Sorted:{
+                if(sorter.getState() == Sorter.States.Automated){
+                    if(action == IntakeActions.Collect && !sorter.isFull){
+                        if(sorter.getColor(sorter.getSlot()) != None){
+                            sorter.setNextSlot();
+                        }
+                    }
+                }
+            }
+            break;
+            case Mix:{
+                if(sorter.getState() == Sorter.States.Automated && artifactNumber < 1){
+                    if(action == IntakeActions.Collect && !sorter.isFull){
+                        if(sorter.getColor(sorter.getSlot()) != None){
+                            sorter.setNextSlot();
+                        }
+                    }
+                }
+            }
+            break;
+            case Normal:
+            break;
+        }
+        updateColor();
         intakeMotor.update();
         sorter.update();
     }

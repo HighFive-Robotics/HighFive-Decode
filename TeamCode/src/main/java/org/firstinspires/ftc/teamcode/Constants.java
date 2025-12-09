@@ -88,7 +88,7 @@ public class Constants {
 
             public static double kP = 0.0335, kI = 0.0002, kD = 0.0005, kF=0.0005;
 
-            public static double Position = 0.5;
+            public static int artifactNumber = 0, purpleArtifactNumber = 0, greenArtifactNumber = 0;
             public static double ticksPerRotation = 8192;
             public static double targetSlot1 = 0, targetSlot2 = 120, targetSlot3 = 240;
 
