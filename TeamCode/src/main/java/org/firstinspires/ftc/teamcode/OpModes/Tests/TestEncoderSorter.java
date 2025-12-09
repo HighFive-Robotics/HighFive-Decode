@@ -3,6 +3,9 @@ package org.firstinspires.ftc.teamcode.OpModes.Tests;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.intakeMotorName;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.shooterMotorDownName;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.sorterServoName;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kD;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kI;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kP;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.ticksPerRotation;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -27,7 +30,10 @@ public class TestEncoderSorter extends LinearOpMode {
 
         servo = HighServo.Builder.startBuilding()
                 .setServo(hardwareMap.get(CRServo.class , sorterServoName))
-                .setContinousRotationRunMode()
+                .setPIDRunMode()
+                .setPIDCoefficients(kP,kI,kD,0)
+                .setEncoderResolution(ticksPerRotation)
+                .setEncoder(encoder)
                 .build();
 
         waitForStart();

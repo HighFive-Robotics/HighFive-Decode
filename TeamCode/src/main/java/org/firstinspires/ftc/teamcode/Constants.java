@@ -53,8 +53,8 @@ public class Constants {
         public static String pinPointName = "odo";
         public static String webcamName = "Webcam 1";
         public static String intakeMotorName = "IM";
-        public static String intakeJointServoName = "IJ";
         public static String intakeSensorName = "IS";
+        public static String breakBeamIntakeName = "IB";
         public static String shooterMotorUpName = "OMT";
         public static String shooterMotorDownName = "OMB";
         public static String blockerServoName = "BO";
@@ -94,11 +94,6 @@ public class Constants {
 
             public static Color[][] targetColors = {{Color.Green, Color.Purple,Color.Purple},{Color.Purple,Color.Green,Color.Purple},{ Color.Purple,Color.Purple,Color.Green}};
             public static Color[] sorterColors = {Color.None,Color.None,Color.None};
-        }
-
-        @Config
-        public static class JointPositions {
-            public static double targetBlock = 0, targetPass = 0.3, targetPark = 0;
         }
     }
 

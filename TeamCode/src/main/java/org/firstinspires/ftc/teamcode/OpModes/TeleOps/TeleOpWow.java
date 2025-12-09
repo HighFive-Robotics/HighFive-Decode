@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
-import org.firstinspires.ftc.teamcode.Core.Module.Intake.Joint;
+import org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.BlockerOuttake;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
@@ -72,11 +72,11 @@ public class TeleOpWow extends LinearOpMode {
         while (opModeIsActive()) {
 
             if(gamepad1.left_trigger >= 0.8){
-                robot.intake.setAction(Intake.IntakeActions.Spit);
+                robot.intake.setPower(IntakeMotor.States.Spit);
             } else if(gamepad1.right_trigger >= 0.8){
-                robot.intake.setAction(Intake.IntakeActions.Collect);
+                robot.intake.setPower(IntakeMotor.States.Collect);
             } else if(!intakeDriver2) {
-                robot.intake.setAction(Intake.IntakeActions.Wait);
+                robot.intake.setPower(IntakeMotor.States.Wait);
             }
 
             if(gamepad1.left_bumper && timers.get("leftBumper1").milliseconds() >= 250){
@@ -87,16 +87,6 @@ public class TeleOpWow extends LinearOpMode {
             if(gamepad1.right_bumper && timers.get("rightBumper1").milliseconds() >= 250){
                 gamepad2.rumble(150);
                 timers.get("rightBumper1").reset();
-            }
-
-            if(gamepad1.left_stick_button && timers.get("leftStick1").milliseconds() >= 250){
-                robot.intake.joint.setState(Joint.States.Block);
-                timers.get("leftStick1").reset();
-            }
-
-            if(gamepad1.right_stick_button && timers.get("rightStick1").milliseconds() >= 250){
-                robot.intake.joint.setState(Joint.States.Pass);
-                timers.get("rightStick1").reset();
             }
 
             if(gamepad1.triangle && gamepad1.dpad_up){

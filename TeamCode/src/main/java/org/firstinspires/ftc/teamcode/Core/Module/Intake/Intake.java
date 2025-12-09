@@ -1,58 +1,51 @@
 package org.firstinspires.ftc.teamcode.Core.Module.Intake;
 
-import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.Position;
+import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.breakBeamIntakeName;
+import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.intakeSensorName;
 
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighModule;
+import org.firstinspires.ftc.teamcode.Core.Hardware.HighSensor;
 
 
 public class Intake extends HighModule {
     public IntakeMotor intakeMotor;
-    public Joint joint;
     public Sorter sorter;
+    public HighSensor sensor;
+    public DigitalChannel breakBeam;
 
-    IntakeActions action;
+    IntakeActions action = IntakeActions.Collect;
 
     public enum IntakeActions{
         Collect,
-        CollectLowPower,
-        Spit,
         Transfer,
         Wait,
         Park
     }
     public Intake(HardwareMap hwMap){
         intakeMotor = new IntakeMotor(hwMap);
-        joint = new Joint(hwMap);
-        sorter = new Sorter(hwMap, Position, false);
+        sorter = new Sorter(hwMap);
+        sensor = new HighSensor(hwMap, intakeSensorName);
+        breakBeam = hwMap.get(DigitalChannel.class, breakBeamIntakeName);
     }
-    public Intake(HardwareMap hwMap ,double initPosition, boolean isAuto){
+    public Intake(HardwareMap hwMap, Sorter.Slots slot){
         intakeMotor = new IntakeMotor(hwMap);
-        joint = new Joint(hwMap, initPosition, isAuto);
-        sorter = new Sorter(hwMap, Position, true);
+        sorter = new Sorter(hwMap);
+        sensor = new HighSensor(hwMap, intakeSensorName);
+        breakBeam = hwMap.get(DigitalChannel.class, breakBeamIntakeName);
+        sorter.setSlot(slot);
     }
     public void setAction(IntakeActions action){
         this.action = action;
         switch (action){
-            case Collect:
-                intakeMotor.setState(IntakeMotor.States.Collect);
-                break;
-            case Wait:
-                intakeMotor.setState(IntakeMotor.States.Wait);
-                break;
-            case Spit:
-                intakeMotor.setState(IntakeMotor.States.Spit);
-                break;
-            case Park:
-                intakeMotor.setState(IntakeMotor.States.Wait);
-                intakeMotor.disable();
-                joint.setState(Joint.States.Park);
-                break;
-            case CollectLowPower:
-                intakeMotor.setPower(0.7);
-                break;
         }
+    }
+
+    public void setPower(IntakeMotor.States state){
+        intakeMotor.setState(state);
     }
 
     public IntakeActions getLastAction(){
@@ -61,8 +54,14 @@ public class Intake extends HighModule {
 
     @Override
     public void update() {
+        if(sorter.getState() == Sorter.States.Automated){
+            if(action == IntakeActions.Collect && !sorter.isFull){
+                if(sorter.getColor(sorter.getSlot()) != Constants.Color.None){
+                    sorter.setNextSlot();
+                }
+            }
+        }
         intakeMotor.update();
-        joint.update();
         sorter.update();
     }
 }
