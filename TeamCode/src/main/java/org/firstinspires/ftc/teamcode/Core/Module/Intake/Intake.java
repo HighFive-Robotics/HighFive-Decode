@@ -94,7 +94,7 @@ public class Intake extends HighModule {
             }
         }
 
-        if(timer.milliseconds() >= 1000){
+        if(timer.milliseconds() >= 750){
             artifactPassThrough = false;
         }
     }
@@ -109,6 +109,7 @@ public class Intake extends HighModule {
                             sorter.setNextSlot();
                         }
                     }
+                    updateColor();
                 }
             }
             break;
@@ -119,13 +120,13 @@ public class Intake extends HighModule {
                             sorter.setNextSlot();
                         }
                     }
+                    updateColor();
                 }
             }
             break;
             case Normal:
             break;
         }
-        updateColor();
         intakeMotor.update();
         sorter.update();
     }

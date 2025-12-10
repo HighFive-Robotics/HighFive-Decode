@@ -56,7 +56,7 @@ public class Sorter extends HighModule {
                 .setEncoder(encoder)
                 .build();
 
-        servo.setTolerance(2);
+        servo.setTolerance(1.35);
         tolerance = servo.getTolerance();
         setSlot(Slots.Slot2);
     }
