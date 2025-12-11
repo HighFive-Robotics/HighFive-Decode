@@ -113,8 +113,8 @@ public class Intake extends HighModule {
         switch (collectType){
             case Sorted:
                 if(sorter.getState() == Sorter.States.Automated){
-                    if(action == IntakeActions.Collect && !sorter.isFull){
-                        if(sorter.getColor(sorter.getSlot()) != None){
+                    if(!sorter.isFull){
+                        if(sorter.getColor(sorter.getSlot()) != None && !artifactPassThrough){
                             sorter.setNextSlot();
                         }
                     }
@@ -123,8 +123,8 @@ public class Intake extends HighModule {
                 break;
             case Mix:
                 if(sorter.getState() == Sorter.States.Automated && artifactNumber < 1){
-                    if(action == IntakeActions.Collect && !sorter.isFull){
-                        if(sorter.getColor(sorter.getSlot()) != None){
+                    if(!sorter.isFull){
+                        if(sorter.getColor(sorter.getSlot()) != None && !artifactPassThrough){
                             sorter.setNextSlot();
                         }
                     }
