@@ -27,8 +27,8 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighServo;
 
 @Config
 public class Sorter extends HighModule {
-    HighServo servo;
-    HighEncoder encoder;
+    public HighServo servo;
+    public HighEncoder encoder;
     public int slotNumber = 1;
     private final double tolerance;
     boolean isFull = false;

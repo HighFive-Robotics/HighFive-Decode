@@ -7,49 +7,50 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Sorter;
 
 @TeleOp
 public class TestSorter extends LinearOpMode{
 
-    Sorter sorter;
+    Intake intake;
     ElapsedTime timer = new ElapsedTime();
     ElapsedTime loopTimer = new ElapsedTime();
 
     @Override
     public void runOpMode() throws InterruptedException {
 
-        sorter = new Sorter(hardwareMap,hardwareMap.get(DcMotorEx.class, intakeMotorName),0);
+       intake = new Intake(hardwareMap);
         waitForStart();
         while(opModeIsActive()){
             if(gamepad1.left_bumper && timer.milliseconds() >= 250){
-                sorter.setPreviousSlot();
+                intake.sorter.setPreviousSlot();
                 timer.reset();
             }
             if(gamepad1.right_bumper && timer.milliseconds() >= 250){
-                sorter.setNextSlot();
+                intake.sorter.setNextSlot();
                 timer.reset();
             }
 
             if(gamepad1.square && timer.milliseconds() >= 250){
-                sorter.setSlot(Sorter.Slots.Slot1);
+                intake.sorter.setSlot(Sorter.Slots.Slot1);
                 timer.reset();
             }
             if(gamepad1.cross && timer.milliseconds() >= 250){
-                sorter.setSlot(Sorter.Slots.Slot2);
+                intake.sorter.setSlot(Sorter.Slots.Slot2);
                 timer.reset();
             }
             if(gamepad1.circle && timer.milliseconds() >= 250){
-                sorter.setSlot(Sorter.Slots.Slot3);
+                intake.sorter.setSlot(Sorter.Slots.Slot3);
                 timer.reset();
             }
 
-            telemetry.addData("Current slot:", sorter.getSlot());
-            telemetry.addData("Current number slot:", sorter.slotNumber);
+            telemetry.addData("Current slot:", intake.sorter.getSlot());
+            telemetry.addData("Current number slot:", intake.sorter.slotNumber);
             telemetry.addData("Hz", 1.0 / loopTimer.seconds());
             loopTimer.reset();
             telemetry.update();
-            sorter.update();
+            intake.update();
         }
     }
 }
