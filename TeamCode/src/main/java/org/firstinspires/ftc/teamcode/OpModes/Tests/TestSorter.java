@@ -1,7 +1,10 @@
 package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
+import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.intakeMotorName;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Sorter;
@@ -16,7 +19,7 @@ public class TestSorter extends LinearOpMode{
     @Override
     public void runOpMode() throws InterruptedException {
 
-        sorter = new Sorter(hardwareMap,0);
+        sorter = new Sorter(hardwareMap,hardwareMap.get(DcMotorEx.class, intakeMotorName),0);
         waitForStart();
         while(opModeIsActive()){
             if(gamepad1.left_bumper && timer.milliseconds() >= 250){

@@ -43,14 +43,14 @@ public class Intake extends HighModule {
 
     public Intake(HardwareMap hwMap){
         intakeMotor = new IntakeMotor(hwMap);
-        sorter = new Sorter(hwMap,0);
+        sorter = new Sorter(hwMap,intakeMotor.motor.motor,0);
         sensor = new HighSensor(hwMap, intakeSensorName);
         breakBeam = hwMap.get(DigitalChannel.class, breakBeamIntakeName);
         breakBeam.setMode(DigitalChannel.Mode.INPUT);
     }
     public Intake(HardwareMap hwMap, Sorter.Slots slot){
         intakeMotor = new IntakeMotor(hwMap);
-        sorter = new Sorter(hwMap,0);
+        sorter = new Sorter(hwMap,intakeMotor.motor.motor,0);
         sensor = new HighSensor(hwMap, intakeSensorName);
         breakBeam = hwMap.get(DigitalChannel.class, breakBeamIntakeName);
         breakBeam.setMode(DigitalChannel.Mode.INPUT);
