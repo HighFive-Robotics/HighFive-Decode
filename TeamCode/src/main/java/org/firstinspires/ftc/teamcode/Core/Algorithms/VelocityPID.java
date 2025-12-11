@@ -89,7 +89,6 @@ public class VelocityPID {
 
     public boolean atSetPoint() {
         return Math.abs(getVelocityError()) <= errorTolerance_v;
-
     }
 
     public double[] getCoefficients() {
@@ -117,7 +116,6 @@ public class VelocityPID {
 
     public double calculate(double pv) {
         return calculate(pv, 12);
-
     }
 
     public double calculate(double pv, double voltage) {
@@ -145,13 +143,10 @@ public class VelocityPID {
 
         if (Math.abs(periodSeconds) < 1E-9) {
             return prevBaseOutput;
-
         }
 
         double deltaError = errorVal_p - prevErrorVal;
-
         double proportionalTerm = kP * gainScheduler.apply(deltaError);
-
         double integralTerm = kI * errorVal_p * periodSeconds;
 
         double deltaErrorDerivative = (errorVal_p - 2 * prevErrorVal + prevPrevErrorVal);
@@ -162,10 +157,10 @@ public class VelocityPID {
         double derivativeTerm = kD * currentFilterEstimate;
 
         double deltaSetPoint = setPoint - prevSetPoint;
+
         double velocityFFTerm = kF * deltaSetPoint;
 
         double deltaBaseOutput = proportionalTerm + integralTerm + derivativeTerm + velocityFFTerm;
-
         double currentBaseOutput = prevBaseOutput + deltaBaseOutput;
 
         if (currentBaseOutput >= maxOutput && integralTerm > 0) {
@@ -179,7 +174,6 @@ public class VelocityPID {
         }
 
         currentBaseOutput = Range.clip(currentBaseOutput, minOutput, maxOutput);
-
         prevBaseOutput = currentBaseOutput;
 
         double staticTerm = 0;
@@ -188,6 +182,8 @@ public class VelocityPID {
         }
 
         double accTerm = kA * (deltaSetPoint / periodSeconds);
+
+        prevSetPoint = setPoint;
 
         double finalOutput = currentBaseOutput + staticTerm + accTerm;
 
