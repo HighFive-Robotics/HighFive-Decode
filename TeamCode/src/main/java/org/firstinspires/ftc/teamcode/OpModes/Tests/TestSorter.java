@@ -11,10 +11,10 @@ public class TestSorter extends LinearOpMode{
 
     Sorter sorter;
     ElapsedTime timer = new ElapsedTime();
+    ElapsedTime loopTimer = new ElapsedTime();
 
     @Override
     public void runOpMode() throws InterruptedException {
-
 
         sorter = new Sorter(hardwareMap,0);
         waitForStart();
@@ -41,6 +41,11 @@ public class TestSorter extends LinearOpMode{
                 timer.reset();
             }
 
+            telemetry.addData("Current slot:", sorter.getSlot());
+            telemetry.addData("Current number slot:", sorter.slotNumber);
+            telemetry.addData("Hz", 1.0 / loopTimer.seconds());
+            loopTimer.reset();
+            telemetry.update();
             sorter.update();
         }
     }

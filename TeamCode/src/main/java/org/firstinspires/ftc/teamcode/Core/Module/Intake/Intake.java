@@ -28,7 +28,7 @@ public class Intake extends HighModule {
     public boolean breakBeamCollected = false;
 
     IntakeActions action = IntakeActions.Collect;
-    CollectTypes collectType = CollectTypes.Sorted;
+    CollectTypes collectType = CollectTypes.Normal;
 
     public enum IntakeActions{
         Collect,

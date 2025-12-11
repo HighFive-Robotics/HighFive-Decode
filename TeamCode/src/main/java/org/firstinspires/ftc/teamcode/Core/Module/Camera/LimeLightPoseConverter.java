@@ -46,7 +46,7 @@ public class LimeLightPoseConverter extends LinearOpMode {
                     status.getTemp(), status.getCpu(),(int)status.getFps());
             telemetry.addData("Pipeline", "Index: %d, Type: %s",
                     status.getPipelineIndex(), status.getPipelineType());
-            limelight.updateRobotOrientation(robot.drive.getHeading());
+           // limelight.updateRobotOrientation(robot.drive.getHeading());
             LLResult result = limelight.getLatestResult();
             if (result.isValid()) {
                 Pose3D botpose = result.getBotpose();

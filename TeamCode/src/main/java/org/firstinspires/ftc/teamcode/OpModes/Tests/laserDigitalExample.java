@@ -22,6 +22,7 @@
 
 package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -45,6 +46,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
  * Display:
  * The current detection state is displayed in telemetry.
  */
+@Disabled
 @TeleOp(name = "laserDigitalExample")
 public class laserDigitalExample extends LinearOpMode {
 

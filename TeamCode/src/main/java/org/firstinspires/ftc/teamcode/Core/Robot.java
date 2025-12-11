@@ -13,9 +13,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighModule;
-import org.firstinspires.ftc.teamcode.Core.Module.Others.Drive;
+import org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
-import org.firstinspires.ftc.teamcode.Core.Module.Others.Lift;
+
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Shooter;
 
 import java.util.List;
@@ -35,7 +35,6 @@ public class Robot extends HighModule {
     //public Camera camera;
     public Shooter shooter;
     public Intake intake;
-    public Lift lift;
 
     boolean isAuto;
     boolean stopShoot = false, stopIntake = false;
@@ -43,7 +42,6 @@ public class Robot extends HighModule {
     public enum Actions {
         Shoot,
         PrepareForShooting,
-
         WaitToBeFedUp,
         ColorGreen,//Doesn't work
         ColorPurple,//Doesn't work
@@ -65,7 +63,6 @@ public class Robot extends HighModule {
                 drive.startFieldCentricDrive(gamepad, true, startPose.getHeading());
             }
         }
-        lift = new Lift(hardwareMap);
         shooter = new Shooter(hardwareMap);
         intake = new Intake(hardwareMap);
         allHubs = hardwareMap.getAll(LynxModule.class);
@@ -84,7 +81,6 @@ public class Robot extends HighModule {
             drive.setStartingPose(startPose);
            // camera = new Camera(hardwareMap);
         }
-        lift = new Lift(hardwareMap);
         shooter = new Shooter(hardwareMap);
         intake = new Intake(hardwareMap);
         allHubs = hardwareMap.getAll(LynxModule.class);
@@ -98,12 +94,12 @@ public class Robot extends HighModule {
         lastAction = action;
         switch (action){
             case Shoot:
-                intake.setAction(Intake.IntakeActions.Collect);
+                intake.setPower(IntakeMotor.States.Collect);
                 stopShoot = true;
                 timerShoot.reset();
                 break;
             case PrepareForShooting:
-                intake.intakeMotor.setPower(-0.7);
+                intake.setPower(IntakeMotor.States.Spit);
                 stopIntake = true;
                 timerIntake.reset();
                 break;
@@ -111,7 +107,7 @@ public class Robot extends HighModule {
     }
 
     public boolean isDone() {
-        return !drive.isBusy();
+        return false;
     }
 
     @Override
@@ -130,7 +126,6 @@ public class Robot extends HighModule {
 
         shooter.update();
         intake.update();
-        lift.update();
         drive.update();
         if (isAuto) {
             //camera.update();

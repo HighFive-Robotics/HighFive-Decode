@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Core.Module.Intake;
 
+import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.intakeMotorName;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.shooterMotorDownName;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.sorterServoName;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kD;
@@ -47,7 +48,7 @@ public class Sorter extends HighModule {
     States state = States.Automated;
 
     public Sorter(HardwareMap hwMap, double offset) {
-        encoder = new HighEncoder(hwMap.get(DcMotorEx.class, shooterMotorDownName), offset, false);
+        encoder = new HighEncoder(hwMap.get(DcMotorEx.class, intakeMotorName), offset, true);
         servo = HighServo.Builder.startBuilding()
                 .setServo(hwMap.get(CRServo.class , sorterServoName))
                 .setPIDRunMode()
@@ -56,9 +57,10 @@ public class Sorter extends HighModule {
                 .setEncoder(encoder)
                 .build();
 
-        servo.setTolerance(1.35);
-        tolerance = servo.getTolerance();
+        tolerance = 1.35;
+        servo.pidfController.setTolerance(tolerance);
         setSlot(Slots.Slot2);
+        slotNumber = 2;
     }
 
     public void setSlot(Slots slot) {
@@ -88,14 +90,17 @@ public class Sorter extends HighModule {
         switch (slotNumber){
             case 1: {
                 servo.setTarget(targetSlot1);
+                slot = Slots.Slot1;
             }
             break;
             case 2: {
                 servo.setTarget(targetSlot2);
+                slot = Slots.Slot2;
             }
             break;
             case 3: {
                 servo.setTarget(targetSlot3);
+                slot = Slots.Slot3;
             }
             break;
         }
@@ -108,16 +113,19 @@ public class Sorter extends HighModule {
                 servo.setTarget(targetSlot2);
                 slot = Slots.Slot2;
             }
+            break;
             case 2:{
                 slotNumber = 3;
                 servo.setTarget(targetSlot3);
                 slot = Slots.Slot3;
             }
+            break;
             case 3:{
                 slotNumber = 1;
                 servo.setTarget(targetSlot1);
                 slot = Slots.Slot1;
             }
+            break;
         }
     }
 
@@ -128,16 +136,19 @@ public class Sorter extends HighModule {
                 servo.setTarget(targetSlot3);
                 slot = Slots.Slot3;
             }
+            break;
             case 2:{
                 slotNumber = 1;
                 servo.setTarget(targetSlot1);
                 slot = Slots.Slot1;
             }
+            break;
             case 3:{
                 slotNumber = 2;
                 servo.setTarget(targetSlot2);
                 slot = Slots.Slot2;
             }
+            break;
         }
     }
 

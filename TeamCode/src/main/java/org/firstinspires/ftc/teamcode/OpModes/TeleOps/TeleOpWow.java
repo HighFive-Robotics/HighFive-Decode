@@ -30,7 +30,7 @@ public class TeleOpWow extends LinearOpMode {
     Robot robot;
 
     public HashMap<String , ElapsedTime> timers = new HashMap<>();
-
+    ElapsedTime loopTimer = new ElapsedTime();
     Telemetry graph;
 
 
@@ -89,12 +89,6 @@ public class TeleOpWow extends LinearOpMode {
                 timers.get("rightBumper1").reset();
             }
 
-            if(gamepad1.triangle && gamepad1.dpad_up){
-                robot.lift.setPower(1);
-            } else {
-                robot.lift.setPower(0);
-            }
-
             if(gamepad2.right_bumper && timers.get("rightBumper2").milliseconds() >= 250){
                 intakeDriver2 = true;
                 robot.setAction(Robot.Actions.Shoot);
@@ -139,7 +133,7 @@ public class TeleOpWow extends LinearOpMode {
                 rumbled = true;
             }
             if(gamepad1.ps){
-                robot.drive.resetTeleOpHeading();
+                 robot.drive.resetTeleOpHeading();
             }
 
             if(robot.intake.getLastAction() == Intake.IntakeActions.Wait){
@@ -151,7 +145,7 @@ public class TeleOpWow extends LinearOpMode {
                 rumbled = false;
             }
 
-            telemetry.addData("State intake:" , robot.intake.intakeMotor.getState());
+            /*telemetry.addData("State intake:" , robot.intake.intakeMotor.getState());
             telemetry.addData("Power intake:" , robot.intake.intakeMotor.power);
             telemetry.addData("Shooter 1:" , robot.shooter.motorUp.getPower());
             telemetry.addData("Shooter 2:" , robot.shooter.motorDown.getPower());
@@ -164,7 +158,13 @@ public class TeleOpWow extends LinearOpMode {
             telemetry.addData("Rumble" , rumbled);
             telemetry.addData("target > 2" , robot.shooter.getTarget() > 2);
             telemetry.addData("at target" , robot.shooter.atTarget() );
-            telemetry.addData("rumbled" , timers.get("rumble").milliseconds());
+            telemetry.addData("rumbled" , timers.get("rumble").milliseconds());*/
+
+            telemetry.addData("Slot: ", robot.intake.sorter.getSlot());
+            telemetry.addData("Slot number: ", robot.intake.sorter.slotNumber);
+            telemetry.addData("Action intake:" , robot.intake.getLastAction());
+            telemetry.addData("Hz", 1.0 / loopTimer.seconds());
+            loopTimer.reset();
             telemetry.update();
             graph.update();
             robot.update();

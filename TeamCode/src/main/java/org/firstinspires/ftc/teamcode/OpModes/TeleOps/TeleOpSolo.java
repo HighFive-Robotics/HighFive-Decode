@@ -24,14 +24,12 @@ public class TeleOpSolo extends LinearOpMode {
 
     public static double littleVelo = 4 , bigVelo = 7.5 , negativeVelo = -2;
 
-
     public boolean intakeDriver2 = false, rumbled = false;
     Robot robot;
 
     public HashMap<String , ElapsedTime> timers = new HashMap<>();
 
     Telemetry graph;
-
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -76,12 +74,6 @@ public class TeleOpSolo extends LinearOpMode {
                 robot.intake.setPower(IntakeMotor.States.Collect);
             } else if(!intakeDriver2) {
                 robot.intake.setPower(IntakeMotor.States.Wait);
-            }
-
-            if(gamepad1.triangle && gamepad1.dpad_up){
-                robot.lift.setPower(1);
-            } else {
-                robot.lift.setPower(0);
             }
 
             if(gamepad1.right_bumper && timers.get("rightBumper2").milliseconds() >= 250){
