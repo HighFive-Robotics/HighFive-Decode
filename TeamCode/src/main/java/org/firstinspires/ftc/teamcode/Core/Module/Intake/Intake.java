@@ -77,6 +77,7 @@ public class Intake extends HighModule {
             timer.reset();
         }
         if(artifactPassThrough){
+            sensor.update();
             if(sensor.getColor() != None && sorter.getColor(sorter.getSlot()) != None){
                 Constants.Color color = sensor.getColor();
                 sorter.setColor(sensor.getColor(), sorter.getSlot());
