@@ -28,7 +28,7 @@ public class Intake extends HighModule {
     public boolean breakBeamCollected = false;
 
     IntakeActions action = IntakeActions.Collect;
-    CollectTypes collectType = CollectTypes.Normal;
+    CollectTypes collectType = CollectTypes.Sorted;
 
     public enum IntakeActions{
         Collect,
@@ -66,6 +66,14 @@ public class Intake extends HighModule {
         intakeMotor.setState(state);
     }
 
+    public void setCollectType(CollectTypes CollectTypes) {
+        this.collectType = CollectTypes;
+    }
+
+    public CollectTypes getCollectType() {
+        return collectType;
+    }
+
     public IntakeActions getLastAction(){
         return action;
     }
@@ -78,9 +86,9 @@ public class Intake extends HighModule {
         }
         if(artifactPassThrough){
             sensor.update();
-            if(sensor.getColor() != None && sorter.getColor(sorter.getSlot()) != None){
+            if(sensor.getColor() != None && sorter.getColor(sorter.getSlot()) == None){
                 Constants.Color color = sensor.getColor();
-                sorter.setColor(sensor.getColor(), sorter.getSlot());
+                sorter.setColor(color, sorter.getSlot());
                 artifactNumber++;
                 switch(color){
                     case Purple:{

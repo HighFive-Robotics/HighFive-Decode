@@ -132,6 +132,16 @@ public class TeleOpWow extends LinearOpMode {
                 timers.get("rumble").reset();
                 rumbled = true;
             }
+
+            if(gamepad2.dpad_left && timers.get("square2").milliseconds() >= 250){
+                robot.intake.sorter.setPreviousSlot();
+                timers.get("square2").reset();
+            }
+            if(gamepad2.dpad_right && timers.get("square2").milliseconds() >= 250){
+                robot.intake.sorter.setNextSlot();
+
+                timers.get("square2").reset();
+            }
             if(gamepad1.ps){
                  robot.drive.resetTeleOpHeading();
             }
@@ -163,6 +173,10 @@ public class TeleOpWow extends LinearOpMode {
             telemetry.addData("Slot: ", robot.intake.sorter.getSlot());
             telemetry.addData("Slot number: ", robot.intake.sorter.slotNumber);
             telemetry.addData("Action intake:" , robot.intake.getLastAction());
+            telemetry.addData("Collect type:" , robot.intake.getCollectType());
+            telemetry.addData("Break beam:" , robot.intake.breakBeamCollected);
+            telemetry.addData("ArtifactPassThrough:" , robot.intake.artifactPassThrough);
+            telemetry.addData("Color:" , robot.intake.sensor.getColor());
             telemetry.addData("Hz", 1.0 / loopTimer.seconds());
             loopTimer.reset();
             telemetry.update();

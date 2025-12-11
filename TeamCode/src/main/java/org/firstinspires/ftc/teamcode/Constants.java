@@ -72,7 +72,7 @@ public class Constants {
 
         @Config
         public static class ColorSensorConstants{
-            public static double tolerance = 100;
+            public static double tolerance = 150;
             public static Color currentColor = Color.None;
             public static float[] targetGreenRGB = {30F, 155F, 100F};
             public static float[] targetPurpleRGB = {90F, 120F, 180F};

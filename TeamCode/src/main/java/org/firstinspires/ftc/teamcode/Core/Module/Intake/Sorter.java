@@ -48,7 +48,7 @@ public class Sorter extends HighModule {
     States state = States.Automated;
 
     public Sorter(HardwareMap hwMap,DcMotorEx motor, double offset) {
-        encoder = new HighEncoder(motor, offset, true);
+        encoder = new HighEncoder(motor, offset, false);
         servo = HighServo.Builder.startBuilding()
                 .setServo(hwMap.get(CRServo.class , sorterServoName))
                 .setPIDRunMode()
