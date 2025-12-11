@@ -102,7 +102,7 @@ public class Intake extends HighModule {
             }
         }
 
-        if(timer.milliseconds() >= 750){
+        if(timer.milliseconds() >= 350){
             artifactPassThrough = false;
             colorAssignedToCurrentSample = false;
         }
