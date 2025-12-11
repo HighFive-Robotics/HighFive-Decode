@@ -112,6 +112,10 @@ public class Robot extends HighModule {
 
     @Override
     public void update() {
+        for (LynxModule hub : allHubs) {
+            hub.clearBulkCache();
+        }
+
         Constants.Globals.voltage = hardwareMap.voltageSensor.iterator().next().getVoltage();
 
         if(stopShoot && (timerShoot.milliseconds() > 1200 || shooter.getVelocityError() >= 0.7)){
@@ -130,8 +134,6 @@ public class Robot extends HighModule {
         if (isAuto) {
             //camera.update();
         }
-        for (LynxModule hub : allHubs) {
-            hub.clearBulkCache();
-        }
+
     }
 }
