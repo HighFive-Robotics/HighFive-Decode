@@ -412,6 +412,7 @@ public class HighMotor {
      * This value is updated in the update() method.
      */
     public double getCurrentDrawn() {
+        currentDrawn = motor.getCurrent(CurrentUnit.AMPS);
         return currentDrawn;
     }
 
@@ -879,7 +880,6 @@ public class HighMotor {
         if(useEncoder){
             currentPosition = motor.getCurrentPosition() * reverseEncoderMultiplier;
         }
-        currentDrawn = motor.getCurrent(CurrentUnit.AMPS);
         switch(runMode){
             case Squid:
                 power = getPowerSquid(currentPosition);
