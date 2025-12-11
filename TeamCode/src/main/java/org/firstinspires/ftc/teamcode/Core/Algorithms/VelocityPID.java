@@ -245,9 +245,7 @@ public class VelocityPID {
             deltaOutput = proportionalTerm + integralTerm + derivativeTerm + feedForwardChange;
             currentOutput = prevOutput + deltaOutput;
         }
-        if(setPoint==0 && closeToNull(prevOutput,pv)){currentOutput = 0;}
         currentOutput = Range.clip(currentOutput, minOutput, maxOutput);
-        currentOutput = voltage>=13?currentOutput*(12/voltage):currentOutput;
         currentOutput = Range.clip(currentOutput, minOutput, maxOutput);
         prevOutput = currentOutput;
 
