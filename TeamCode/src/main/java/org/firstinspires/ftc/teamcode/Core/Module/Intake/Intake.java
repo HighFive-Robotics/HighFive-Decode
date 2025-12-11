@@ -15,7 +15,6 @@ import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighModule;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighSensor;
 
-
 public class Intake extends HighModule {
     public IntakeMotor intakeMotor;
     public Sorter sorter;
@@ -26,6 +25,7 @@ public class Intake extends HighModule {
 
     public boolean artifactPassThrough = false;
     public boolean breakBeamCollected = false;
+    private boolean colorAssignedToCurrentSample = false;
 
     IntakeActions action = IntakeActions.Collect;
     CollectTypes collectType = CollectTypes.Sorted;
@@ -48,6 +48,7 @@ public class Intake extends HighModule {
         breakBeam = hwMap.get(DigitalChannel.class, breakBeamIntakeName);
         breakBeam.setMode(DigitalChannel.Mode.INPUT);
     }
+
     public Intake(HardwareMap hwMap, Sorter.Slots slot){
         intakeMotor = new IntakeMotor(hwMap);
         sorter = new Sorter(hwMap,intakeMotor.motor.motor,0);
@@ -56,10 +57,9 @@ public class Intake extends HighModule {
         breakBeam.setMode(DigitalChannel.Mode.INPUT);
         sorter.setSlot(slot);
     }
+
     public void setAction(IntakeActions action){
         this.action = action;
-        switch (action){
-        }
     }
 
     public void setPower(IntakeMotor.States state){
@@ -86,32 +86,32 @@ public class Intake extends HighModule {
         }
         if(artifactPassThrough){
             sensor.update();
-            if(sensor.getColor() != None && sorter.getColor(sorter.getSlot()) == None){
+            if(sensor.getColor() != None && sorter.getColor(sorter.getSlot()) == None && !colorAssignedToCurrentSample){
                 Constants.Color color = sensor.getColor();
                 sorter.setColor(color, sorter.getSlot());
+                colorAssignedToCurrentSample = true;
                 artifactNumber++;
                 switch(color){
-                    case Purple:{
+                    case Purple:
                         purpleArtifactNumber++;
-                    }
-                    break;
-                    case Green:{
+                        break;
+                    case Green:
                         greenArtifactNumber++;
-                    }
-                    break;
+                        break;
                 }
             }
         }
 
         if(timer.milliseconds() >= 750){
             artifactPassThrough = false;
+            colorAssignedToCurrentSample = false;
         }
     }
 
     @Override
     public void update() {
         switch (collectType){
-            case Sorted:{
+            case Sorted:
                 if(sorter.getState() == Sorter.States.Automated){
                     if(action == IntakeActions.Collect && !sorter.isFull){
                         if(sorter.getColor(sorter.getSlot()) != None){
@@ -120,9 +120,8 @@ public class Intake extends HighModule {
                     }
                     updateColor();
                 }
-            }
-            break;
-            case Mix:{
+                break;
+            case Mix:
                 if(sorter.getState() == Sorter.States.Automated && artifactNumber < 1){
                     if(action == IntakeActions.Collect && !sorter.isFull){
                         if(sorter.getColor(sorter.getSlot()) != None){
@@ -131,10 +130,9 @@ public class Intake extends HighModule {
                     }
                     updateColor();
                 }
-            }
-            break;
+                break;
             case Normal:
-            break;
+                break;
         }
         intakeMotor.update();
         sorter.update();
