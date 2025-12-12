@@ -1,120 +1,115 @@
 package org.firstinspires.ftc.teamcode.Core.Hardware;
 
-
 import static org.firstinspires.ftc.teamcode.Constants.Color.Green;
 import static org.firstinspires.ftc.teamcode.Constants.Color.None;
 import static org.firstinspires.ftc.teamcode.Constants.Color.Purple;
-import static org.firstinspires.ftc.teamcode.Constants.Intake.ColorSensorConstants.GreenValuesHSV;
-import static org.firstinspires.ftc.teamcode.Constants.Intake.ColorSensorConstants.PurpleValuesHSV;
-import static org.firstinspires.ftc.teamcode.Constants.Intake.ColorSensorConstants.Treshold;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.ColorSensorConstants.currentColor;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.ColorSensorConstants.targetGreenRGB;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.ColorSensorConstants.targetPurpleRGB;
-import static org.firstinspires.ftc.teamcode.Constants.Intake.ColorSensorConstants.tolerance;
+
+import android.graphics.Color;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
-import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Algorithms.LowPassFilter;
 
-import java.util.Arrays;
-
 @Config
-public class HighSensor extends HighModule{
+public class HighSensor extends HighModule {
     RevColorSensorV3 sensor;
-    private final LowPassFilter redFilter, blueFilter, greenFilter;
-    double filterParameter = 0.8;
+    private final LowPassFilter hFilter, sFilter, vFilter;
+
+    public static double HUE_TOLERANCE = 30;
+    public static double MIN_SATURATION = 0.3;
+    public static double MAX_DISTANCE_CM = 3.0;
+
     float[] hsvValues = new float[3];
-    float[] rgbValues = new float[3];
-    double greenError = 0, purpleError = 0;
+    double filteredHue = 0;
+
+    private double greenTargetHue;
+    private double purpleTargetHue;
 
     public HighSensor(HardwareMap hardwareMap, String name) {
         sensor = hardwareMap.get(RevColorSensorV3.class, name);
+        sensor.setGain(25.0f);
 
-        redFilter = new LowPassFilter(filterParameter, sensor.red());
-        greenFilter = new LowPassFilter(filterParameter, sensor.green());
-        blueFilter = new LowPassFilter(filterParameter, sensor.blue());
+        hFilter = new LowPassFilter(0.7, 0);
+        sFilter = new LowPassFilter(0.7, 0);
+        vFilter = new LowPassFilter(0.7, 0);
+
+        float[] tempHsv = new float[3];
+        Color.RGBToHSV((int)targetGreenRGB[0], (int)targetGreenRGB[1], (int)targetGreenRGB[2], tempHsv);
+        greenTargetHue = tempHsv[0];
+
+        Color.RGBToHSV((int)targetPurpleRGB[0], (int)targetPurpleRGB[1], (int)targetPurpleRGB[2], tempHsv);
+        purpleTargetHue = tempHsv[0];
     }
 
     public double getDistance(DistanceUnit distanceUnit) {
         return sensor.getDistance(distanceUnit);
     }
 
-    private void updateColor() {
-        rgbValues[0] = (float) redFilter.getValue(sensor.red()) / 16;
-        rgbValues[1] = (float) greenFilter.getValue(sensor.green()) / 16;
-        rgbValues[2] = (float) blueFilter.getValue(sensor.blue()) / 16;
+    private void updateColorProcessing() {
+        NormalizedRGBA colors = sensor.getNormalizedColors();
+        Color.colorToHSV(colors.toColor(), hsvValues);
+
+        hsvValues[0] = (float) hFilter.getValue(hsvValues[0]);
+        hsvValues[1] = (float) sFilter.getValue(hsvValues[1]);
+        hsvValues[2] = (float) vFilter.getValue(hsvValues[2]);
+
+        filteredHue = hsvValues[0];
     }
 
-    private void updateSetColorHSV() {
-        if (Math.abs(hsvValues[0] - GreenValuesHSV[0]) <= Treshold[0]) {
-            currentColor = Green;
-        } else if (Math.abs(hsvValues[0] - PurpleValuesHSV[0]) <= Treshold[0]) {
-            currentColor = Purple;
-        } else {
+    private void determineColorState() {
+        double dist = sensor.getDistance(DistanceUnit.CM);
+
+        if (dist > MAX_DISTANCE_CM) {
             currentColor = None;
+            return;
         }
-    }
 
-    private void updateSetColorRGB() {
-        if(greenError < purpleError && greenError <= tolerance){
+        if (hsvValues[1] < MIN_SATURATION) {
+            currentColor = None;
+            return;
+        }
+
+        if (Math.abs(filteredHue - greenTargetHue) < HUE_TOLERANCE) {
             currentColor = Green;
-        } else if(purpleError < greenError && purpleError <= tolerance){
+        }
+        else if (Math.abs(filteredHue - purpleTargetHue) < HUE_TOLERANCE) {
             currentColor = Purple;
-        } else {
+        }
+        else {
             currentColor = None;
         }
     }
 
     @Override
     public void update() {
-        updateColor();
-        greenError = getError(rgbValues, targetGreenRGB);
-        purpleError = getError(rgbValues, targetPurpleRGB);
-        updateSetColorRGB();
-    }
-
-    public void updateHSV() {
-        updateColor();
-        updateSetColorHSV();
+        updateColorProcessing();
+        determineColorState();
     }
 
     public Constants.Color getColor() {
         return currentColor;
     }
 
-    public float[] RGB() {
-        return rgbValues;
-    }
-
     public float[] getHSVColorValues(){
-        android.graphics.Color.RGBToHSV((int)rgbValues[0] / 16, (int)rgbValues[1] / 16, (int)rgbValues[2] / 16, hsvValues);
         return hsvValues;
     }
 
-    private double getError(float r1, float r2, float g1, float g2, float b1, float b2){
-        return Math.sqrt((r1-r2)*(r1-r2)+(g1-g2)*(g1-g2)+(b1-b2)*(b1-b2));
-    }
-
-    private double getError(float[] rgb1, float[] rgb2){
-        return Math.sqrt((rgb1[0]-rgb2[0])*(rgb1[0]-rgb2[0])+(rgb1[1]-rgb2[1])*(rgb1[1]-rgb2[1])+(rgb1[2]-rgb2[2])*(rgb1[2]-rgb2[2]));
-    }
-
     public void telemetry(Telemetry telemetry) {
-        telemetry.addData("Color in RGB", Arrays.toString(rgbValues));
-        telemetry.addData("Color in Red", (sensor.red()));
-        telemetry.addData("Color in Green", (sensor.green()));
-        telemetry.addData("Color in Blue", (sensor.blue()));
-        telemetry.addData("Color in HSV", Arrays.toString(this.hsvValues));
-        telemetry.addData("Error Green", greenError);
-        telemetry.addData("Target Green", Arrays.toString(targetGreenRGB));
-        telemetry.addData("Error Purple", purpleError);
-        telemetry.addData("Target Purple", Arrays.toString(targetPurpleRGB));
-        telemetry.addData("Color known", this.getColor());
+        telemetry.addData("Distance (CM)", sensor.getDistance(DistanceUnit.CM));
+        telemetry.addData("Hue", hsvValues[0]);
+        telemetry.addData("Saturation", hsvValues[1]);
+        telemetry.addData("Value", hsvValues[2]);
+        telemetry.addData("Green Target Hue", greenTargetHue);
+        telemetry.addData("Purple Target Hue", purpleTargetHue);
+        telemetry.addData("Detected Color", currentColor);
     }
 }
