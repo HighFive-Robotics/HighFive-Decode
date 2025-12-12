@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Core.Algorithms;
 
 import java.util.function.Function;
+
 public class SQUIDAngle {
     private double kP, kI, kD, kF;
     private double setPoint;
@@ -17,26 +18,17 @@ public class SQUIDAngle {
     private double period;
     private double lastDerivative = 0;
     private double derivativeFilterGain = 0.8;
-    private final double linThreshold = 3;
-    private final double lineMultiplier = 1.2, dampeningLevel=0.06;
+    private final double linThreshold = 2.0;
     public Function<Double,Double> gainS = correction -> {
         double val = Math.abs(correction);
         if (val <= linThreshold) {
             return (correction * val) / linThreshold;
         }
-        else if(val <= 6) {
+        else {
             return correction;
         }
-        else {
-            return correction * 1.05;
-        }
     };
-    public Function<Double,Double> coefGain = coef -> {
-        double error = Math.abs(errorVal_p);
-        if(error >= 1.5 && error <= linThreshold * lineMultiplier){
-            return coef - Math.pow(dampeningLevel,(int)(error));
-        }else return coef;
-    };
+    public Function<Double,Double> coefGain = coef -> coef;
     public SQUIDAngle(double kp, double ki, double kd, double kf) {
         this(kp, ki, kd, kf, 0, 0);
     }
@@ -144,9 +136,12 @@ public class SQUIDAngle {
         } else {
             totalError = 0;
         }
+
         double mappedError = gainS.apply(errorVal_p);
         double mappedP = coefGain.apply(kP);
+
         double pTerm = mappedP * Math.sqrt(Math.abs(mappedError)) * Math.signum(mappedError);
+
         return pTerm + kI * totalError + kD * errorVal_v + kF * setPoint;
     }
     public void setPIDF(double kp, double ki, double kd, double kf) {
