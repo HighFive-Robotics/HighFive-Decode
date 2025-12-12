@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighMotor;
 @Config
 public class IntakeMotor extends HighModule {
 
-    public HighMotor motor, inactiveMotor;
+    public HighMotor motor;
 
     public enum States {
         Collect,
@@ -65,13 +65,5 @@ public class IntakeMotor extends HighModule {
     @Override
     public void update() {
         motor.update();
-    }
-    public void disable(){
-        setState(States.Wait);
-        inactiveMotor = motor;
-        motor = null;
-    }
-    public void enable(){
-        motor = inactiveMotor;
     }
 }

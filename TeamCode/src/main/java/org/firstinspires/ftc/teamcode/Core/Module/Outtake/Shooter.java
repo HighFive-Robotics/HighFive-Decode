@@ -44,7 +44,7 @@ public class Shooter extends HighModule {
                 .setReverseMotor(true)
                 .setUseZeroPowerBehaviour(false)
                 .build();
-        blocker = new BlockerOuttake(hwMap,blocker.ClosedPosition,true);
+        blocker = new BlockerOuttake(hwMap, BlockerOuttake.ClosedPosition,true);
         tolerance = motorUp.getTolerance();
     }
 
@@ -69,7 +69,7 @@ public class Shooter extends HighModule {
     public void update() {
         velocity = motorUp.getCurrentVelocity();
         motorUp.update();
-        motorUp.setVelocityPIDFSA(kp,ki,kd,kf,ks,ka,1);
+        //motorUp.setVelocityPIDFSA(kp,ki,kd,kf,ks,ka,1);
         motorDown.setPower(motorUp.getPower());
         motorDown.update();
         blocker.update();

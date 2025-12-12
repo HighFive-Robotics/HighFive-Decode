@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.OpModes.TeleOps;
 
 import static org.firstinspires.ftc.teamcode.Constants.Globals.finalAutoPose;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.sorterColors;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -31,7 +32,6 @@ public class TeleOpWow extends LinearOpMode {
 
     public HashMap<String , ElapsedTime> timers = new HashMap<>();
     ElapsedTime loopTimer = new ElapsedTime();
-    Telemetry graph;
 
 
     @Override
@@ -66,7 +66,6 @@ public class TeleOpWow extends LinearOpMode {
         timers.get("triangle2").reset();
         timers.get("rumble").reset();
 
-        graph = FtcDashboard.getInstance().getTelemetry();
         waitForStart();
 
         while (opModeIsActive()) {
@@ -177,10 +176,10 @@ public class TeleOpWow extends LinearOpMode {
             telemetry.addData("Break beam:" , robot.intake.breakBeamCollected);
             telemetry.addData("ArtifactPassThrough:" , robot.intake.artifactPassThrough);
             telemetry.addData("Color:" , robot.intake.sensor.getColor());
+            telemetry.addData("Colors", sorterColors.toString());
             telemetry.addData("Hz", 1.0 / loopTimer.seconds());
             loopTimer.reset();
             telemetry.update();
-            graph.update();
             robot.update();
         }
     }

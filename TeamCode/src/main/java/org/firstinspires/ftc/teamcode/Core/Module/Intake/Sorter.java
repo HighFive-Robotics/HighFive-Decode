@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.Core.Module.Intake;
 
-import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.intakeMotorName;
-import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.shooterMotorDownName;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.sorterServoName;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kD;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kF;
@@ -17,7 +15,6 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.Constants;
@@ -106,6 +103,22 @@ public class Sorter extends HighModule {
         }
     }
 
+    public int getNextSlot(int slotNumber){
+        slotNumber = Range.clip(slotNumber, 1, 3);
+        switch (slotNumber){
+            case 1:{
+                return 2;
+            }
+            case 2:{
+                return 3;
+            }
+            case 3:{
+                return 1;
+            }
+        }
+        return 0;
+    }
+
     public void setNextSlot(){
         switch (slotNumber){
             case 1:{
@@ -171,17 +184,40 @@ public class Sorter extends HighModule {
         return Constants.Color.None;
     }
 
+    public Constants.Color getColor(int slotNumber) {
+        slotNumber = Range.clip(slotNumber, 1, 3);
+        switch (slotNumber){
+            case 1:{
+                return sorterColors[0];
+            }
+            case 2:{
+                return sorterColors[1];
+            }
+            case 3:{
+                return sorterColors[2];
+            }
+        }
+        return Constants.Color.None;
+    }
+
+    public int getSlotNumber() {
+        return slotNumber;
+    }
+
     public void setColor(Constants.Color color, Slots slot) {
         switch (slot){
             case Slot1:{
                 sorterColors[0] = color;
             }
+            break;
             case Slot2:{
                 sorterColors[1] = color;
             }
+            break;
             case Slot3:{
                 sorterColors[2] = color;
             }
+            break;
         }
     }
 

@@ -7,7 +7,6 @@ import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -29,8 +28,6 @@ public class Robot extends HighModule {
     public Follower drive;
     public List<LynxModule> allHubs;
     protected HardwareMap hardwareMap;
-
-    public IMU imu;
 
     //public Camera camera;
     public Shooter shooter;
@@ -69,7 +66,6 @@ public class Robot extends HighModule {
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
-
     }
 
     public Robot(HardwareMap hardwareMap, Pose startPose, boolean isAuto, Constants.Color allianceColor, Telemetry telemetry) {
@@ -87,7 +83,6 @@ public class Robot extends HighModule {
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
-
     }
 
     public void setAction(Actions action){
@@ -131,9 +126,6 @@ public class Robot extends HighModule {
         shooter.update();
         intake.update();
         drive.update();
-        if (isAuto) {
-            //camera.update();
-        }
 
     }
 }

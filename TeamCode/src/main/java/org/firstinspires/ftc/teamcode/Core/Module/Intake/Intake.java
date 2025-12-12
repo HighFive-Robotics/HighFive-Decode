@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.Core.Module.Intake;
 
+import static org.firstinspires.ftc.teamcode.Constants.Color.Green;
 import static org.firstinspires.ftc.teamcode.Constants.Color.None;
+import static org.firstinspires.ftc.teamcode.Constants.Color.Purple;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.breakBeamIntakeName;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.intakeSensorName;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.artifactNumber;
@@ -32,6 +34,8 @@ public class Intake extends HighModule {
 
     public enum IntakeActions{
         Collect,
+        FindGreen,
+        FindPurple,
         Wait,
     }
 
@@ -60,6 +64,32 @@ public class Intake extends HighModule {
 
     public void setAction(IntakeActions action){
         this.action = action;
+        switch (action){
+           case FindGreen:{
+               if(greenArtifactNumber > 0){
+                   if(sorter.getColor(sorter.getSlot()) != Green){
+                       if(sorter.getColor(sorter.getNextSlot(sorter.getSlotNumber())) == Green){
+                            sorter.setNextSlot();
+                       } else {
+                           sorter.setPreviousSlot();
+                       }
+                   }
+               }
+           }
+           break;
+            case FindPurple:{
+                if(purpleArtifactNumber > 0){
+                    if(sorter.getColor(sorter.getSlot()) != Purple){
+                        if(sorter.getColor(sorter.getNextSlot(sorter.getSlotNumber())) == Purple){
+                            sorter.setNextSlot();
+                        } else {
+                            sorter.setPreviousSlot();
+                        }
+                    }
+                }
+            }
+            break;
+        }
     }
 
     public void setPower(IntakeMotor.States state){
@@ -79,27 +109,31 @@ public class Intake extends HighModule {
     }
 
     public void updateColor(){
-        breakBeamCollected = breakBeam.getState();
-        if(breakBeamCollected){
-            artifactPassThrough = true;
-            timer.reset();
-        }
-        if(artifactPassThrough){
-            sensor.update();
-            if(sensor.getColor() != None && sorter.getColor(sorter.getSlot()) == None && !colorAssignedToCurrentSample){
-                Constants.Color color = sensor.getColor();
-                sorter.setColor(color, sorter.getSlot());
-                colorAssignedToCurrentSample = true;
-                artifactNumber++;
-                switch(color){
-                    case Purple:
-                        purpleArtifactNumber++;
-                        break;
-                    case Green:
-                        greenArtifactNumber++;
-                        break;
+        if(intakeMotor.getState() != IntakeMotor.States.Wait){
+            breakBeamCollected = breakBeam.getState();
+            if(breakBeamCollected){
+                artifactPassThrough = true;
+                timer.reset();
+            }
+            if(artifactPassThrough){
+                sensor.update();
+                if(sensor.getColor() != None && sorter.getColor(sorter.getSlot()) == None && !colorAssignedToCurrentSample){
+                    Constants.Color color = sensor.getColor();
+                    sorter.setColor(color, sorter.getSlot());
+                    colorAssignedToCurrentSample = true;
+                    artifactNumber++;
+                    switch(color){
+                        case Purple:
+                            purpleArtifactNumber++;
+                            break;
+                        case Green:
+                            greenArtifactNumber++;
+                            break;
+                        }
                 }
             }
+        } else {
+            breakBeamCollected = false;
         }
 
         if(timer.milliseconds() >= 350){
