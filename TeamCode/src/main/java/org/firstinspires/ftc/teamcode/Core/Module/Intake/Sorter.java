@@ -28,7 +28,7 @@ public class Sorter extends HighModule {
     public HighEncoder encoder;
     public int slotNumber = 1;
     private final double tolerance;
-    boolean isFull = false;
+    public boolean isFull = false;
 
     public enum States {
         Manual,
