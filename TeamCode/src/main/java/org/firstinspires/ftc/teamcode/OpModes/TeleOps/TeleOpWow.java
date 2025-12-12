@@ -177,6 +177,7 @@ public class TeleOpWow extends LinearOpMode {
             telemetry.addData("ArtifactPassThrough:" , robot.intake.artifactPassThrough);
             telemetry.addData("Color:" , robot.intake.sensor.getColor());
             telemetry.addData("Colors", sorterColors.toString());
+            telemetry.addData("Is Full", robot.intake.sorter.isFull);
             telemetry.addData("Hz", 1.0 / loopTimer.seconds());
             loopTimer.reset();
             telemetry.update();

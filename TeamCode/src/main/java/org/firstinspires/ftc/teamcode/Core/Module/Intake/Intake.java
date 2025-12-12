@@ -136,7 +136,7 @@ public class Intake extends HighModule {
             breakBeamCollected = false;
         }
 
-        if(timer.milliseconds() >= 350){
+        if(timer.milliseconds() >= 550){
             artifactPassThrough = false;
             colorAssignedToCurrentSample = false;
         }
