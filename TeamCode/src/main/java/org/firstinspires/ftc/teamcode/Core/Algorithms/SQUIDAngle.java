@@ -18,7 +18,7 @@ public class SQUIDAngle {
     private double lastDerivative = 0;
     private double derivativeFilterGain = 0.8;
     private final double linThreshold = 3;
-    private final double lineMultiplier = 1.2, dampeningLevel=0.12;
+    private final double lineMultiplier = 1.2, dampeningLevel=0.06;
     public Function<Double,Double> gainS = correction -> {
         double val = Math.abs(correction);
         if (val <= linThreshold) {
