@@ -24,9 +24,9 @@ public class HighSensor extends HighModule {
     RevColorSensorV3 sensor;
     private final LowPassFilter hFilter, sFilter, vFilter;
 
-    public static double HUE_TOLERANCE = 30;
-    public static double MIN_SATURATION = 0.3;
-    public static double MAX_DISTANCE_CM = 3.0;
+    public static double hueTolerance = 30;
+    public static double minSaturation = 0.3;
+    public static double maxDistanceCm = 3.0;
 
     float[] hsvValues = new float[3];
     double filteredHue = 0;
@@ -68,20 +68,20 @@ public class HighSensor extends HighModule {
     private void determineColorState() {
         double dist = sensor.getDistance(DistanceUnit.CM);
 
-        if (dist > MAX_DISTANCE_CM) {
+        if (dist > maxDistanceCm) {
             currentColor = None;
             return;
         }
 
-        if (hsvValues[1] < MIN_SATURATION) {
+        if (hsvValues[1] < minSaturation) {
             currentColor = None;
             return;
         }
 
-        if (Math.abs(filteredHue - greenTargetHue) < HUE_TOLERANCE) {
+        if (Math.abs(filteredHue - greenTargetHue) < hueTolerance) {
             currentColor = Green;
         }
-        else if (Math.abs(filteredHue - purpleTargetHue) < HUE_TOLERANCE) {
+        else if (Math.abs(filteredHue - purpleTargetHue) < hueTolerance) {
             currentColor = Purple;
         }
         else {
