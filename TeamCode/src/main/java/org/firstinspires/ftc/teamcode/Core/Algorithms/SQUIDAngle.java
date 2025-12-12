@@ -25,7 +25,7 @@ public class SQUIDAngle {
             return (correction * val) / linThreshold;
         }
         else {
-            return correction;
+            return correction*1.1;
         }
     };
     public Function<Double,Double> coefGain = coef -> coef;
