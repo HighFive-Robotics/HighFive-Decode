@@ -21,7 +21,7 @@ import java.util.List;
 
 public class Robot extends HighModule {
 
-    ElapsedTime timerShoot = new ElapsedTime(), timerIntake = new ElapsedTime();
+    ElapsedTime timerShoot = new ElapsedTime(), timerIntake = new ElapsedTime() , voltageTimer = new ElapsedTime();
 
     Telemetry telemetry;
     public Actions lastAction = Actions.None;
@@ -110,8 +110,10 @@ public class Robot extends HighModule {
         for (LynxModule hub : allHubs) {
             hub.clearBulkCache();
         }
-
-        Constants.Globals.voltage = hardwareMap.voltageSensor.iterator().next().getVoltage();
+        if(voltageTimer.milliseconds() >= 500) {
+            Constants.Globals.voltage = hardwareMap.voltageSensor.iterator().next().getVoltage();
+            voltageTimer.reset();
+        }
 
         if(stopShoot && (timerShoot.milliseconds() > 1200 || shooter.getVelocityError() >= 0.7)){
             stopShoot = false;
