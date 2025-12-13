@@ -78,15 +78,15 @@ public class Constants {
             public static float[] targetPurpleRGB = {62F, 60F, 105F};
 
             //We don't use this anymore
-            public static float[] GreenValuesHSV = {160F,0.75F,20F};
-            public static float[] PurpleValuesHSV = {215F,0.40F,5F};
+            public static float[] GreenValuesHSV = {160F,0.6F,20F};
+            public static float[] PurpleValuesHSV = {215F,0.35F,5F};
             public static float[] Treshold = {17.5F, 0.2F, 5F};
         }
 
         @Config
         public static class SorterConstants{
 
-            public static double kP = 0.0335, kI = 0.0002, kD = 0.0005, kF=0.0005;
+            public static double kP = 0.0235, kI = 0.01, kD = 0.0003, kF=0.0005;
 
             public static int artifactNumber = 0, purpleArtifactNumber = 0, greenArtifactNumber = 0;
             public static double ticksPerRotation = 8192;

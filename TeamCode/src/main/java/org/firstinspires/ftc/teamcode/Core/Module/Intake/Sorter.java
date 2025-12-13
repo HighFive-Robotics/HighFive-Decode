@@ -58,6 +58,10 @@ public class Sorter extends HighModule {
         servo.pidfController.setTolerance(tolerance);
         setSlot(Slots.Slot2);
         slotNumber = 2;
+
+        sorterColors[0] = Constants.Color.None;
+        sorterColors[1] = Constants.Color.None;
+        sorterColors[2] = Constants.Color.None;
     }
 
     public void setSlot(Slots slot) {
@@ -103,8 +107,7 @@ public class Sorter extends HighModule {
         }
     }
 
-    public int getNextSlot(int slotNumber){
-        slotNumber = Range.clip(slotNumber, 1, 3);
+    public int getNextSlot(){
         switch (slotNumber){
             case 1:{
                 return 2;

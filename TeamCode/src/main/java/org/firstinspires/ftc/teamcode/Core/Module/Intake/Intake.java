@@ -23,6 +23,10 @@ public class Intake extends HighModule {
     public HighSensor sensor;
     public DigitalChannel breakBeam;
 
+    Sorter.Slots currentSlot;
+    Constants.Color currentColor;
+    int currentSlotNumber;
+
     ElapsedTime timer = new ElapsedTime();
 
     public boolean artifactPassThrough = false;
@@ -67,8 +71,8 @@ public class Intake extends HighModule {
         switch (action){
            case FindGreen:{
                if(greenArtifactNumber > 0){
-                   if(sorter.getColor(sorter.getSlot()) != Green){
-                       if(sorter.getColor(sorter.getNextSlot(sorter.getSlotNumber())) == Green){
+                   if(currentColor != Green){
+                       if(sorter.getColor(sorter.getNextSlot()) == Green){
                             sorter.setNextSlot();
                        } else {
                            sorter.setPreviousSlot();
@@ -79,8 +83,8 @@ public class Intake extends HighModule {
            break;
             case FindPurple:{
                 if(purpleArtifactNumber > 0){
-                    if(sorter.getColor(sorter.getSlot()) != Purple){
-                        if(sorter.getColor(sorter.getNextSlot(sorter.getSlotNumber())) == Purple){
+                    if(currentColor != Purple){
+                        if(sorter.getColor(sorter.getNextSlot()) == Purple){
                             sorter.setNextSlot();
                         } else {
                             sorter.setPreviousSlot();
@@ -110,33 +114,41 @@ public class Intake extends HighModule {
 
     public void updateColor(){
         if(intakeMotor.getState() != IntakeMotor.States.Wait){
-            breakBeamCollected = breakBeam.getState();
-            if(breakBeamCollected){
-                artifactPassThrough = true;
-                timer.reset();
-            }
-            if(artifactPassThrough){
-                sensor.update();
-                if(sensor.getColor() != None && sorter.getColor(sorter.getSlot()) == None && !colorAssignedToCurrentSample){
-                    Constants.Color color = sensor.getColor();
-                    sorter.setColor(color, sorter.getSlot());
-                    colorAssignedToCurrentSample = true;
-                    artifactNumber++;
-                    switch(color){
-                        case Purple:
-                            purpleArtifactNumber++;
-                            break;
-                        case Green:
-                            greenArtifactNumber++;
-                            break;
+            if(intakeMotor.getPower() >= 0){
+                breakBeamCollected = breakBeam.getState();
+                if(breakBeamCollected){
+                    artifactPassThrough = true;
+                    timer.reset();
+                }
+                if(artifactPassThrough){
+                    sensor.update();
+                    if(sensor.getColor() != None && currentColor == None && !colorAssignedToCurrentSample){
+                        Constants.Color color = sensor.getColor();
+                        sorter.setColor(color, currentSlot);
+                        colorAssignedToCurrentSample = true;
+                        artifactNumber++;
+                        switch(color){
+                            case Purple:
+                                purpleArtifactNumber++;
+                                break;
+                            case Green:
+                                greenArtifactNumber++;
+                                break;
                         }
+                    }
+                }
+            } else if(intakeMotor.getPower() <= 0){
+                breakBeamCollected = breakBeam.getState();
+                if(breakBeamCollected){
+                    sorter.setColor(None, currentSlot);
                 }
             }
+
         } else {
             breakBeamCollected = false;
         }
 
-        if(timer.milliseconds() >= 550){
+        if(timer.milliseconds() >= 250){
             artifactPassThrough = false;
             colorAssignedToCurrentSample = false;
         }
@@ -144,11 +156,14 @@ public class Intake extends HighModule {
 
     @Override
     public void update() {
+        currentSlot = sorter.getSlot();
+        currentSlotNumber = sorter.getSlotNumber();
+        currentColor = sorter.getColor(currentSlot);
         switch (collectType){
             case Sorted:
                 if(sorter.getState() == Sorter.States.Automated){
                     if(!sorter.isFull){
-                        if(sorter.getColor(sorter.getSlot()) != None && !artifactPassThrough){
+                        if(currentColor != None && !artifactPassThrough){
                             sorter.setNextSlot();
                         }
                     }
@@ -158,7 +173,7 @@ public class Intake extends HighModule {
             case Mix:
                 if(sorter.getState() == Sorter.States.Automated && artifactNumber < 1){
                     if(!sorter.isFull){
-                        if(sorter.getColor(sorter.getSlot()) != None && !artifactPassThrough){
+                        if(currentColor != None && !artifactPassThrough){
                             sorter.setNextSlot();
                         }
                     }

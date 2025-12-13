@@ -22,7 +22,7 @@ public class IntakeMotor extends HighModule {
         Collect,
         Wait,
         Spit,
-        Transfer
+        Transfer,
     }
 
     States state = States.Wait;
@@ -56,6 +56,10 @@ public class IntakeMotor extends HighModule {
                 setPower(powerSpit);
                 break;
         }
+    }
+
+    public double getPower(){
+        return power;
     }
 
     public States getState() {

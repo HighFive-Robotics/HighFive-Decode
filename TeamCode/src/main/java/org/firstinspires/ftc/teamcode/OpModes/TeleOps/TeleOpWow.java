@@ -1,6 +1,10 @@
 package org.firstinspires.ftc.teamcode.OpModes.TeleOps;
 
 import static org.firstinspires.ftc.teamcode.Constants.Globals.finalAutoPose;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kD;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kF;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kI;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kP;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.sorterColors;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -17,6 +21,7 @@ import org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.BlockerOuttake;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 @Config
@@ -154,6 +159,11 @@ public class TeleOpWow extends LinearOpMode {
                 rumbled = false;
             }
 
+            if(gamepad2.dpad_down){
+                sorterColors = new Constants.Color[]{Constants.Color.None, Constants.Color.None, Constants.Color.None};
+            }
+
+            robot.intake.sorter.servo.setPIDCoefficients(kP,kI,kD,kF);
             /*telemetry.addData("State intake:" , robot.intake.intakeMotor.getState());
             telemetry.addData("Power intake:" , robot.intake.intakeMotor.power);
             telemetry.addData("Shooter 1:" , robot.shooter.motorUp.getPower());
@@ -167,7 +177,7 @@ public class TeleOpWow extends LinearOpMode {
             telemetry.addData("Rumble" , rumbled);
             telemetry.addData("target > 2" , robot.shooter.getTarget() > 2);
             telemetry.addData("at target" , robot.shooter.atTarget() );
-            telemetry.addData("rumbled" , timers.get("rumble").milliseconds());*/
+            telemetry.addData("rumbled" , timers.get("rumble").milliseconds());
 
             telemetry.addData("Slot: ", robot.intake.sorter.getSlot());
             telemetry.addData("Slot number: ", robot.intake.sorter.slotNumber);
@@ -177,7 +187,16 @@ public class TeleOpWow extends LinearOpMode {
             telemetry.addData("ArtifactPassThrough:" , robot.intake.artifactPassThrough);
             telemetry.addData("Color:" , robot.intake.sensor.getColor());
             telemetry.addData("Colors", sorterColors.toString());
-            telemetry.addData("Is Full", robot.intake.sorter.isFull);
+            telemetry.addData("Is Full", robot.intake.sorter.isFull);*/
+
+            telemetry.addData("Angle:", robot.intake.sorter.servo.getCurrentPositionPID());
+            telemetry.addData("Error:" , robot.intake.sorter.servo.pidfController.getPositionError());
+            telemetry.addData("Target:" , robot.intake.sorter.servo.getTargetPID());
+            telemetry.addData("Power:", robot.intake.sorter.servo.getPowerPID(robot.intake.sorter.servo.getCurrentPositionPID()));
+            telemetry.addData("Color 1:", sorterColors[0]);
+            telemetry.addData("Color 2:", sorterColors[1]);
+            telemetry.addData("Color 3:", sorterColors[2]);
+            robot.intake.sensor.telemetry(telemetry);
             telemetry.addData("Hz", 1.0 / loopTimer.seconds());
             loopTimer.reset();
             telemetry.update();
