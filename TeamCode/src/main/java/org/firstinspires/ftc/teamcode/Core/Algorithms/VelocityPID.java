@@ -224,7 +224,6 @@ public class VelocityPID {
     public void clearTotalError() {
         prevBaseOutput = 0;
     }
-
     public void setDerivativeFilterGain(double gain) {
         if (gain < 0 || gain >= 1) throw new IllegalArgumentException("Filter gain must be between 0 (inclusive) and 1 (exclusive)");
         filterGain = gain;

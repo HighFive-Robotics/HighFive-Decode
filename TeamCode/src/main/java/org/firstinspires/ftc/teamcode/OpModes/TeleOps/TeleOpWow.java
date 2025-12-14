@@ -1,10 +1,13 @@
 package org.firstinspires.ftc.teamcode.OpModes.TeleOps;
 
 import static org.firstinspires.ftc.teamcode.Constants.Globals.finalAutoPose;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.artifactNumber;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.greenArtifactNumber;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kD;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kF;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kI;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kP;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.purpleArtifactNumber;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.sorterColors;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -16,6 +19,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.Core.Hardware.HighServo;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.BlockerOuttake;
@@ -163,7 +167,7 @@ public class TeleOpWow extends LinearOpMode {
                 sorterColors = new Constants.Color[]{Constants.Color.None, Constants.Color.None, Constants.Color.None};
             }
 
-            robot.intake.sorter.servo.setPIDCoefficients(kP,kI,kD,kF);
+    robot.intake.sorter.servo.setPIDCoefficients(kP,kI,kD,kF, HighServo.FeedForwardType.Arm,1);
             /*telemetry.addData("State intake:" , robot.intake.intakeMotor.getState());
             telemetry.addData("Power intake:" , robot.intake.intakeMotor.power);
             telemetry.addData("Shooter 1:" , robot.shooter.motorUp.getPower());
@@ -193,9 +197,13 @@ public class TeleOpWow extends LinearOpMode {
             telemetry.addData("Error:" , robot.intake.sorter.servo.pidfController.getPositionError());
             telemetry.addData("Target:" , robot.intake.sorter.servo.getTargetPID());
             telemetry.addData("Power:", robot.intake.sorter.servo.getPowerPID(robot.intake.sorter.servo.getCurrentPositionPID()));
+            telemetry.addData("Velocity Error" , robot.shooter.getVelocityError());
             telemetry.addData("Color 1:", sorterColors[0]);
             telemetry.addData("Color 2:", sorterColors[1]);
             telemetry.addData("Color 3:", sorterColors[2]);
+            telemetry.addData("Artifact number:", artifactNumber);
+            telemetry.addData("Purple Artifact number:", purpleArtifactNumber);
+            telemetry.addData("Green Artifact number:", greenArtifactNumber);
             robot.intake.sensor.telemetry(telemetry);
             telemetry.addData("Hz", 1.0 / loopTimer.seconds());
             loopTimer.reset();

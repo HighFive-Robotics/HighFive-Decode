@@ -4,6 +4,7 @@ import java.util.function.Function;
 
 public class SQUIDAngle {
     private double kP, kI, kD, kF;
+
     private double setPoint;
     private double measuredValue;
     private double minIntegral, maxIntegral;
@@ -18,20 +19,27 @@ public class SQUIDAngle {
     private double period;
     private double lastDerivative = 0;
     private double derivativeFilterGain = 0.8;
-    private final double linThreshold = 2.0;
+    private final double linThreshold = 1;
+
     public Function<Double,Double> gainS = correction -> {
         double val = Math.abs(correction);
+
         if (val <= linThreshold) {
-            return (correction * val) / linThreshold;
+
+            return (correction * val) / (linThreshold * 0.5);
         }
         else {
-            return correction*1.1;
+            return correction * (2.0 + Math.pow(val / 100.0, 2));
         }
     };
-    public Function<Double,Double> coefGain = coef -> coef;
+    public Function<Double,Double> coefGain = coef -> {
+        return coef * 1.0;
+    };
+
     public SQUIDAngle(double kp, double ki, double kd, double kf) {
         this(kp, ki, kd, kf, 0, 0);
     }
+
     public SQUIDAngle(double kp, double ki, double kd, double kf, double sp, double pv) {
         kP = kp;
         kI = ki;
@@ -46,28 +54,35 @@ public class SQUIDAngle {
         errorVal_p = setPoint - measuredValue;
         reset();
     }
+
     public void reset() {
         totalError = 0;
         prevErrorVal = 0;
         lastTimeStamp = 0;
         lastDerivative = 0;
     }
+
     public void setTolerance(double positionTolerance) {
         setTolerance(positionTolerance, Double.POSITIVE_INFINITY);
     }
+
     public void setTolerance(double positionTolerance, double velocityTolerance) {
         errorTolerance_p = positionTolerance;
         errorTolerance_v = velocityTolerance;
     }
+
     public void setIntegralZone(double degrees) {
         this.integralZone = degrees;
     }
+
     public void setDerivativeFilter(double gain) {
         this.derivativeFilterGain = gain;
     }
+
     public double getSetPoint() {
         return setPoint;
     }
+
     public void setSetPoint(double sp) {
         setPoint = sp;
         errorVal_p = (setPoint - measuredValue) % 360.0;
@@ -84,28 +99,36 @@ public class SQUIDAngle {
             errorVal_v = 0;
         }
     }
+
     public boolean atSetPoint() {
         return Math.abs(errorVal_p) < errorTolerance_p && Math.abs(errorVal_v) < errorTolerance_v;
     }
+
     public double[] getCoefficients() {
         return new double[]{kP, kI, kD, kF};
     }
+
     public double getPositionError() {
         return errorVal_p;
     }
+
     public double[] getTolerance() {
         return new double[]{errorTolerance_p, errorTolerance_v};
     }
+
     public double getVelocityError() {
         return errorVal_v;
     }
+
     public double calculate() {
         return calculate(measuredValue);
     }
+
     public double calculate(double pv, double sp) {
         setSetPoint(sp);
         return calculate(pv);
     }
+
     public double calculate(double pv) {
         double currentTimeStamp = System.nanoTime() * 1.0E-9;
         if (lastTimeStamp == 0) lastTimeStamp = currentTimeStamp;
@@ -114,11 +137,13 @@ public class SQUIDAngle {
         prevErrorVal = errorVal_p;
         measuredValue = pv;
         errorVal_p = (setPoint - measuredValue) % 360.0;
+
         if (errorVal_p > 180.0) {
             errorVal_p -= 360.0;
         } else if (errorVal_p < -180.0) {
             errorVal_p += 360.0;
         }
+
         if (period > 1E-6) {
             double rawDerivative = (errorVal_p - prevErrorVal) / period;
             errorVal_v = (derivativeFilterGain * lastDerivative) + ((1 - derivativeFilterGain) * rawDerivative);
@@ -126,9 +151,11 @@ public class SQUIDAngle {
         } else {
             errorVal_v = 0;
         }
+
         if (errorVal_p * prevErrorVal < 0) {
             totalError = 0;
         }
+
         if (Math.abs(errorVal_p) <= integralZone) {
             totalError += period * errorVal_p;
             if (totalError > maxIntegral) totalError = maxIntegral;
@@ -142,46 +169,35 @@ public class SQUIDAngle {
 
         double pTerm = mappedP * Math.sqrt(Math.abs(mappedError)) * Math.signum(mappedError);
 
-        return pTerm + kI * totalError + kD * errorVal_v + kF * setPoint;
+        double fTerm = kF * setPoint;
+
+        return pTerm + (kI * totalError) + (kD * errorVal_v) + fTerm;
     }
+
     public void setPIDF(double kp, double ki, double kd, double kf) {
         kP = kp;
         kI = ki;
         kD = kd;
         kF = kf;
     }
+
     public void setIntegrationBounds(double integralMin, double integralMax) {
         minIntegral = integralMin;
         maxIntegral = integralMax;
     }
+
     public void clearTotalError() {
         totalError = 0;
     }
-    public void setP(double kp) {
-        kP = kp;
-    }
-    public void setI(double ki) {
-        kI = ki;
-    }
-    public void setD(double kd) {
-        kD = kd;
-    }
-    public void setF(double kf) {
-        kF = kf;
-    }
-    public double getP() {
-        return kP;
-    }
-    public double getI() {
-        return kI;
-    }
-    public double getD() {
-        return kD;
-    }
-    public double getF() {
-        return kF;
-    }
-    public double getPeriod() {
-        return period;
-    }
+
+    public void setP(double kp) { kP = kp; }
+    public void setI(double ki) { kI = ki; }
+    public void setD(double kd) { kD = kd; }
+    public void setF(double kf) { kF = kf; }
+
+    public double getP() { return kP; }
+    public double getI() { return kI; }
+    public double getD() { return kD; }
+    public double getF() { return kF; }
+    public double getPeriod() { return period; }
 }

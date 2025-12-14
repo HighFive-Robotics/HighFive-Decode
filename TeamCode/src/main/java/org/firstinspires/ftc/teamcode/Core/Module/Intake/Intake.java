@@ -8,6 +8,7 @@ import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.intakeSensorN
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.artifactNumber;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.greenArtifactNumber;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.purpleArtifactNumber;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.sorterColors;
 
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -126,15 +127,6 @@ public class Intake extends HighModule {
                         Constants.Color color = sensor.getColor();
                         sorter.setColor(color, currentSlot);
                         colorAssignedToCurrentSample = true;
-                        artifactNumber++;
-                        switch(color){
-                            case Purple:
-                                purpleArtifactNumber++;
-                                break;
-                            case Green:
-                                greenArtifactNumber++;
-                                break;
-                        }
                     }
                 }
             } else if(intakeMotor.getPower() <= 0){
@@ -148,7 +140,7 @@ public class Intake extends HighModule {
             breakBeamCollected = false;
         }
 
-        if(timer.milliseconds() >= 250){
+        if(timer.milliseconds() >= 400){
             artifactPassThrough = false;
             colorAssignedToCurrentSample = false;
         }
@@ -183,6 +175,42 @@ public class Intake extends HighModule {
             case Normal:
                 break;
         }
+
+       artifactNumber = 0;
+       purpleArtifactNumber = 0;
+       greenArtifactNumber = 0;
+
+        switch(sorterColors[0]){
+            case Purple:
+                purpleArtifactNumber++;
+                artifactNumber++;
+                break;
+            case Green:
+                greenArtifactNumber++;
+                artifactNumber++;
+                break;
+        }
+        switch(sorterColors[1]){
+            case Purple:
+                purpleArtifactNumber++;
+                artifactNumber++;
+                break;
+            case Green:
+                greenArtifactNumber++;
+                artifactNumber++;
+                break;
+        }
+        switch(sorterColors[2]){
+            case Purple:
+                purpleArtifactNumber++;
+                artifactNumber++;
+                break;
+            case Green:
+                greenArtifactNumber++;
+                artifactNumber++;
+                break;
+        }
+
         intakeMotor.update();
         sorter.update();
     }

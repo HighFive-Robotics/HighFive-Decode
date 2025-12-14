@@ -1,67 +1,71 @@
 package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.intakeMotorName;
-import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.shooterMotorDownName;
-import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.sorterServoName;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kD;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kF;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kI;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kP;
-import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.ticksPerRotation;
 
-import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Constants;
-import org.firstinspires.ftc.teamcode.Core.Hardware.HighEncoder;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighServo;
+import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
+import org.firstinspires.ftc.teamcode.Core.Module.Intake.Sorter;
 
-@Config
 @TeleOp
-public class PIDSorterTest extends LinearOpMode {
+public class PIDSorterTest extends LinearOpMode{
 
-    double power = 0;
-    HighServo servo;
-    HighEncoder encoder;
-    public static double target=0;
-    double enc;
+    Intake intake;
+    ElapsedTime timer = new ElapsedTime();
+    ElapsedTime loopTimer = new ElapsedTime();
+    boolean autoCycling = false;
+
     @Override
     public void runOpMode() throws InterruptedException {
-        encoder = new HighEncoder(hardwareMap.get(DcMotorEx.class, intakeMotorName), 0, true);
-
-        servo = HighServo.Builder.startBuilding()
-                .setServo(hardwareMap.get(CRServo.class , sorterServoName))
-                .setPIDRunMode()
-                .setPIDCoefficients(kP,kI,kD,kF)
-                .setEncoderResolution(ticksPerRotation)
-                .setEncoder(encoder)
-                .build();
-
-        encoder.resetPosition();
-        servo.pidfController.setTolerance(1.35);
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        intake = new Intake(hardwareMap);
+        intake.sorter.setSlot(Sorter.Slots.Slot1);
         waitForStart();
         while(opModeIsActive()){
-            servo.setPIDCoefficients(kP,kI,kD,kF);
-            if(gamepad1.square){
-                target = 0;
+            intake.sorter.servo.setPIDCoefficients(kP,kI,kD,kF, HighServo.FeedForwardType.Lift,1);
+
+            if(gamepad1.ps && timer.milliseconds() >= 250){
+                autoCycling = !autoCycling;
+                timer.reset();
             }
-            if(gamepad1.cross){
-                target=120;
+            if(gamepad1.square && timer.milliseconds() >= 250){
+                intake.sorter.setSlot(Sorter.Slots.Slot1);
+                timer.reset();
             }
-            if(gamepad1.circle){
-                target=240;
+            if(gamepad1.cross && timer.milliseconds() >= 250){
+                intake.sorter.setSlot(Sorter.Slots.Slot2);
+                timer.reset();
             }
-            servo.setTarget(target);
-            telemetry.addData("Angle:", servo.getCurrentPositionPID());
-            telemetry.addData("Error:" , servo.pidfController.getPositionError());
-            telemetry.addData("Target:" , target);
-            telemetry.addData("Power:", servo.getPowerPID(servo.getCurrentPositionPID()));
+            if(gamepad1.circle && timer.milliseconds() >= 250){
+                intake.sorter.setSlot(Sorter.Slots.Slot3);
+                timer.reset();
+            }
+
+            if(timer.seconds() >= 5 && autoCycling){
+                intake.sorter.setNextSlot();
+                timer.reset();
+            }
+            telemetry.addData("Angle:", intake.sorter.servo.getCurrentPositionPID());
+            telemetry.addData("Target:", intake.sorter.servo.getTargetPID());
+            telemetry.addData("Error:" ,intake.sorter.servo.pidfController.getPositionError());
+            telemetry.addData("Error:" ,intake.sorter.servo.pidfController.getPositionError());
+            telemetry.addData("Current slot:", intake.sorter.getSlot());
+            telemetry.addData("Current number slot:", intake.sorter.slotNumber);
+            telemetry.addData("Hz", 1.0 / loopTimer.seconds());
+            loopTimer.reset();
             telemetry.update();
-            servo.update();
+            intake.update();
         }
     }
 }
