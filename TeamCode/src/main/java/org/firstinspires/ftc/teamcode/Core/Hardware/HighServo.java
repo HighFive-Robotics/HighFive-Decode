@@ -552,7 +552,6 @@ public class HighServo {
                 currentPositionPID = currentPositionPID % encoderResolution;
                 if (currentPositionPID < 0) currentPositionPID += encoderResolution;
                 currentPositionPID = currentPositionPID / encoderResolution * 360;
-
                 power = pidfController.calculate(currentPositionPID);
                 if (Math.abs(power - lastPower) >= epsilon) {
                     CRServo.setPower(power);

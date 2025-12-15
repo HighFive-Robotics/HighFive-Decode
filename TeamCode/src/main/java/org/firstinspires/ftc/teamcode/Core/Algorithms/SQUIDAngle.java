@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Core.Algorithms;
 
+import java.nio.channels.ClosedByInterruptException;
 import java.util.function.Function;
 
 public class SQUIDAngle {
@@ -19,18 +20,14 @@ public class SQUIDAngle {
     private double period;
     private double lastDerivative = 0;
     private double derivativeFilterGain = 0.8;
-    private final double linThreshold = 1;
+    private final double linThreshold = 900;
+    private double angleMultiplier = 100;
 
     public Function<Double,Double> gainS = correction -> {
-        double val = Math.abs(correction);
-
-        if (val <= linThreshold) {
-
-            return (correction * val) / (linThreshold * 0.5);
-        }
-        else {
-            return correction * (2.0 + Math.pow(val / 100.0, 2));
-        }
+        if(Math.abs(correction) < linThreshold){
+            double newCorrection = (correction)*(linThreshold/angleMultiplier);
+            return correction;
+        }else return correction*2.5;
     };
     public Function<Double,Double> coefGain = coef -> {
         return coef * 1.0;
@@ -45,8 +42,9 @@ public class SQUIDAngle {
         kI = ki;
         kD = kd;
         kF = kf;
-        setPoint = sp;
-        measuredValue = pv;
+        setPoint = angleMultiplier*sp;
+        setIntegralZone(integralZone);
+        measuredValue = pv*angleMultiplier;
         minIntegral = -1.0;
         maxIntegral = 1.0;
         lastTimeStamp = 0;
@@ -67,12 +65,12 @@ public class SQUIDAngle {
     }
 
     public void setTolerance(double positionTolerance, double velocityTolerance) {
-        errorTolerance_p = positionTolerance;
-        errorTolerance_v = velocityTolerance;
+        errorTolerance_p = angleMultiplier*positionTolerance;
+        errorTolerance_v = angleMultiplier*velocityTolerance;
     }
 
     public void setIntegralZone(double degrees) {
-        this.integralZone = degrees;
+        this.integralZone = degrees * angleMultiplier;
     }
 
     public void setDerivativeFilter(double gain) {
@@ -84,12 +82,12 @@ public class SQUIDAngle {
     }
 
     public void setSetPoint(double sp) {
-        setPoint = sp;
-        errorVal_p = (setPoint - measuredValue) % 360.0;
-        if (errorVal_p > 180.0) {
-            errorVal_p -= 360.0;
-        } else if (errorVal_p < -180.0) {
-            errorVal_p += 360.0;
+        setPoint = sp*angleMultiplier;
+        errorVal_p = (setPoint - measuredValue) % (360.0*angleMultiplier);
+        if (errorVal_p > (180*angleMultiplier)) {
+            errorVal_p -= (360.0*angleMultiplier);
+        } else if (errorVal_p <(-180*angleMultiplier)) {
+            errorVal_p += (360.0*angleMultiplier);
         }
         if (Math.abs(period) > 1E-6) {
             double rawDerivative = (errorVal_p - prevErrorVal) / period;
@@ -135,13 +133,13 @@ public class SQUIDAngle {
         period = currentTimeStamp - lastTimeStamp;
         lastTimeStamp = currentTimeStamp;
         prevErrorVal = errorVal_p;
-        measuredValue = pv;
-        errorVal_p = (setPoint - measuredValue) % 360.0;
+        measuredValue = pv*angleMultiplier;
+        errorVal_p = (setPoint - measuredValue) % (360.0*angleMultiplier);
 
-        if (errorVal_p > 180.0) {
-            errorVal_p -= 360.0;
-        } else if (errorVal_p < -180.0) {
-            errorVal_p += 360.0;
+        if (errorVal_p > (180.0*angleMultiplier)) {
+            errorVal_p -= (360.0*angleMultiplier);
+        } else if (errorVal_p < (-180.0*angleMultiplier)) {
+            errorVal_p += (360.0*angleMultiplier);
         }
 
         if (period > 1E-6) {

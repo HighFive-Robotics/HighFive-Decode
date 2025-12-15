@@ -154,7 +154,7 @@ public class TeleOpWow extends LinearOpMode {
                  robot.drive.resetTeleOpHeading();
             }
 
-            if(robot.intake.getLastAction() == Intake.IntakeActions.Wait){
+            if(robot.intake.getPower() == IntakeMotor.States.Wait){
                 intakeDriver2 = false;
             }
 
@@ -167,37 +167,10 @@ public class TeleOpWow extends LinearOpMode {
                 sorterColors = new Constants.Color[]{Constants.Color.None, Constants.Color.None, Constants.Color.None};
             }
 
-    robot.intake.sorter.servo.setPIDCoefficients(kP,kI,kD,kF, HighServo.FeedForwardType.Arm,1);
-            /*telemetry.addData("State intake:" , robot.intake.intakeMotor.getState());
-            telemetry.addData("Power intake:" , robot.intake.intakeMotor.power);
-            telemetry.addData("Shooter 1:" , robot.shooter.motorUp.getPower());
-            telemetry.addData("Shooter 2:" , robot.shooter.motorDown.getPower());
-            telemetry.addData("Up:" , robot.shooter.motorUp.getCurrentPosition());
-            telemetry.addData("Down:" , robot.shooter.motorDown.getCurrentPosition());
-            graph.addData("Current Velo" , robot.shooter.motorUp.getCurrentVelocity());
-            telemetry.addData("Current Velo" , robot.shooter.motorUp.getCurrentVelocity());
-            graph.addData("Current Velo From Current" , robot.shooter.motorUp.getVelocityFromCurrent(Constants.Globals.voltage));
-            telemetry.addData("Current Velo From Current" , robot.shooter.motorUp.getVelocityFromCurrent(Constants.Globals.voltage));
-            telemetry.addData("Rumble" , rumbled);
-            telemetry.addData("target > 2" , robot.shooter.getTarget() > 2);
-            telemetry.addData("at target" , robot.shooter.atTarget() );
-            telemetry.addData("rumbled" , timers.get("rumble").milliseconds());
-
-            telemetry.addData("Slot: ", robot.intake.sorter.getSlot());
-            telemetry.addData("Slot number: ", robot.intake.sorter.slotNumber);
-            telemetry.addData("Action intake:" , robot.intake.getLastAction());
-            telemetry.addData("Collect type:" , robot.intake.getCollectType());
-            telemetry.addData("Break beam:" , robot.intake.breakBeamCollected);
-            telemetry.addData("ArtifactPassThrough:" , robot.intake.artifactPassThrough);
-            telemetry.addData("Color:" , robot.intake.sensor.getColor());
-            telemetry.addData("Colors", sorterColors.toString());
-            telemetry.addData("Is Full", robot.intake.sorter.isFull);*/
-
+            robot.intake.sorter.servo.setPIDCoefficients(kP,kI,kD,kF, HighServo.FeedForwardType.Arm,1);
             telemetry.addData("Angle:", robot.intake.sorter.servo.getCurrentPositionPID());
-            telemetry.addData("Error:" , robot.intake.sorter.servo.pidfController.getPositionError());
+            telemetry.addData("Error:" , robot.intake.sorter.servo.pidfController.getPositionError()/100);
             telemetry.addData("Target:" , robot.intake.sorter.servo.getTargetPID());
-            telemetry.addData("Power:", robot.intake.sorter.servo.getPowerPID(robot.intake.sorter.servo.getCurrentPositionPID()));
-            telemetry.addData("Velocity Error" , robot.shooter.getVelocityError());
             telemetry.addData("Color 1:", sorterColors[0]);
             telemetry.addData("Color 2:", sorterColors[1]);
             telemetry.addData("Color 3:", sorterColors[2]);

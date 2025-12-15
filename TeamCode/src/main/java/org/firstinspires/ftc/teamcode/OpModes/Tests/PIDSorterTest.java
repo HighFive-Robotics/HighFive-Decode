@@ -35,7 +35,7 @@ public class PIDSorterTest extends LinearOpMode{
         while(opModeIsActive()){
             intake.sorter.servo.setPIDCoefficients(kP,kI,kD,kF, HighServo.FeedForwardType.Lift,1);
 
-            if(gamepad1.ps && timer.milliseconds() >= 250){
+            if(gamepad1.psWasPressed()){
                 autoCycling = !autoCycling;
                 timer.reset();
             }
@@ -52,16 +52,17 @@ public class PIDSorterTest extends LinearOpMode{
                 timer.reset();
             }
 
-            if(timer.seconds() >= 5 && autoCycling){
+            if(timer.milliseconds() >= 2500 && autoCycling){
                 intake.sorter.setNextSlot();
                 timer.reset();
             }
-            telemetry.addData("Angle:", intake.sorter.servo.getCurrentPositionPID());
+            telemetry.addData("Error:" ,intake.sorter.servo.pidfController.getPositionError()/100);
+            telemetry.addData("True Angle:", intake.sorter.servo.getCurrentPositionPID());
+            telemetry.addData("Angle:", intake.sorter.servo.getCurrentPositionPID()*100);
             telemetry.addData("Target:", intake.sorter.servo.getTargetPID());
             telemetry.addData("Error:" ,intake.sorter.servo.pidfController.getPositionError());
-            telemetry.addData("Error:" ,intake.sorter.servo.pidfController.getPositionError());
-            telemetry.addData("Current slot:", intake.sorter.getSlot());
-            telemetry.addData("Current number slot:", intake.sorter.slotNumber);
+            telemetry.addData("Auto Cycling:" ,autoCycling);
+            telemetry.addData("Current Slot" ,intake.sorter.getSlot());
             telemetry.addData("Hz", 1.0 / loopTimer.seconds());
             loopTimer.reset();
             telemetry.update();

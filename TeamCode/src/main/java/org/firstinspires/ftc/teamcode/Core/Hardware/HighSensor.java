@@ -37,6 +37,9 @@ public class HighSensor extends HighModule {
     public double getDistance(DistanceUnit distanceUnit) {
         return sensor.getDistance(distanceUnit);
     }
+    public boolean isInReach(double distance){
+        return sensor.getDistance(DistanceUnit.CM) <= distance;
+    }
 
     private void processBatch() {
         float[] avgHsv = new float[3];
@@ -59,9 +62,9 @@ public class HighSensor extends HighModule {
                 float hue = tempHsv[0];
                 float threshold = Treshold[0];
 
-                if (Math.abs(hue - GreenValuesHSV[0]) <= threshold && hue <=200) {
+                if (Math.abs(hue - GreenValuesHSV[0]) <= (threshold+1.35) ) {
                     greenCount++;
-                } else if (Math.abs(hue - PurpleValuesHSV[0]) <= threshold && hue >= 185) {
+                } else if (Math.abs(hue - PurpleValuesHSV[0]) <= threshold || hue >=170 ){
                     purpleCount++;
                 } else {
                     noneCount++;
@@ -87,6 +90,7 @@ public class HighSensor extends HighModule {
     public void update() {
         if (colorThread == null || !colorThread.isAlive()) {
             colorThread = new Thread(this::processBatch);
+            colorThread.setPriority(Thread.MAX_PRIORITY);
             colorThread.start();
         }
     }
