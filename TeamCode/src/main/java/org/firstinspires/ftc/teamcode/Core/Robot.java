@@ -186,7 +186,6 @@ public class Robot extends HighModule {
             case Normal:
                 break;
         }
-
         shooter.update();
         drive.update();
         telemetry.addData("Timer",intakeHelper.milliseconds());

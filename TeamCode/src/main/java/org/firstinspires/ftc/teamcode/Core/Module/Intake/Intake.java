@@ -157,6 +157,7 @@ public class Intake extends HighModule {
 
     @Override
     public void update() {
+        sorter.update();
         currentSlot = sorter.getSlot();
         currentSlotNumber = sorter.getSlotNumber();
         currentColor = sorter.getColor(currentSlot);
@@ -196,6 +197,5 @@ public class Intake extends HighModule {
         }
 
         intakeMotor.update();
-        sorter.update();
     }
 }

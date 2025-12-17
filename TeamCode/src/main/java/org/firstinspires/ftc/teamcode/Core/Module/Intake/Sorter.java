@@ -208,19 +208,20 @@ public class Sorter extends HighModule {
 
     public void setColor(Constants.Color color, Slots slot) {
         switch (slot) {
-            case Slot1: {
+            case Slot1:
                 sorterColors[0] = color;
-            }
-            break;
-            case Slot2: {
+                break;
+            case Slot2:
                 sorterColors[1] = color;
-            }
-            break;
-            case Slot3: {
+                break;
+            case Slot3:
                 sorterColors[2] = color;
-            }
-            break;
+                break;
         }
+    }
+
+    public void setColor(Constants.Color color, int SlotNumber) {
+        sorterColors[SlotNumber - 1] = color;
     }
 
     public void setState(States state) {
@@ -236,14 +237,17 @@ public class Sorter extends HighModule {
         this.target = target;
         servo.setTarget(target);
     }
+
     @Override
     public double getTarget() {
         return target;
     }
+
     @Override
     public boolean atTarget() {
         return servo.pidfController.getPositionError() <= tolerance;
     }
+
     @Override
     public void update() {
         isFull = sorterColors[0] != Constants.Color.None && sorterColors[1] != Constants.Color.None && sorterColors[2] != Constants.Color.None;
