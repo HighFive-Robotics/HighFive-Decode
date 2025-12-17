@@ -162,29 +162,31 @@ public class Robot extends HighModule {
             intakeHelping=false;
         }
         intake.update();
-        switch (intake.getCollectType()){
-            case Sorted:
-                if(intake.sorter.getState() == Sorter.States.Automated){
-                    if(!intake.sorter.isFull){
-                        if(intake.currentColor != None && !intake.artifactPassThrough){
-                            setAction(Actions.NextSlot);
+        if(intake.getLastAction() == Intake.IntakeActions.Wait){
+            switch (intake.getCollectType()){
+                case Sorted:
+                    if(intake.sorter.getState() == Sorter.States.Automated){
+                        if(!intake.sorter.isFull){
+                            if(intake.currentColor != None && !intake.artifactPassThrough){
+                                setAction(Actions.NextSlot);
+                            }
                         }
+                        intake.updateColor();
                     }
-                    intake.updateColor();
-                }
-                break;
-            case Mix:
-                if(intake.sorter.getState() == Sorter.States.Automated && artifactNumber < 1){
-                    if(!intake.sorter.isFull){
-                        if(intake.currentColor != None && !intake.artifactPassThrough){
-                            setAction(Actions.NextSlot);
+                    break;
+                case Mix:
+                    if(intake.sorter.getState() == Sorter.States.Automated && artifactNumber < 1){
+                        if(!intake.sorter.isFull){
+                            if(intake.currentColor != None && !intake.artifactPassThrough){
+                                setAction(Actions.NextSlot);
+                            }
                         }
+                        intake.updateColor();
                     }
-                    intake.updateColor();
-                }
-                break;
-            case Normal:
-                break;
+                    break;
+                case Normal:
+                    break;
+            }
         }
         shooter.update();
         drive.update();
