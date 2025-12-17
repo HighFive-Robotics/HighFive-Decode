@@ -37,12 +37,16 @@ public class Intake extends HighModule {
     IntakeActions action = IntakeActions.Collect;
     IntakeMotor.States lastPower = IntakeMotor.States.Wait;
     CollectTypes collectType = CollectTypes.Sorted;
+    FindColors findColor;
 
     public enum IntakeActions{
         Collect,
+        Wait
+    }
+
+    public enum FindColors{
         FindGreen,
-        FindPurple,
-        Wait,
+        FindPurple
     }
 
     public enum CollectTypes {
@@ -70,7 +74,11 @@ public class Intake extends HighModule {
 
     public void setAction(IntakeActions action){
         this.action = action;
-        switch (action) {
+    }
+
+    public void findColor(FindColors findColor){
+        this.findColor = findColor;
+        switch (findColor) {
             case FindGreen: {
                 if (greenArtifactNumber > 0) {
                     if (currentColor != Green) {
@@ -95,8 +103,6 @@ public class Intake extends HighModule {
                 }
             }
             break;
-            case Wait:
-                break;
         }
     }
 
@@ -161,9 +167,9 @@ public class Intake extends HighModule {
         currentSlot = sorter.getSlot();
         currentSlotNumber = sorter.getSlotNumber();
         currentColor = sorter.getColor(currentSlot);
-       artifactNumber = 0;
-       purpleArtifactNumber = 0;
-       greenArtifactNumber = 0;
+        artifactNumber = 0;
+        purpleArtifactNumber = 0;
+        greenArtifactNumber = 0;
 
         switch(sorterColors[0]){
             case Purple:

@@ -120,12 +120,12 @@ public class Robot extends HighModule {
             case FindGreen:
                 setIntakeForSwitch();
                 isManualControl = false;
-                intake.setAction(Intake.IntakeActions.FindGreen);
+                intake.findColor(Intake.FindColors.FindGreen);
                 break;
             case FindPurple:
                 setIntakeForSwitch();
                 isManualControl = false;
-                intake.setAction(Intake.IntakeActions.FindPurple);
+                intake.findColor(Intake.FindColors.FindPurple);
                 break;
         }
     }
@@ -144,7 +144,6 @@ public class Robot extends HighModule {
         if(voltageTimer.milliseconds() >= 500) {
             Constants.Globals.voltage = hardwareMap.voltageSensor.iterator().next().getVoltage();
             voltageTimer.reset();
-
         }
         if(stopShoot && (timerShoot.milliseconds() > 1200 || (timerShoot.milliseconds() > 200 && shooter.getVelocityError() >= 0.7))){
             intake.sorter.setColor(None,intake.sorter.getSlot());
@@ -162,7 +161,7 @@ public class Robot extends HighModule {
             intakeHelping=false;
         }
         intake.update();
-        if(intake.getLastAction() == Intake.IntakeActions.Wait){
+        if(intake.getLastAction() != Intake.IntakeActions.Wait){
             switch (intake.getCollectType()){
                 case Sorted:
                     if(intake.sorter.getState() == Sorter.States.Automated){
