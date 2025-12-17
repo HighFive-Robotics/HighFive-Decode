@@ -62,7 +62,7 @@ public class HighSensor extends HighModule {
                 float hue = tempHsv[0];
                 float threshold = Treshold[0];
 
-                if (Math.abs(hue - GreenValuesHSV[0]) <= (threshold+1.35) ) {
+                if (Math.abs(hue - GreenValuesHSV[0]) <= (threshold+0.35) ) {
                     greenCount++;
                 } else if (Math.abs(hue - PurpleValuesHSV[0]) <= threshold || hue >=170 ){
                     purpleCount++;

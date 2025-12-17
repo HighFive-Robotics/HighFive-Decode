@@ -62,6 +62,7 @@ public class Constants {
         public static String liftServoLB = "SLB";
         public static String liftServoRB = "SRB";
         public static String liftServoRF = "SRF";
+        public static String cameraName = "limelight";
     }
 
     public static class Intake{
@@ -86,7 +87,7 @@ public class Constants {
         @Config
         public static class SorterConstants{
 
-            public static double kP = 0.00225, kI = 0.00025, kD = 0.000001, kF=3.5e-9;
+            public static double kP = 0.00137, kI = 0.00025, kD = 0.000001, kF=3.5e-9;
             public static int artifactNumber = 0, purpleArtifactNumber = 0, greenArtifactNumber = 0;
             public static double ticksPerRotation = 8192;
             public static double targetSlot1 = 0, targetSlot2 = 120, targetSlot3 = 240;

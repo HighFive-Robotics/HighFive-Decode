@@ -24,9 +24,9 @@ public class Intake extends HighModule {
     public HighSensor sensor;
     public DigitalChannel breakBeam;
 
-    Sorter.Slots currentSlot;
-    Constants.Color currentColor;
-    int currentSlotNumber;
+    public Sorter.Slots currentSlot;
+    public Constants.Color currentColor;
+    public int currentSlotNumber;
 
     ElapsedTime timer = new ElapsedTime();
 
@@ -70,23 +70,11 @@ public class Intake extends HighModule {
 
     public void setAction(IntakeActions action){
         this.action = action;
-        switch (action){
-           case FindGreen:{
-               if(greenArtifactNumber > 0){
-                   if(currentColor != Green){
-                       if(sorter.getColor(sorter.getNextSlot()) == Green){
-                            sorter.setNextSlot();
-                       } else {
-                           sorter.setPreviousSlot();
-                       }
-                   }
-               }
-           }
-           break;
-            case FindPurple:{
-                if(purpleArtifactNumber > 0){
-                    if(currentColor != Purple){
-                        if(sorter.getColor(sorter.getNextSlot()) == Purple){
+        switch (action) {
+            case FindGreen: {
+                if (greenArtifactNumber > 0) {
+                    if (currentColor != Green) {
+                        if (sorter.getColor(sorter.getNextSlot()) == Green) {
                             sorter.setNextSlot();
                         } else {
                             sorter.setPreviousSlot();
@@ -95,6 +83,20 @@ public class Intake extends HighModule {
                 }
             }
             break;
+            case FindPurple: {
+                if (purpleArtifactNumber > 0) {
+                    if (currentColor != Purple) {
+                        if (sorter.getColor(sorter.getNextSlot()) == Purple) {
+                            sorter.setNextSlot();
+                        } else {
+                            sorter.setPreviousSlot();
+                        }
+                    }
+                }
+            }
+            break;
+            case Wait:
+                break;
         }
     }
 
@@ -158,31 +160,6 @@ public class Intake extends HighModule {
         currentSlot = sorter.getSlot();
         currentSlotNumber = sorter.getSlotNumber();
         currentColor = sorter.getColor(currentSlot);
-        switch (collectType){
-            case Sorted:
-                if(sorter.getState() == Sorter.States.Automated){
-                    if(!sorter.isFull){
-                        if(currentColor != None && !artifactPassThrough){
-                            sorter.setNextSlot();
-                        }
-                    }
-                    updateColor();
-                }
-                break;
-            case Mix:
-                if(sorter.getState() == Sorter.States.Automated && artifactNumber < 1){
-                    if(!sorter.isFull){
-                        if(currentColor != None && !artifactPassThrough){
-                            sorter.setNextSlot();
-                        }
-                    }
-                    updateColor();
-                }
-                break;
-            case Normal:
-                break;
-        }
-
        artifactNumber = 0;
        purpleArtifactNumber = 0;
        greenArtifactNumber = 0;
