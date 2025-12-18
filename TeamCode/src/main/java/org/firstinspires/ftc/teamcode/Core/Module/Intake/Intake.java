@@ -34,12 +34,12 @@ public class Intake extends HighModule {
     public boolean breakBeamCollected = false;
     private boolean colorAssignedToCurrentSample = false;
 
-    IntakeActions action = IntakeActions.Collect;
+    States state = States.Collect;
     IntakeMotor.States lastPower = IntakeMotor.States.Wait;
     CollectTypes collectType = CollectTypes.Sorted;
     FindColors findColor;
 
-    public enum IntakeActions{
+    public enum States {
         Collect,
         Wait
     }
@@ -72,8 +72,8 @@ public class Intake extends HighModule {
         sorter.setSlot(slot);
     }
 
-    public void setAction(IntakeActions action){
-        this.action = action;
+    public void setState(States state){
+        this.state = state;
     }
 
     public void findColor(FindColors findColor){
@@ -123,8 +123,8 @@ public class Intake extends HighModule {
         return collectType;
     }
 
-    public IntakeActions getLastAction(){
-        return action;
+    public States getState(){
+        return state;
     }
 
     public void updateColor(){

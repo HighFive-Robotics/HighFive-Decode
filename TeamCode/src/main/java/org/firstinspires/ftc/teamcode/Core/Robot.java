@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.Core;
 
 import static org.firstinspires.ftc.teamcode.Constants.Color.None;
-import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.cameraName;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.artifactNumber;
 
@@ -130,7 +129,7 @@ public class Robot extends HighModule {
         }
     }
     public void setIntakeForSwitch(){
-        intake.setAction(Intake.IntakeActions.Wait);
+        intake.setState(Intake.States.Wait);
         intake.setPower(IntakeMotor.States.Collect);
         intakeHelping = true;
         intakeHelper.reset();
@@ -148,12 +147,12 @@ public class Robot extends HighModule {
         if(stopShoot && (timerShoot.milliseconds() > 1200 || (timerShoot.milliseconds() > 200 && shooter.getVelocityError() >= 0.7))){
             intake.sorter.setColor(None,intake.sorter.getSlot());
             stopShoot = false;
-            intake.setAction(Intake.IntakeActions.Wait);
+            intake.setState(Intake.States.Wait);
             intake.setPower(IntakeMotor.States.Wait);
         }
         if(stopIntake && timerIntake.milliseconds() >= 450){
             stopIntake = false;
-            intake.setAction(Intake.IntakeActions.Wait);
+            intake.setState(Intake.States.Wait);
             intake.setPower(IntakeMotor.States.Wait);
         }
         if(intakeHelping && intakeHelper.milliseconds() >= 520){
@@ -161,7 +160,7 @@ public class Robot extends HighModule {
             intakeHelping=false;
         }
         intake.update();
-        if(intake.getLastAction() != Intake.IntakeActions.Wait){
+        if(intake.getState() != Intake.States.Wait){
             switch (intake.getCollectType()){
                 case Sorted:
                     if(intake.sorter.getState() == Sorter.States.Automated){

@@ -1,13 +1,11 @@
 package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
-import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.intakeMotorName;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.greenArtifactNumber;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.purpleArtifactNumber;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.sorterColors;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Constants;
@@ -39,11 +37,11 @@ public class TestSorterColor extends LinearOpMode{
             }
 
             if(gamepad1.cross && timer.milliseconds() >= 250){
-                intake.setAction(Intake.IntakeActions.FindGreen);
+                intake.setState(Intake.States.FindGreen);
                 timer.reset();
             }
             if(gamepad1.square && timer.milliseconds() >= 250){
-                intake.setAction(Intake.IntakeActions.FindPurple);
+                intake.setState(Intake.States.FindPurple);
                 timer.reset();
             }
 

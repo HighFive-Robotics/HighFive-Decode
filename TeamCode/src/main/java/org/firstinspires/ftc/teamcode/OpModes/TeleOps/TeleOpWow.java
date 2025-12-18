@@ -10,14 +10,12 @@ import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kP
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.purpleArtifactNumber;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.sorterColors;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighServo;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
@@ -25,7 +23,6 @@ import org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.BlockerOuttake;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
-import java.util.Arrays;
 import java.util.HashMap;
 
 @Config
@@ -107,7 +104,7 @@ public class TeleOpWow extends LinearOpMode {
 
             if(gamepad2.left_bumper && timers.get("leftBumper2").milliseconds() >= 250){
                 intakeDriver2 = false;
-                robot.intake.setAction(Intake.IntakeActions.Wait);
+                robot.intake.setState(Intake.States.Wait);
                 timers.get("leftBumper2").reset();
             }
 
