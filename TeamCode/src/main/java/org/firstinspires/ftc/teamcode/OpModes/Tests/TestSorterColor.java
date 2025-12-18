@@ -1,19 +1,21 @@
 package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
-import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.intakeMotorName;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.greenArtifactNumber;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.purpleArtifactNumber;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.sorterColors;
+import static org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake.FindColors.FindGreen;
+import static org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake.FindColors.FindPurple;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Sorter;
 
+@Disabled
 @TeleOp
 public class TestSorterColor extends LinearOpMode{
 
@@ -39,11 +41,11 @@ public class TestSorterColor extends LinearOpMode{
             }
 
             if(gamepad1.cross && timer.milliseconds() >= 250){
-//                intake.setAction(Intake.IntakeActions.FindGreen);
+                intake.findColor(FindPurple);
                 timer.reset();
             }
             if(gamepad1.square && timer.milliseconds() >= 250){
-//                intake.setAction(Intake.IntakeActions.FindPurple);
+                intake.findColor(FindGreen);
                 timer.reset();
             }
 

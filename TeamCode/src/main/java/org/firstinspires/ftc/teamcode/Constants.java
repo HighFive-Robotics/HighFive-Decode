@@ -59,6 +59,7 @@ public class Constants {
         public static String shooterMotorDownName = "OMB";
         public static String blockerServoName = "BO";
         public static String sorterServoName = "S";
+        public static String sorterAnalogInputName = "SAI";
         public static String liftServoLB = "SLB";
         public static String liftServoRB = "SRB";
         public static String liftServoRF = "SRF";
@@ -75,13 +76,14 @@ public class Constants {
         public static class ColorSensorConstants{
             public static double tolerance = 70;
             public static Color currentColor = Color.None;
-            public static float[] targetGreenRGB = {26F, 100F, 70F};
-            public static float[] targetPurpleRGB = {62F, 60F, 105F};
 
-            //We don't use this anymore
             public static float[] GreenValuesHSV = {155F,0.6F,20F};
             public static float[] PurpleValuesHSV = {217F,0.4F,5F};
             public static float[] Treshold = {17.85F, 0.2F, 5F};
+
+            //We don't use this anymore
+            public static float[] targetGreenRGB = {26F, 100F, 70F};
+            public static float[] targetPurpleRGB = {62F, 60F, 105F};
         }
 
         @Config

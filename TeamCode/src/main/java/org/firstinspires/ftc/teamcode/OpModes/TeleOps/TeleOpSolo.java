@@ -86,7 +86,7 @@ public class TeleOpSolo extends LinearOpMode {
 
             if(gamepad1.left_bumper && timers.get("leftBumper2").milliseconds() >= 250){
                 intakeDriver2 = false;
-                robot.intake.setAction(Intake.IntakeActions.Wait);
+                robot.intake.setState(Intake.States.Wait);
                 timers.get("leftBumper2").reset();
             }
 
@@ -117,7 +117,7 @@ public class TeleOpSolo extends LinearOpMode {
                 robot.intake.sorter.setTarget(robot.intake.sorter.position);
             }
 
-            if(robot.intake.getLastAction() == Intake.IntakeActions.Wait){
+            if(robot.intake.getState() == Intake.States.Wait){
                 intakeDriver2 = false;
             }
 

@@ -186,8 +186,8 @@ public class Robot extends HighModule {
 
         }
     }
-    public void setIntakeForSwitch() {
-        intake.setAction(Intake.IntakeActions.Wait);
+    public void setIntakeForSwitch(){
+        intake.setState(Intake.States.Wait);
         intake.setPower(IntakeMotor.States.Collect);
         intakeHelping = true;
         intakeHelper.reset();
@@ -227,12 +227,12 @@ public class Robot extends HighModule {
         if (stopShoot && (timerShoot.milliseconds() > 600 || (timerShoot.milliseconds() > 75 && shooter.getVelocityError() >= 0.6))) {
             intake.sorter.setColor(None, intake.sorter.getSlot());
             stopShoot = false;
-            intake.setAction(Intake.IntakeActions.Wait);
+            intake.setState(Intake.States.Wait);
             intake.setPower(IntakeMotor.States.Wait);
         }
         if (stopIntake && timerIntake.milliseconds() >= 100) {
             stopIntake = false;
-            intake.setAction(Intake.IntakeActions.Wait);
+            intake.setState(Intake.States.Wait);
             intake.setPower(IntakeMotor.States.Wait);
         }
         if (intakeHelping && intakeHelper.milliseconds() >= 375) {

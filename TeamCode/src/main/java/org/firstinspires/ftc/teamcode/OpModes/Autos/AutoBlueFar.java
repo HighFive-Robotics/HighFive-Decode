@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
+import org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
 @Autonomous(name = "🔵🔝AutoBlueFar🔝🔵")
@@ -53,12 +54,14 @@ public class AutoBlueFar extends LinearOpMode {
     private final ElapsedTime stateTimer = new ElapsedTime();
     private final ElapsedTime actionTimer = new ElapsedTime();
 
-    private final double velocity = 3.6;
+    private final double velocity = 3.45; // TODO Verif daca trebuie schimbata
     private final double reverseVelocity = -1;
 
     @Override
     public void runOpMode() throws InterruptedException {
         robot = new Robot(hardwareMap, startPose, true, Constants.Color.Blue, telemetry, gamepad1);
+        robot.intake.setCollectType(Intake.CollectTypes.Normal);
+        robot.intake.setState(Intake.States.Wait);
         autoColor = Constants.Color.Blue;
         robot.drive.resetTeleOpHeading();
         robot.drive.setConstants(Constants.FConstants);
@@ -79,7 +82,7 @@ public class AutoBlueFar extends LinearOpMode {
         opModeTimer.reset();
         stateTimer.reset();
         actionTimer.reset();
-        state = States.DriveToPreload;
+        state = AutoBlueFar.States.DriveToPreload;
         while (opModeIsActive()) {
             switch (state) {
                 case DriveToPreload:
@@ -87,8 +90,8 @@ public class AutoBlueFar extends LinearOpMode {
                         robot.drive.followPath(preloadPath, true);
                         robot.shooter.setTargetVelocity(reverseVelocity);
                         stateTimer.reset();
-                        state = States.ResetForShootPreload;
-                        robot.intake.setAction(Intake.IntakeActions.Collect);
+                        state = AutoBlueFar.States.ResetForShootPreload;
+                        robot.intake.setPower(IntakeMotor.States.Collect);
                         actionTimer.reset();
                     }
                     break;
@@ -100,15 +103,15 @@ public class AutoBlueFar extends LinearOpMode {
                         actionTimer.reset();
                         cycles = 0;
                         shootingState = -1;
-                        state = States.ShootSequencePreload;
+                        state = AutoBlueFar.States.ShootSequencePreload;
                     }
                     break;
                 case ShootSequencePreload:
                     if (runShootingSequence()) {
                         robot.drive.setMaxPower(1);
-                        robot.intake.setAction(Intake.IntakeActions.Collect);
+                        robot.intake.setPower(IntakeMotor.States.Collect);
                         stateTimer.reset();
-                        state = States.CollectArtefacts;
+                        state = AutoBlueFar.States.CollectArtefacts;
                     }
                     break;
                 case CollectArtefacts:
@@ -116,7 +119,7 @@ public class AutoBlueFar extends LinearOpMode {
                         robot.drive.followPath(goToCollect, true);
                         robot.shooter.setTargetVelocity(0);
                         stateTimer.reset();
-                       state = States.Park;
+                       state = AutoBlueFar.States.Park;
                     }
                     break;
                 case Park:
@@ -126,8 +129,8 @@ public class AutoBlueFar extends LinearOpMode {
                     }
                     break;
             }
-            if (opModeTimer.milliseconds() > 27000 && state != States.CollectArtefacts && state != States.Park) {
-                state = States.CollectArtefacts;
+            if (opModeTimer.milliseconds() > 27000 && state != AutoBlueFar.States.CollectArtefacts && state != AutoBlueFar.States.Park) {
+                state = AutoBlueFar.States.CollectArtefacts;
                 stateTimer.reset();
             }
             telemetry.addData("State", state);
@@ -144,21 +147,21 @@ public class AutoBlueFar extends LinearOpMode {
             case -1:
                 if(actionTimer.milliseconds()>=250){
                     robot.shooter.setTargetVelocity(velocity);
-                    robot.intake.setAction(Intake.IntakeActions.Wait);
+                    robot.intake.setPower(IntakeMotor.States.Wait);
                     actionTimer.reset();
                     shootingState=0;
                 }
                 break;
             case 0:
                 if (robot.shooter.atTarget() && actionTimer.milliseconds() > 250) {
-                    robot.intake.setAction(Intake.IntakeActions.Collect);
+                    robot.intake.setPower(IntakeMotor.States.Collect);
                     actionTimer.reset();
                     shootingState = 1;
                 }
                 break;
             case 1:
                 if (actionTimer.milliseconds() > 1200 || robot.shooter.getVelocityError() >= 0.7) {
-                    robot.intake.setAction(Intake.IntakeActions.Wait);
+                    robot.intake.setPower(IntakeMotor.States.Wait);
                     actionTimer.reset();
                     stateTimer.reset();
                     shootingState = 0;

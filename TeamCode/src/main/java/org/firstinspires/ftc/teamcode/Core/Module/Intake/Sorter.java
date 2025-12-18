@@ -41,7 +41,7 @@ public class Sorter extends HighModule {
         Slot3
     }
 
-    Slots slot = Slots.Slot2;
+    Slots slot = Slots.Slot1;
     States state = States.Automated;
 
     public Sorter(HardwareMap hwMap, DcMotorEx motor, double offset) {
@@ -56,8 +56,8 @@ public class Sorter extends HighModule {
 
         tolerance = 2.5;
         servo.pidfController.setTolerance(tolerance);
-        setSlot(Slots.Slot2);
-        slotNumber = 2;
+        setSlot(Slots.Slot1);
+        slotNumber = 1;
         /// TODO DO NOT MAKE NONE
         sorterColors[0] = Constants.Color.None;
         sorterColors[1] = Constants.Color.None;
@@ -119,7 +119,6 @@ public class Sorter extends HighModule {
                 return 1;
             }
         }
-        //return 0;
     }
 
     public void setNextSlot() {
