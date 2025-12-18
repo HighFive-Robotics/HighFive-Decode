@@ -6,6 +6,7 @@ import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.so
 import static org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake.FindColors.FindGreen;
 import static org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake.FindColors.FindPurple;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Sorter;
 
+@Disabled
 @TeleOp
 public class TestSorterColor extends LinearOpMode{
 

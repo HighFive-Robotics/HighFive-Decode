@@ -8,6 +8,7 @@ import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kP
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -18,6 +19,7 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighServo;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Sorter;
 
+@Disabled
 @TeleOp
 public class PIDSorterTest extends LinearOpMode{
 
