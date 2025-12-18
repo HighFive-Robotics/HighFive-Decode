@@ -53,7 +53,7 @@ public class AutoBlueFarLittleTriangle extends LinearOpMode {
     private final ElapsedTime stateTimer = new ElapsedTime();
     private final ElapsedTime actionTimer = new ElapsedTime();
 
-    private final double velocity = 3.45; // TODO Verif daca trebuie schimbata
+    private final double velocity = 5.5; // TODO Verif daca trebuie schimbata
     private final double reverseVelocity = -1;
 
     @Override
