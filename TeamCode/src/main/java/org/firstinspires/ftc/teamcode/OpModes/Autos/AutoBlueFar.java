@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
+import org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
 @Autonomous(name = "🔵🔝AutoBlueFar🔝🔵")
@@ -90,7 +91,7 @@ public class AutoBlueFar extends LinearOpMode {
                         robot.shooter.setTargetVelocity(reverseVelocity);
                         stateTimer.reset();
                         state = AutoBlueFar.States.ResetForShootPreload;
-                        robot.intake.setState(Intake.States.Collect);
+                        robot.intake.setPower(IntakeMotor.States.Collect);
                         actionTimer.reset();
                     }
                     break;
@@ -108,7 +109,7 @@ public class AutoBlueFar extends LinearOpMode {
                 case ShootSequencePreload:
                     if (runShootingSequence()) {
                         robot.drive.setMaxPower(1);
-                        robot.intake.setState(Intake.States.Collect);
+                        robot.intake.setPower(IntakeMotor.States.Collect);
                         stateTimer.reset();
                         state = AutoBlueFar.States.CollectArtefacts;
                     }
@@ -146,21 +147,21 @@ public class AutoBlueFar extends LinearOpMode {
             case -1:
                 if(actionTimer.milliseconds()>=250){
                     robot.shooter.setTargetVelocity(velocity);
-                    robot.intake.setState(Intake.States.Wait);
+                    robot.intake.setPower(IntakeMotor.States.Wait);
                     actionTimer.reset();
                     shootingState=0;
                 }
                 break;
             case 0:
                 if (robot.shooter.atTarget() && actionTimer.milliseconds() > 250) {
-                    robot.intake.setState(Intake.States.Collect);
+                    robot.intake.setPower(IntakeMotor.States.Collect);
                     actionTimer.reset();
                     shootingState = 1;
                 }
                 break;
             case 1:
                 if (actionTimer.milliseconds() > 1200 || robot.shooter.getVelocityError() >= 0.7) {
-                    robot.intake.setState(Intake.States.Wait);
+                    robot.intake.setPower(IntakeMotor.States.Wait);
                     actionTimer.reset();
                     stateTimer.reset();
                     shootingState = 0;

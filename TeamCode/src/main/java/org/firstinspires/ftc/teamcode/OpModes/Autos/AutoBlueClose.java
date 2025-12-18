@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
+import org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
 @Autonomous(name = "🔵🔝AutoBlueClose🔝🔵")
@@ -148,7 +149,7 @@ public class AutoBlueClose extends LinearOpMode {
                 case ResetForShootPreload:
                     if (robot.isDone() || stateTimer.milliseconds() > 5000) {
                         robot.drive.setMaxPower(1);
-                        robot.intake.setState(Intake.States.Wait);
+                        robot.intake.setPower(IntakeMotor.States.Wait);
                         stateTimer.reset();
                         actionTimer.reset();
                         cycles = 0;
@@ -159,7 +160,7 @@ public class AutoBlueClose extends LinearOpMode {
                 case ShootSequencePreload:
                     if (runShootingSequence()) {
                         robot.drive.setMaxPower(1);
-                        robot.intake.setState(Intake.States.Collect);
+                        robot.intake.setPower(IntakeMotor.States.Collect);
                         stateTimer.reset();
                         state = AutoBlueClose.States.DriveToSpike1;
                     }
@@ -199,15 +200,9 @@ public class AutoBlueClose extends LinearOpMode {
                     }
                     break;
                 case ShootSequence1:
-//                    if(cycles == 0 ){
-//                        robot.drive.deactivateAllPIDFs();
-//                        robot.drive.activateTranslational();
-//                        robot.drive.update();
-//                        robot.drive.updateDrivetrain();
-//                    }
                     if (runShootingSequence()) {
                         robot.drive.setMaxPower(1);
-                        robot.intake.setState(Intake.States.Wait);
+                        robot.intake.setPower(IntakeMotor.States.Wait);
                         stateTimer.reset();
                         state = AutoBlueClose.States.DriveToSpike2;
                     }
@@ -216,7 +211,7 @@ public class AutoBlueClose extends LinearOpMode {
                     if (stateTimer.milliseconds() >= 300) {
                         robot.drive.followPath(goForSpike2, true);
                         robot.shooter.setTargetVelocity(reverseVelocity);
-                        robot.intake.setState(Intake.States.Collect);
+                        robot.intake.setPower(IntakeMotor.States.Collect);
                         stateTimer.reset();
                         state = AutoBlueClose.States.CollectSpike2;
                     }
@@ -255,7 +250,7 @@ public class AutoBlueClose extends LinearOpMode {
                 case ShootSequence2:
                     if (runShootingSequence()) {
                         robot.drive.setMaxPower(1);
-                        robot.intake.setState(Intake.States.Collect);
+                        robot.intake.setPower(IntakeMotor.States.Collect);
                         stateTimer.reset();
                         state = AutoBlueClose.States.DriveToSpike3;
                     }
@@ -340,14 +335,14 @@ public class AutoBlueClose extends LinearOpMode {
                 break;
             case 0:
                 if (robot.shooter.atTarget() && actionTimer.milliseconds() > 200) {
-                    robot.intake.setState(Intake.States.Collect);
+                    robot.intake.setPower(IntakeMotor.States.Collect);
                     actionTimer.reset();
                     shootingState = 1;
                 }
                 break;
             case 1:
                 if (actionTimer.milliseconds() > 1200 || robot.shooter.getVelocityError() >= 0.7) {
-                    robot.intake.setState(Intake.States.Wait);
+                    robot.intake.setPower(IntakeMotor.States.Wait);
                     actionTimer.reset();
                     stateTimer.reset();
                     shootingState = 0;
