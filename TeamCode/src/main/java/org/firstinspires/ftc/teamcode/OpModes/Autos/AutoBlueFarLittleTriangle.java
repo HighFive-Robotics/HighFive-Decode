@@ -47,14 +47,14 @@ public class AutoBlueFarLittleTriangle extends LinearOpMode {
     private int shootingState = 0;
 
     public Pose startPose = new Pose(58, 0, Math.toRadians(-90));
-    private final Pose shootPose = new Pose(58, 16, Math.toRadians(-45));
+    private final Pose shootPose = new Pose(54, 8, Math.toRadians(-70));
     private final Pose preCollect1Pose = new Pose(35, 20, Math.toRadians(-90));
 
     private final ElapsedTime opModeTimer = new ElapsedTime();
     private final ElapsedTime stateTimer = new ElapsedTime();
     private final ElapsedTime actionTimer = new ElapsedTime();
 
-    private final double velocity = 5.5; // TODO Verif daca trebuie schimbata
+    private final double velocity = 4.8; // TODO Verif daca trebuie schimbata
     private final double reverseVelocity = -1;
 
     @Override
@@ -86,7 +86,7 @@ public class AutoBlueFarLittleTriangle extends LinearOpMode {
         while (opModeIsActive()) {
             switch (state) {
                 case DriveToPreload:
-                    if(stateTimer.milliseconds() >= 300){
+                    if (stateTimer.milliseconds() >= 300) {
                         robot.drive.followPath(preloadPath, true);
                         robot.shooter.setTargetVelocity(reverseVelocity);
                         stateTimer.reset();
@@ -97,20 +97,20 @@ public class AutoBlueFarLittleTriangle extends LinearOpMode {
                     break;
                 case ResetForShootPreload:
                     if (robot.isDone()) {
-                        robot.drive.setMaxPower(1);
+                        robot.intake.intakeMotor.setPower(-0.7);
                         stateTimer.reset();
                         actionTimer.reset();
                         cycles = 0;
                         shootingState = -1;
-                        state = AutoBlueFarLittleTriangle.States.ShootSequencePreload;
+                        state = States.ShootSequencePreload;
                     }
                     break;
                 case ShootSequencePreload:
                     if (runShootingSequence()) {
                         robot.drive.setMaxPower(1);
-                        robot.intake.setPower(IntakeMotor.States.Collect);
+                        robot.intake.setPower(IntakeMotor.States.Wait);
                         stateTimer.reset();
-                        state = AutoBlueFarLittleTriangle.States.CollectArtefacts;
+                        state = States.CollectArtefacts;
                     }
                     break;
                 case CollectArtefacts:
@@ -118,7 +118,7 @@ public class AutoBlueFarLittleTriangle extends LinearOpMode {
                         robot.drive.followPath(goToCollect, true);
                         robot.shooter.setTargetVelocity(0);
                         stateTimer.reset();
-                       state = AutoBlueFarLittleTriangle.States.Park;
+                        state = AutoBlueFarLittleTriangle.States.Park;
                     }
                     break;
                 case Park:
