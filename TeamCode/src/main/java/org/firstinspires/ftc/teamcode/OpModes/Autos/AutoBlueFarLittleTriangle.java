@@ -41,12 +41,13 @@ public class AutoBlueFarLittleTriangle extends LinearOpMode {
     }
 
     public Robot robot;
+
     public States state;
     private int cycles = 0;
     private int shootingState = 0;
 
-    public Pose startPose = new Pose(58, 0, Math.toRadians(90));
-    private final Pose shootPose = new Pose(58, 16, Math.toRadians(45));
+    public Pose startPose = new Pose(58, 0, Math.toRadians(-90));
+    private final Pose shootPose = new Pose(58, 16, Math.toRadians(-45));
     private final Pose preCollect1Pose = new Pose(35, 20, Math.toRadians(-90));
 
     private final ElapsedTime opModeTimer = new ElapsedTime();

@@ -37,7 +37,7 @@ public class Shooter extends HighModule {
                 .setVelocityPIDCoefficients(kp,ki,kd,kf,ks,ka,1)
                 .setUseZeroPowerBehaviour(false)
                 .build();
-        motorUp.setTolerance(0.1);
+        motorUp.setTolerance(0.075);
         motorDown = HighMotor.Builder.startBuilding()
                 .setMotor(hwMap.get(DcMotorEx.class, shooterMotorDownName))
                 .setRunMode(HighMotor.RunMode.Standard)
