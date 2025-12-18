@@ -127,26 +127,26 @@ public class Intake extends HighModule {
         return state;
     }
 
-    public void updateColor(){
-        if(intakeMotor.getState() != IntakeMotor.States.Wait){
-            if(intakeMotor.getPower() >= 0){
+    public void updateColor() {
+        if (intakeMotor.getState() != IntakeMotor.States.Wait) {
+            if (intakeMotor.getPower() >= 0) {
                 breakBeamCollected = breakBeam.getState();
                 boolean artifactSeen = sensor.isInReach(1);
-                if(breakBeamCollected || artifactSeen){
+                if (breakBeamCollected || artifactSeen) {
                     artifactPassThrough = true;
                     timer.reset();
                 }
-                if(artifactPassThrough){
+                if (artifactPassThrough) {
                     sensor.update();
-                    if(sensor.getColor() != None && currentColor == None && !colorAssignedToCurrentSample){
+                    if (sensor.getColor() != None && currentColor == None && !colorAssignedToCurrentSample) {
                         Constants.Color color = sensor.getColor();
                         sorter.setColor(color, currentSlot);
                         colorAssignedToCurrentSample = true;
                     }
                 }
-            } else if(intakeMotor.getPower() <= 0){
+            } else if (intakeMotor.getPower() <= 0) {
                 breakBeamCollected = breakBeam.getState();
-                if(breakBeamCollected){
+                if (breakBeamCollected) {
                     sorter.setColor(None, currentSlot);
                 }
             }
@@ -155,13 +155,10 @@ public class Intake extends HighModule {
             breakBeamCollected = false;
         }
 
-        if(timer.milliseconds() >= 400){
+        if (timer.milliseconds() >= 400) {
             artifactPassThrough = false;
             colorAssignedToCurrentSample = false;
         }
-    }
-    public IntakeActions getAction(){
-        return action;
     }
     public boolean atTarget(){
         return sorter.atTarget();

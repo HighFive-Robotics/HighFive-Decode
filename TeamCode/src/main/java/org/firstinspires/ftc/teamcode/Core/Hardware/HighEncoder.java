@@ -14,7 +14,7 @@ public class HighEncoder {
         this.encoder = encoder;
         this.offset = offset;
         if(reversed){
-        reverseMultiplier = -1;
+            reverseMultiplier = -1;
         }
         encoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         encoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
