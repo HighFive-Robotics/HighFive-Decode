@@ -54,7 +54,7 @@ public class Sorter extends HighModule {
                 .setEncoder(encoder)
                 .build();
 
-        tolerance = 1.1;
+        tolerance = 2.5;
         servo.pidfController.setTolerance(tolerance);
         setSlot(Slots.Slot2);
         slotNumber = 2;
@@ -245,7 +245,7 @@ public class Sorter extends HighModule {
 
     @Override
     public boolean atTarget() {
-        return servo.pidfController.getPositionError() <= tolerance;
+        return (servo.pidfController.getPositionError()/servo.pidfController.getAngleMultiplier()) <= tolerance;
     }
 
     @Override

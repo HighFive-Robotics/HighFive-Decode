@@ -84,6 +84,7 @@ public class TeleOpLm2 extends LinearOpMode {
                 robot.intake.setPower(IntakeMotor.States.Spit);
             } else if(gamepad1.right_trigger >= 0.8){
                 robot.isManualControl=true;
+                robot.shouldAutoCycle = true;
                 robot.intake.setPower(IntakeMotor.States.Collect);
             } else if(!intakeDriver2 && robot.isManualControl) {
                 robot.intake.setPower(IntakeMotor.States.Wait);
@@ -149,6 +150,9 @@ public class TeleOpLm2 extends LinearOpMode {
             if(gamepad2.dpadRightWasPressed()){
                 robot.setAction(Robot.Actions.NextSlot);
             }
+            if(gamepad2.dpadUpWasPressed()){
+                robot.setAction(Robot.Actions.EmptySorter);
+            }
             if(gamepad1.psWasPressed()){
                 robot.drive.resetTeleOpHeading();
             }
@@ -162,10 +166,9 @@ public class TeleOpLm2 extends LinearOpMode {
             }
 
             if(gamepad2.dpadDownWasPressed()){
-//                robot.setAction(Robot.Actions.EmptySorter);
+                sorterColors = new Constants.Color[]{Constants.Color.None, Constants.Color.None, Constants.Color.None};
             }
-
-            robot.intake.sorter.servo.setPIDCoefficients(kP,kI,kD,kF, HighServo.FeedForwardType.Arm,1);
+//            robot.intake.sorter.servo.setPIDCoefficients(kP,kI,kD,kF, HighServo.FeedForwardType.Arm,1);
            /* telemetry.addData("Angle:", robot.intake.sorter.servo.getCurrentPositionPID());
             telemetry.addData("Error:" , robot.intake.sorter.servo.pidfController.getPositionError()/100);
             telemetry.addData("Target:" , robot.intake.sorter.servo.getTargetPID());*/

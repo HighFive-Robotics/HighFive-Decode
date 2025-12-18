@@ -21,7 +21,7 @@ public class SQUIDAngle {
     private double lastDerivative = 0;
     private double derivativeFilterGain = 0.8;
     private final double linThreshold = 900;
-    private double angleMultiplier = 100;
+    private final double angleMultiplier = 100;
 
     public Function<Double,Double> gainS = correction -> {
         if(Math.abs(correction) < linThreshold){
@@ -198,4 +198,5 @@ public class SQUIDAngle {
     public double getD() { return kD; }
     public double getF() { return kF; }
     public double getPeriod() { return period; }
+    public double getAngleMultiplier(){return angleMultiplier;}
 }

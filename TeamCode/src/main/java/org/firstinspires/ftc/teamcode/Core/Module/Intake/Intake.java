@@ -160,7 +160,12 @@ public class Intake extends HighModule {
             colorAssignedToCurrentSample = false;
         }
     }
-
+    public IntakeActions getAction(){
+        return action;
+    }
+    public boolean atTarget(){
+        return sorter.atTarget();
+    }
     @Override
     public void update() {
         sorter.update();

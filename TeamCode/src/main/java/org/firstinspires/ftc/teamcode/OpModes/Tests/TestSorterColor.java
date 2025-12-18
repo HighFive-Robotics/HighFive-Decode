@@ -39,11 +39,11 @@ public class TestSorterColor extends LinearOpMode{
             }
 
             if(gamepad1.cross && timer.milliseconds() >= 250){
-                intake.setAction(Intake.IntakeActions.FindGreen);
+//                intake.setAction(Intake.IntakeActions.FindGreen);
                 timer.reset();
             }
             if(gamepad1.square && timer.milliseconds() >= 250){
-                intake.setAction(Intake.IntakeActions.FindPurple);
+//                intake.setAction(Intake.IntakeActions.FindPurple);
                 timer.reset();
             }
 

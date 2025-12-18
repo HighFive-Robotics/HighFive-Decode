@@ -557,6 +557,7 @@ public class HighServo {
                     CRServo.setPower(power);
                     lastPower = power;
                 }
+                atTarget = pidfController.atSetPoint();
                 break;
         }
     }

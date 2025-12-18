@@ -1,7 +1,8 @@
 package org.firstinspires.ftc.teamcode.Core;
 
+import static org.firstinspires.ftc.teamcode.Constants.Color.Green;
 import static org.firstinspires.ftc.teamcode.Constants.Color.None;
-import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.cameraName;
+import static org.firstinspires.ftc.teamcode.Constants.Color.Purple;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.artifactNumber;
 
@@ -25,7 +26,7 @@ import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Shooter;
 import java.util.List;
 
 public class Robot extends HighModule {
-    ElapsedTime timerShoot = new ElapsedTime(), timerIntake = new ElapsedTime() , voltageTimer = new ElapsedTime() , intakeHelper = new ElapsedTime();
+    ElapsedTime timerShoot = new ElapsedTime(), timerIntake = new ElapsedTime(), voltageTimer = new ElapsedTime(), intakeHelper = new ElapsedTime(), alignTimer = new ElapsedTime();
     Telemetry telemetry;
     public Actions lastAction = Actions.None;
     public Follower drive;
@@ -36,8 +37,21 @@ public class Robot extends HighModule {
     public HighCamera camera;
     boolean isAuto;
     boolean stopShoot = false, stopIntake = false;
-    boolean intakeHelping=false;
-    public boolean isManualControl=true;
+    boolean intakeHelping = false;
+    public boolean isManualControl = true;
+    public boolean shouldAutoCycle = false;
+    SortingBehaviour shootingSeq = SortingBehaviour.Idle;
+    int slotCycles = -1;
+    Constants.Color[] motif = {None, None, None};
+
+    public enum SortingBehaviour {
+        Aligning,
+        Shooting,
+        Sorting,
+        Idle,
+
+    }
+
     public enum Actions {
         Shoot,
         PrepareForShooting,
@@ -52,7 +66,7 @@ public class Robot extends HighModule {
         None
     }
 
-    public Robot(HardwareMap hardwareMap, Pose startPose, boolean isAuto, Constants.Color allianceColor, Telemetry telemetry , Gamepad gamepad) {
+    public Robot(HardwareMap hardwareMap, Pose startPose, boolean isAuto, Constants.Color allianceColor, Telemetry telemetry, Gamepad gamepad) {
         this.telemetry = telemetry;
         this.hardwareMap = hardwareMap;
         this.isAuto = isAuto;
@@ -61,7 +75,7 @@ public class Robot extends HighModule {
         if (isAuto) {
             drive.setStartingPose(startPose);
         } else {
-            if(autoColor == Constants.Color.Blue) {
+            if (autoColor == Constants.Color.Blue) {
                 drive.startFieldCentricDrive(gamepad, true, Math.PI + startPose.getHeading());
             } else {
                 drive.startFieldCentricDrive(gamepad, true, startPose.getHeading());
@@ -92,81 +106,146 @@ public class Robot extends HighModule {
         }
     }
 
-    public void setAction(Actions action){
+    public void setAction(Actions action) {
         lastAction = action;
-        switch (action){
+        switch (action) {
             case Shoot:
                 intake.setPower(IntakeMotor.States.Collect);
                 stopShoot = true;
+                shouldAutoCycle = false;
                 isManualControl = false;
                 timerShoot.reset();
                 break;
             case PrepareForShooting:
-                intake.setPower(IntakeMotor.States.Spit);
+                intake.intakeMotor.setPower(-0.6);
                 stopIntake = true;
+                shouldAutoCycle = false;
                 isManualControl = false;
                 timerIntake.reset();
                 break;
             case PrevSlot:
                 setIntakeForSwitch();
                 isManualControl = false;
+                shouldAutoCycle = false;
                 intake.sorter.setPreviousSlot();
                 break;
             case NextSlot:
                 setIntakeForSwitch();
                 isManualControl = false;
+                shouldAutoCycle = false;
                 intake.sorter.setNextSlot();
                 break;
             case FindGreen:
                 setIntakeForSwitch();
                 isManualControl = false;
+                shouldAutoCycle = false;
                 intake.findColor(Intake.FindColors.FindGreen);
                 break;
             case FindPurple:
                 setIntakeForSwitch();
                 isManualControl = false;
+                shouldAutoCycle = false;
                 intake.findColor(Intake.FindColors.FindPurple);
                 break;
+            case EmptySorter:
+                alignTimer.reset();
+                isManualControl = false;
+                shouldAutoCycle = false;
+                slotCycles = 1;
+                motif = new Constants.Color[]{None, None, None};
+                intake.sorter.setSlot(intake.sorter.getSlot());
+                shootingSeq = SortingBehaviour.Aligning;
+                break;
+            case ShootGPP:
+                alignTimer.reset();
+                isManualControl = false;
+                shouldAutoCycle = false;
+                slotCycles = 1;
+                motif = new Constants.Color[]{Green, Purple, Purple};
+                findSpecificColor(motif[0]);
+                shootingSeq = SortingBehaviour.Aligning;
+                break;
+            case ShootPGP:
+                alignTimer.reset();
+                isManualControl = false;
+                shouldAutoCycle = false;
+                slotCycles = 1;
+                motif = new Constants.Color[]{Purple, Green, Purple};
+                findSpecificColor(motif[0]);
+                shootingSeq = SortingBehaviour.Aligning;
+                break;
+            case ShootPPG:
+                alignTimer.reset();
+                isManualControl = false;
+                shouldAutoCycle = false;
+                slotCycles = 1;
+                motif = new Constants.Color[]{Purple, Purple, Green};
+                findSpecificColor(motif[0]);
+                shootingSeq = SortingBehaviour.Aligning;
+                break;
+
         }
     }
-    public void setIntakeForSwitch(){
+    public void setIntakeForSwitch() {
         intake.setAction(Intake.IntakeActions.Wait);
         intake.setPower(IntakeMotor.States.Collect);
         intakeHelping = true;
         intakeHelper.reset();
     }
+    public void findSpecificColor(Constants.Color color) {
+        switch (color) {
+            case Green:
+                if (Constants.Intake.SorterConstants.greenArtifactNumber > 0) {
+                    setAction(Actions.FindGreen);
+                } else {
+                    setAction(Actions.NextSlot);
+                }
+                break;
+            case Purple:
+                if (Constants.Intake.SorterConstants.purpleArtifactNumber > 0) {
+                    setAction(Actions.FindPurple);
+                } else {
+                    setAction(Actions.NextSlot);
+                }
+                break;
+            case None:
+                setAction(Actions.NextSlot);
+                break;
+        }
+    }
+
     public boolean isDone() {
         return !drive.isBusy();
     }
 
     @Override
     public void update() {
-        if(voltageTimer.milliseconds() >= 500) {
+        if (voltageTimer.milliseconds() >= 500) {
             Constants.Globals.voltage = hardwareMap.voltageSensor.iterator().next().getVoltage();
             voltageTimer.reset();
         }
-        if(stopShoot && (timerShoot.milliseconds() > 1200 || (timerShoot.milliseconds() > 200 && shooter.getVelocityError() >= 0.7))){
-            intake.sorter.setColor(None,intake.sorter.getSlot());
+        if (stopShoot && (timerShoot.milliseconds() > 600 || (timerShoot.milliseconds() > 75 && shooter.getVelocityError() >= 0.6))) {
+            intake.sorter.setColor(None, intake.sorter.getSlot());
             stopShoot = false;
             intake.setAction(Intake.IntakeActions.Wait);
             intake.setPower(IntakeMotor.States.Wait);
         }
-        if(stopIntake && timerIntake.milliseconds() >= 450){
+        if (stopIntake && timerIntake.milliseconds() >= 100) {
             stopIntake = false;
             intake.setAction(Intake.IntakeActions.Wait);
             intake.setPower(IntakeMotor.States.Wait);
         }
-        if(intakeHelping && intakeHelper.milliseconds() >= 520){
+        if (intakeHelping && intakeHelper.milliseconds() >= 375) {
             intake.setPower(IntakeMotor.States.Wait);
-            intakeHelping=false;
+            intakeHelping = false;
         }
         intake.update();
-        if(intake.getLastAction() != Intake.IntakeActions.Wait){
-            switch (intake.getCollectType()){
+        if (shouldAutoCycle) {
+            switch (intake.getCollectType()) {
                 case Sorted:
-                    if(intake.sorter.getState() == Sorter.States.Automated){
-                        if(!intake.sorter.isFull){
-                            if(intake.currentColor != None && !intake.artifactPassThrough){
+                    if (intake.sorter.getState() == Sorter.States.Automated) {
+                        if (!intake.sorter.isFull) {
+                            if (intake.currentColor != None && !intake.artifactPassThrough) {
                                 setAction(Actions.NextSlot);
                             }
                         }
@@ -174,9 +253,9 @@ public class Robot extends HighModule {
                     }
                     break;
                 case Mix:
-                    if(intake.sorter.getState() == Sorter.States.Automated && artifactNumber < 1){
-                        if(!intake.sorter.isFull){
-                            if(intake.currentColor != None && !intake.artifactPassThrough){
+                    if (intake.sorter.getState() == Sorter.States.Automated && artifactNumber < 1) {
+                        if (!intake.sorter.isFull) {
+                            if (intake.currentColor != None && !intake.artifactPassThrough) {
                                 setAction(Actions.NextSlot);
                             }
                         }
@@ -187,9 +266,37 @@ public class Robot extends HighModule {
                     break;
             }
         }
+        if (shootingSeq != SortingBehaviour.Idle) {
+            switch (shootingSeq) {
+                case Aligning:
+                    if (intake.atTarget() || alignTimer.milliseconds() >= 400) {
+                        shootingSeq = SortingBehaviour.Shooting;
+                        setAction(Actions.PrepareForShooting);
+                    }
+                    break;
+                case Shooting:
+                    if(!stopIntake) {
+                        setAction(Actions.Shoot);
+                        shootingSeq = SortingBehaviour.Sorting;
+                        break;
+                    }
+                case Sorting:
+                    if (slotCycles <= 2) {
+                        if (!stopShoot) {
+                            findSpecificColor(motif[slotCycles]);
+                            alignTimer.reset();
+                            shootingSeq = SortingBehaviour.Aligning;
+                            slotCycles++;
+                        }
+                    } else {
+                        shootingSeq = SortingBehaviour.Idle;
+                        slotCycles = -1;
+                    }
+            }
+        }
         shooter.update();
         drive.update();
-        telemetry.addData("Timer",intakeHelper.milliseconds());
+        telemetry.addData("Timer", intakeHelper.milliseconds());
         for (LynxModule hub : allHubs) {
             hub.clearBulkCache();
         }
