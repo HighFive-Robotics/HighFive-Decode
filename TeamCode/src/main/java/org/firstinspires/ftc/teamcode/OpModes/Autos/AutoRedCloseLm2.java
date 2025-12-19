@@ -70,10 +70,10 @@ public class AutoRedCloseLm2 extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        robot = new Robot(hardwareMap, startPose, true, Constants.Color.Blue, telemetry, gamepad1);
+        robot = new Robot(hardwareMap, startPose, true, Constants.Color.Red, telemetry, gamepad1);
         robot.intake.setCollectType(Intake.CollectTypes.Normal);
         robot.intake.setState(Intake.States.Wait);
-        autoColor = Constants.Color.Blue;
+        autoColor = Constants.Color.Red;
         robot.drive.resetTeleOpHeading();
         robot.drive.setConstants(Constants.FConstants);
 

@@ -138,6 +138,16 @@ public class TeleOpLm2 extends LinearOpMode {
                 rumbled = true;
             }
 
+            if(gamepad2.psWasPressed()){
+                if(robot.intake.getCollectType() != Intake.CollectTypes.Normal){
+                    robot.intake.setCollectType(Intake.CollectTypes.Normal);
+                    robot.intake.setState(Intake.States.Wait);
+                } else {
+                    robot.intake.setCollectType(Intake.CollectTypes.Sorted);
+                    robot.intake.setState(Intake.States.Collect);
+                }
+            }
+
             if(gamepad2.dpadLeftWasPressed()){
                 robot.setAction(Robot.Actions.PrevSlot);
             }
@@ -162,21 +172,13 @@ public class TeleOpLm2 extends LinearOpMode {
             if(gamepad2.dpadDownWasPressed()){
                 sorterColors = new Constants.Color[]{Constants.Color.None, Constants.Color.None, Constants.Color.None};
             }
-//            robot.intake.sorter.servo.setPIDCoefficients(kP,kI,kD,kF, HighServo.FeedForwardType.Arm,1);
-           /* telemetry.addData("Angle:", robot.intake.sorter.servo.getCurrentPositionPID());
-            telemetry.addData("Error:" , robot.intake.sorter.servo.pidfController.getPositionError()/100);
-            telemetry.addData("Target:" , robot.intake.sorter.servo.getTargetPID());*/
+
             telemetry.addData("Color 1:", sorterColors[0]);
             telemetry.addData("Color 2:", sorterColors[1]);
             telemetry.addData("Color 3:", sorterColors[2]);
             telemetry.addData("Current Slot", robot.intake.sorter.getSlot());
             telemetry.addData("Current target", robot.intake.sorter.getTarget());
             telemetry.addData("Current slot number", robot.intake.sorter.getSlotNumber());
-           /* telemetry.addData("Artifact number:", artifactNumber);
-            telemetry.addData("Purple Artifact number:", purpleArtifactNumber);
-            telemetry.addData("Green Artifact number:", greenArtifactNumber);
-            telemetry.addData("motif id", robot.camera.getAprilTagId());
-            robot.intake.sensor.telemetry(telemetry);*/
             telemetry.addData("Hz", 1.0 / loopTimer.seconds());
             loopTimer.reset();
             telemetry.update();

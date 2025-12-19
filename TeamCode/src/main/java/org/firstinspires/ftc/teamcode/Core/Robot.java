@@ -117,7 +117,7 @@ public class Robot extends HighModule {
                 timerShoot.reset();
                 break;
             case PrepareForShooting:
-                intake.intakeMotor.setPower(-0.6);
+                intake.intakeMotor.setPower(-0.7);
                 stopIntake = true;
                 shouldAutoCycle = false;
                 isManualControl = false;
@@ -224,18 +224,18 @@ public class Robot extends HighModule {
             Constants.Globals.voltage = hardwareMap.voltageSensor.iterator().next().getVoltage();
             voltageTimer.reset();
         }
-        if (stopShoot && (timerShoot.milliseconds() > 1050 || (timerShoot.milliseconds() > 75 && shooter.getVelocityError() >= 0.65))) {
+        if (stopShoot && (timerShoot.milliseconds() > 800 || (timerShoot.milliseconds() > 125 && shooter.getVelocityError() >= 0.7))) {
             intake.sorter.setColor(None, intake.sorter.getSlot());
             stopShoot = false;
             intake.setState(Intake.States.Wait);
             intake.setPower(IntakeMotor.States.Wait);
         }
-        if (stopIntake && timerIntake.milliseconds() >= 100) {
+        if (stopIntake && timerIntake.milliseconds() >= 185) {
             stopIntake = false;
             intake.setState(Intake.States.Wait);
             intake.setPower(IntakeMotor.States.Wait);
         }
-        if (intakeHelping && intakeHelper.milliseconds() >= 375) {
+        if (intakeHelping && intakeHelper.milliseconds() >= 415) {
             intake.setPower(IntakeMotor.States.Wait);
             intakeHelping = false;
         }

@@ -15,8 +15,8 @@ import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
-@Autonomous(name = "🔵🔝AutoBlueFar🔝🔵")
-public class AutoBlueFarLittleTriangle extends LinearOpMode {
+@Autonomous(name = "🔴🔝AutoRedFar🔝🔴")
+public class AutoRedFarLittleTriangle extends LinearOpMode {
     private enum States {
         DriveToPreload,
         ResetForShootPreload,
@@ -46,9 +46,9 @@ public class AutoBlueFarLittleTriangle extends LinearOpMode {
     private int cycles = 0;
     private int shootingState = 0;
 
-    public Pose startPose = new Pose(58, 0, Math.toRadians(-90));
-    private final Pose shootPose = new Pose(54, 8, Math.toRadians(-67));
-    private final Pose preCollect1Pose = new Pose(27.5, 0, Math.toRadians(-90));
+    public Pose startPose = new Pose(58, 0, Math.toRadians(-90)).mirror();
+    private final Pose shootPose = new Pose(54, 8, Math.toRadians(-67)).mirror();
+    private final Pose preCollect1Pose = new Pose(27.5, 0, Math.toRadians(-90)).mirror();
 
     private final ElapsedTime opModeTimer = new ElapsedTime();
     private final ElapsedTime stateTimer = new ElapsedTime();
@@ -59,10 +59,10 @@ public class AutoBlueFarLittleTriangle extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        robot = new Robot(hardwareMap, startPose, true, Constants.Color.Blue, telemetry, gamepad1);
+        robot = new Robot(hardwareMap, startPose, true, Constants.Color.Red, telemetry, gamepad1);
         robot.intake.setCollectType(Intake.CollectTypes.Normal);
         robot.intake.setState(Intake.States.Wait);
-        autoColor = Constants.Color.Blue;
+        autoColor = Constants.Color.Red;
         robot.drive.resetTeleOpHeading();
         robot.drive.setConstants(Constants.FConstants);
 
@@ -82,7 +82,7 @@ public class AutoBlueFarLittleTriangle extends LinearOpMode {
         opModeTimer.reset();
         stateTimer.reset();
         actionTimer.reset();
-        state = AutoBlueFarLittleTriangle.States.DriveToPreload;
+        state = AutoRedFarLittleTriangle.States.DriveToPreload;
         while (opModeIsActive()) {
             switch (state) {
                 case DriveToPreload:
@@ -90,7 +90,7 @@ public class AutoBlueFarLittleTriangle extends LinearOpMode {
                         robot.drive.followPath(preloadPath, true);
                         robot.shooter.setTargetVelocity(reverseVelocity);
                         stateTimer.reset();
-                        state = AutoBlueFarLittleTriangle.States.ResetForShootPreload;
+                        state = AutoRedFarLittleTriangle.States.ResetForShootPreload;
                         robot.intake.setPower(IntakeMotor.States.Collect);
                         actionTimer.reset();
                     }
@@ -118,7 +118,7 @@ public class AutoBlueFarLittleTriangle extends LinearOpMode {
                         robot.drive.followPath(goToCollect, true);
                         robot.shooter.setTargetVelocity(0);
                         stateTimer.reset();
-                        state = AutoBlueFarLittleTriangle.States.Park;
+                        state = AutoRedFarLittleTriangle.States.Park;
                     }
                     break;
                 case Park:
@@ -128,8 +128,8 @@ public class AutoBlueFarLittleTriangle extends LinearOpMode {
                     }
                     break;
             }
-            if (opModeTimer.milliseconds() > 27000 && state != AutoBlueFarLittleTriangle.States.CollectArtefacts && state != AutoBlueFarLittleTriangle.States.Park) {
-                state = AutoBlueFarLittleTriangle.States.CollectArtefacts;
+            if (opModeTimer.milliseconds() > 27000 && state != AutoRedFarLittleTriangle.States.CollectArtefacts && state != AutoRedFarLittleTriangle.States.Park) {
+                state = AutoRedFarLittleTriangle.States.CollectArtefacts;
                 stateTimer.reset();
             }
             telemetry.addData("State", state);
