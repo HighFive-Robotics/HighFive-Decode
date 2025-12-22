@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.OpModes.TeleOps;
 
+import static org.firstinspires.ftc.teamcode.Constants.Globals.RedGoal;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.finalAutoPose;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kD;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kF;
@@ -132,7 +133,7 @@ public class TeleOpLm2 extends LinearOpMode {
                 rumbled = true;
             }
             if(gamepad2.triangle && timers.get("triangle2").milliseconds() >= 250){
-                robot.shooter.setTargetVelocity(bigVelo);
+                robot.shooter.setTargetVelocity(robot.shooter.getVelocityFromDistance(robot.getDistance()));
                 timers.get("triangle2").reset();
                 timers.get("rumble").reset();
                 rumbled = true;
@@ -176,9 +177,12 @@ public class TeleOpLm2 extends LinearOpMode {
             telemetry.addData("Color 1:", sorterColors[0]);
             telemetry.addData("Color 2:", sorterColors[1]);
             telemetry.addData("Color 3:", sorterColors[2]);
-            telemetry.addData("Current Slot", robot.intake.sorter.getSlot());
-            telemetry.addData("Current target", robot.intake.sorter.getTarget());
-            telemetry.addData("Current slot number", robot.intake.sorter.getSlotNumber());
+            telemetry.addData("Shooter error velo", robot.shooter.getVelocityError());
+            telemetry.addData("Shooter target", robot.shooter.getTarget());
+            telemetry.addData("Shooter velocity", robot.shooter.motorUp.getCurrentVelocity());
+            telemetry.addData("Robot pose", robot.drive.getPose().toString());
+            telemetry.addData("Goal Red", RedGoal.toString());
+            telemetry.addData("Dist Red", robot.getDistance());
             telemetry.addData("Hz", 1.0 / loopTimer.seconds());
             loopTimer.reset();
             telemetry.update();

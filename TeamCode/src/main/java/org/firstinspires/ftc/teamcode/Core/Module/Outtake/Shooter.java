@@ -14,9 +14,12 @@ import static org.firstinspires.ftc.teamcode.Constants.ShooterConstants.wheelDia
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighModule;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighMotor;
+
+import java.awt.font.NumericShaper;
 
 @Config
 public class Shooter extends HighModule {
@@ -59,6 +62,10 @@ public class Shooter extends HighModule {
     }
     public double getVelocityError(){
         return Math.abs(target - velocity);
+    }
+
+    public double getVelocityFromDistance(double distance){
+        return Range.clip( 8.9416e-10 * distance* distance* distance* distance -7.58832e-7 * distance* distance* distance + 0.000234922 * distance * distance -0.0238624 * distance + 4.0805,3,5.35);
     }
 
     @Override

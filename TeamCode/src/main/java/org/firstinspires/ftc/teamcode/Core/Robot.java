@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.Core;
 import static org.firstinspires.ftc.teamcode.Constants.Color.Green;
 import static org.firstinspires.ftc.teamcode.Constants.Color.None;
 import static org.firstinspires.ftc.teamcode.Constants.Color.Purple;
+import static org.firstinspires.ftc.teamcode.Constants.Globals.BlueGoal;
+import static org.firstinspires.ftc.teamcode.Constants.Globals.RedGoal;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.artifactNumber;
 
@@ -40,6 +42,7 @@ public class Robot extends HighModule {
     boolean intakeHelping = false;
     public boolean isManualControl = true;
     public boolean shouldAutoCycle = false;
+    Constants.Color allianceColor;
     SortingBehaviour shootingSeq = SortingBehaviour.Idle;
     int slotCycles = -1;
     Constants.Color[] motif = {None, None, None};
@@ -70,6 +73,7 @@ public class Robot extends HighModule {
         this.telemetry = telemetry;
         this.hardwareMap = hardwareMap;
         this.isAuto = isAuto;
+        this.allianceColor = allianceColor;
         drive = Constants.createFollower(hardwareMap);
         camera = new HighCamera(hardwareMap, HighCamera.Pipelines.AprilTagId);
         if (isAuto) {
@@ -93,6 +97,7 @@ public class Robot extends HighModule {
         this.telemetry = telemetry;
         this.hardwareMap = hardwareMap;
         this.isAuto = isAuto;
+        this.allianceColor = allianceColor;
         drive = Constants.createFollower(hardwareMap);
         camera = new HighCamera(hardwareMap, HighCamera.Pipelines.AprilTagId);
         if (isAuto) {
@@ -296,6 +301,19 @@ public class Robot extends HighModule {
         telemetry.addData("Timer", intakeHelper.milliseconds());
         for (LynxModule hub : allHubs) {
             hub.clearBulkCache();
+        }
+    }
+
+    public double getDistance(){
+        switch (allianceColor){
+            case Blue:{
+                return 2.54 * Math.hypot(BlueGoal.getX() - drive.getPose().getX(),BlueGoal.getY() - drive.getPose().getY());
+            }
+            default:{
+                return 2.54 * Math.hypot(RedGoal.getX() - drive.getPose().getX(),RedGoal.getY() - drive.getPose().getY());
+            }
+            case None:
+                return -1;
         }
     }
 }

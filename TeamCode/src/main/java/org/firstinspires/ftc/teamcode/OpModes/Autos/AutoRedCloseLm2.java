@@ -311,6 +311,7 @@ public class AutoRedCloseLm2 extends LinearOpMode {
                         robot.shooter.setTargetVelocity(0);
                         stateTimer.reset();
                         state = AutoRedCloseLm2.States.Park;
+                        finalAutoPose = robot.drive.getPose();
                     }
                     break;
                 case Park:
@@ -322,6 +323,7 @@ public class AutoRedCloseLm2 extends LinearOpMode {
             }
             if (opModeTimer.milliseconds() > 27000 && state != AutoRedCloseLm2.States.DriveToPark && state != AutoRedCloseLm2.States.Park) {
                 state = AutoRedCloseLm2.States.DriveToPark;
+                finalAutoPose = robot.drive.getPose();
                 stateTimer.reset();
             }
             telemetry.addData("State", state);
@@ -329,6 +331,7 @@ public class AutoRedCloseLm2 extends LinearOpMode {
             telemetry.addData("Shooter Velocity", robot.shooter.motorUp.getCurrentVelocity());
             telemetry.addData("Robot Pose", robot.drive.getPose());
             telemetry.update();
+            finalAutoPose = robot.drive.getPose();
             robot.update();
         }
     }
