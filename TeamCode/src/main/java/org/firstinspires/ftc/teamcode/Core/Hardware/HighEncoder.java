@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.Core.Hardware;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+
 public class HighEncoder {
 
     public DcMotorEx encoder;
@@ -33,5 +35,8 @@ public class HighEncoder {
 
     public double getVelocity(){
         return encoder.getVelocity() * reverseMultiplier;
+    }
+    public double getVelocityDeg(){
+        return encoder.getVelocity(AngleUnit.DEGREES) * reverseMultiplier;
     }
 }
