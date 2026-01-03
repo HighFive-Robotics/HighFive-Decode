@@ -131,7 +131,7 @@ public class Intake extends HighModule {
         if (intakeMotor.getState() != IntakeMotor.States.Wait) {
             if (intakeMotor.getPower() >= 0) {
                 breakBeamCollected = breakBeam.getState();
-                boolean artifactSeen = sensor.isInReach(1);
+                boolean artifactSeen = sensor.isInReach(0.7);
                 if (breakBeamCollected || artifactSeen) {
                     artifactPassThrough = true;
                     timer.reset();

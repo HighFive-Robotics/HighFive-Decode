@@ -5,7 +5,6 @@ import static org.firstinspires.ftc.teamcode.Constants.Color.None;
 import static org.firstinspires.ftc.teamcode.Constants.Color.Purple;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.ColorSensorConstants.GreenValuesHSV;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.ColorSensorConstants.PurpleValuesHSV;
-import static org.firstinspires.ftc.teamcode.Constants.Intake.ColorSensorConstants.Treshold;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.ColorSensorConstants.currentColor;
 
 import android.graphics.Color;
@@ -24,70 +23,79 @@ import java.util.Arrays;
 @Config
 public class HighSensor extends HighModule {
     RevColorSensorV3 sensor;
-    public static double minSaturation = 0.2;
+
+    public static double minSaturation = 0.15;
+
+    public static double minValue = 0.08;
+
     private volatile float[] hsvValues = new float[3];
     private Thread colorThread;
     private final int burstSize = 9;
 
     public HighSensor(HardwareMap hardwareMap, String name) {
         sensor = hardwareMap.get(RevColorSensorV3.class, name);
+
         sensor.setGain(25.0f);
     }
 
     public double getDistance(DistanceUnit distanceUnit) {
         return sensor.getDistance(distanceUnit);
     }
+
     public boolean isInReach(double distance){
         return sensor.getDistance(DistanceUnit.CM) <= distance;
     }
 
     private void processBatch() {
-        float[] avgHsv = new float[3];
-        int greenCount = 0;
-        int purpleCount = 0;
-        int noneCount = 0;
-        float[] tempHsv = new float[3];
+        float sumR = 0;
+        float sumG = 0;
+        float sumB = 0;
 
         for (int i = 0; i < burstSize; i++) {
             NormalizedRGBA colors = sensor.getNormalizedColors();
-            Color.colorToHSV(colors.toColor(), tempHsv);
 
-            avgHsv[0] += tempHsv[0];
-            avgHsv[1] += tempHsv[1];
-            avgHsv[2] += tempHsv[2];
-
-            if (tempHsv[1] < minSaturation) {
-                noneCount++;
-            } else {
-                float hue = tempHsv[0];
-                float threshold = Treshold[0];
-
-                if (Math.abs(hue - GreenValuesHSV[0]) <= (threshold+0.35) ) {
-                    greenCount++;
-                } else if (Math.abs(hue - PurpleValuesHSV[0]) <= threshold || hue >=170 ){
-                    purpleCount++;
-                } else {
-                    noneCount++;
-                }
-            }
+            sumR += colors.red;
+            sumG += colors.green;
+            sumB += colors.blue;
         }
 
-        avgHsv[0] /= burstSize;
-        avgHsv[1] /= burstSize;
-        avgHsv[2] /= burstSize;
-        hsvValues = avgHsv;
+        int r = (int) ((sumR / burstSize) * 255);
+        int g = (int) ((sumG / burstSize) * 255);
+        int b = (int) ((sumB / burstSize) * 255);
 
-        if (greenCount > purpleCount && greenCount > noneCount) {
-            currentColor = Green;
-        } else if (purpleCount > greenCount && purpleCount > noneCount) {
-            currentColor = Purple;
-        } else {
+        r = Math.min(255, Math.max(0, r));
+        g = Math.min(255, Math.max(0, g));
+        b = Math.min(255, Math.max(0, b));
+
+        Color.RGBToHSV(r, g, b, hsvValues);
+
+        float hue = hsvValues[0];
+        float sat = hsvValues[1];
+        float val = hsvValues[2];
+
+        if (sat < minSaturation || val < minValue) {
             currentColor = None;
+            return;
         }
+
+        float distToGreen = getAngularDistance(hue, GreenValuesHSV[0]);
+        float distToPurple = getAngularDistance(hue, PurpleValuesHSV[0]);
+
+        if (distToGreen < distToPurple) {
+            currentColor = Green;
+        } else {
+            currentColor = Purple;
+        }
+    }
+
+    private float getAngularDistance(float h1, float h2) {
+        float diff = Math.abs(h1 - h2);
+        return Math.min(diff, 360 - diff);
     }
 
     @Override
     public void update() {
+
         if (colorThread == null || !colorThread.isAlive()) {
             colorThread = new Thread(this::processBatch);
             colorThread.setPriority(Thread.MAX_PRIORITY);
@@ -104,13 +112,14 @@ public class HighSensor extends HighModule {
     }
 
     public void telemetry(Telemetry telemetry) {
-        telemetry.addData("Distance (CM)", sensor.getDistance(DistanceUnit.CM));
-        telemetry.addData("HSV", Arrays.toString(hsvValues));
-        telemetry.addData("Hue", hsvValues[0]);
-        telemetry.addData("Saturation", hsvValues[1]);
-        telemetry.addData("Value", hsvValues[2]);
-        telemetry.addData("Green Target Hue", GreenValuesHSV[0]);
-        telemetry.addData("Purple Target Hue", PurpleValuesHSV[0]);
-        telemetry.addData("Detected Color", currentColor);
+        telemetry.addData("Dist (CM)", String.format("%.2f", sensor.getDistance(DistanceUnit.CM)));
+        telemetry.addData("HSV", String.format("%.1f, %.2f, %.2f", hsvValues[0], hsvValues[1], hsvValues[2]));
+
+        float distG = getAngularDistance(hsvValues[0], GreenValuesHSV[0]);
+        float distP = getAngularDistance(hsvValues[0], PurpleValuesHSV[0]);
+
+        telemetry.addData("Delta Green", String.format("%.1f", distG));
+        telemetry.addData("Delta Purple", String.format("%.1f", distP));
+        telemetry.addData("Result", currentColor);
     }
 }

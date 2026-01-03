@@ -18,6 +18,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.Core.Algorithms.HighController;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighEncoder;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighModule;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighServo;
@@ -26,6 +27,19 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighServo;
 public class Sorter extends HighModule {
     public HighServo servo;
     public HighEncoder encoder;
+    private HighController.Kernel ballKernel = new HighController.Kernel.Builder()
+            .setPID(0.00055,0,0.00006)
+            .setFeedforward(0.068,0,0)
+            .setBangBangRange(100)
+            .setTolerance(2)
+            .setPrecisionThreshold(10)
+            .setSlewRate(5)
+            .setOscillationDampener(0.05,2)
+            .setOpposingCorrection(true,1.1,-1.0)
+            .setBangBangGain(0.92)
+            .setPrecisionAddition(0.5,1)
+            .setViscousGain(2.5)
+            .build();
     public int slotNumber = 1;
     private final double tolerance;
     public boolean isFull = false;
@@ -46,10 +60,17 @@ public class Sorter extends HighModule {
 
     public Sorter(HardwareMap hwMap, DcMotorEx motor, double offset) {
         encoder = new HighEncoder(motor, offset, false);
+//        servo = HighServo.Builder.startBuilding()
+//                .setServo(hwMap.get(CRServo.class, sorterServoName))
+//                .setPIDRunMode()
+//                .setPIDCoefficients(kP, kI, kD, kF)
+//                .setEncoderResolution(ticksPerRotation)
+//                .setEncoder(encoder)
+//                .build();
         servo = HighServo.Builder.startBuilding()
                 .setServo(hwMap.get(CRServo.class, sorterServoName))
-                .setPIDRunMode()
-                .setPIDCoefficients(kP, kI, kD, kF)
+                .setHighControllerRunMode()
+                .setHKernel(ballKernel)
                 .setEncoderResolution(ticksPerRotation)
                 .setEncoder(encoder)
                 .build();
@@ -244,7 +265,7 @@ public class Sorter extends HighModule {
 
     @Override
     public boolean atTarget() {
-        return (servo.pidfController.getPositionError()/servo.pidfController.getAngleMultiplier()) <= tolerance;
+        return !servo.hControler.isBusy();
     }
 
     @Override

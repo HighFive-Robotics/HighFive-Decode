@@ -25,6 +25,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Core.Algorithms.AsymmetricMotionProfiler;
+import org.firstinspires.ftc.teamcode.Core.Algorithms.HighController;
 import org.firstinspires.ftc.teamcode.Core.Algorithms.SQUIDAngle;
 
 
@@ -34,7 +35,7 @@ public class HighServo {
         MotionProfiler,
         Standard,
         ContinuousRotation,
-        PIDAngle
+        HighControllerAngle, PIDAngle
     }
 
     public enum FeedForwardType{
@@ -47,6 +48,8 @@ public class HighServo {
     public AnalogInput analogInput;
     private final AsymmetricMotionProfiler motionProfiler = new AsymmetricMotionProfiler(1, 1, 1);
     public final SQUIDAngle pidfController = new SQUIDAngle(0,0,0,0);
+    public final HighController.Kernel kernel= new HighController.Kernel();
+    public final HighController hControler = new HighController(kernel);
     public FeedForwardType feedForwardType;
     public HighEncoder encoder;
     private double targetPosition, targetPositionMotionProfile, currentPosition, lastPosition = -1;
@@ -301,6 +304,7 @@ public class HighServo {
     public void setTarget(double target) {
         this.target = target;
         pidfController.setSetPoint(target);
+        hControler.setTarget(target);
     }
 
     /**
@@ -559,6 +563,19 @@ public class HighServo {
                 }
                 atTarget = pidfController.atSetPoint();
                 break;
+            case HighControllerAngle:
+                currentPositionPID = encoder.getPosition();
+                double velo = encoder.getVelocityDeg();
+                currentPositionPID = currentPositionPID % encoderResolution;
+                if (currentPositionPID < 0) currentPositionPID += encoderResolution;
+                currentPositionPID = currentPositionPID / encoderResolution * 360;
+                power = hControler.run(currentPositionPID,velo);
+                if (Math.abs(power - lastPower) >= epsilon) {
+                    CRServo.setPower(power);
+                    lastPower = power;
+                }
+                atTarget = !hControler.isBusy();
+                break;
         }
     }
 
@@ -610,6 +627,9 @@ public class HighServo {
                 break;
         }
     }
+    public void setKernel(HighController.Kernel kernel){
+        this.hControler.setKernel(kernel);
+    }
     /*
        |
        | BUILDER CLASS
@@ -625,6 +645,7 @@ public class HighServo {
         public MotionProfilerRunMode setMotionProfilerRunMode();
         public Builder setStandardRunMode();
         public Builder setPIDRunMode();
+        public Builder setHighControllerRunMode();
     }
     public interface StandardRunMode{
         public Builder setAnalogInput(AnalogInput analogInput);
@@ -683,6 +704,14 @@ public class HighServo {
         }
 
         @Override
+        public Builder setHighControllerRunMode() {
+            this.servo.runMode = RunMode.HighControllerAngle;
+            this.servo.feedForwardType = FeedForwardType.Lift;
+            this.servo.hControler.setMode(HighController.Modes.Angular);
+            return this;
+        }
+
+        @Override
         public Builder setMotionProfilerCoefficients(double maxVelocity, double acceleration, double deceleration) {
             servo.setMotionProfilerCoefficients(maxVelocity,acceleration,deceleration);
             return this;
@@ -697,6 +726,10 @@ public class HighServo {
         }
         public Builder setPIDCoefficients(double kP , double kI , double kD , double kF) {
             servo.pidfController.setPIDF(kP,kI,kD,kF);
+            return this;
+        }
+        public Builder setHKernel(HighController.Kernel kernel){
+            servo.setKernel(kernel);
             return this;
         }
 
