@@ -26,6 +26,7 @@ public class BlockerOuttake extends HighModule {
         servo = HighServo.Builder.startBuilding()
                 .setServo(hwMap.get(Servo.class , blockerServoName))
                 .setStandardRunMode()
+                .setInitPosition(initPosition,isAuto)
                 .build();
     }
 

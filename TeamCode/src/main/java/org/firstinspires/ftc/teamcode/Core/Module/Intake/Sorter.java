@@ -27,19 +27,6 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighServo;
 public class Sorter extends HighModule {
     public HighServo servo;
     public HighEncoder encoder;
-    private HighController.Kernel ballKernel = new HighController.Kernel.Builder()
-            .setPID(0.00055,0,0.00006)
-            .setFeedforward(0.068,0,0)
-            .setBangBangRange(100)
-            .setTolerance(2)
-            .setPrecisionThreshold(10)
-            .setSlewRate(5)
-            .setOscillationDampener(0.05,2)
-            .setOpposingCorrection(true,1.1,-1.0)
-            .setBangBangGain(0.92)
-            .setPrecisionAddition(0.5,1)
-            .setViscousGain(2.5)
-            .build();
     public int slotNumber = 1;
     public boolean isFull = false;
 
@@ -59,6 +46,19 @@ public class Sorter extends HighModule {
 
     public Sorter(HardwareMap hwMap, DcMotorEx motor, double offset) {
         encoder = new HighEncoder(motor, offset, false);
+        HighController.Kernel ballKernel = new HighController.Kernel.Builder()
+                .setPID(0.00055, 0, 0.00006)
+                .setFeedforward(0.068, 0, 0)
+                .setBangBangRange(100)
+                .setTolerance(2)
+                .setPrecisionThreshold(10)
+                .setSlewRate(5)
+                .setOscillationDampener(0.05, 2)
+                .setOpposingCorrection(true, 1.1, -1.0)
+                .setBangBangGain(0.92)
+                .setPrecisionAddition(0.5, 1)
+                .setViscousGain(2.5)
+                .build();
         servo = HighServo.Builder.startBuilding()
                 .setServo(hwMap.get(CRServo.class, sorterServoName))
                 .setHighControllerRunMode()

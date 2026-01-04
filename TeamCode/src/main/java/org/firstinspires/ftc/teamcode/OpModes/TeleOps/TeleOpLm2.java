@@ -2,10 +2,6 @@ package org.firstinspires.ftc.teamcode.OpModes.TeleOps;
 
 import static org.firstinspires.ftc.teamcode.Constants.Globals.RedGoal;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.finalAutoPose;
-import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kD;
-import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kF;
-import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kI;
-import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kP;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.sorterColors;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -15,7 +11,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Constants;
-import org.firstinspires.ftc.teamcode.Core.Hardware.HighServo;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.BlockerOuttake;
@@ -74,11 +69,8 @@ public class TeleOpLm2 extends LinearOpMode {
         while (opModeIsActive()) {
 
             if(gamepad1.left_trigger >= 0.8){
-                //robot.isManualControl=true;
                 robot.intake.setPower(IntakeMotor.States.Spit);
             } else if(gamepad1.right_trigger >= 0.8){
-                //robot.isManualControl=true;
-                //robot.shouldAutoCycle = true;
                 robot.intake.setPower(IntakeMotor.States.Collect);
             } else if(!intakeDriver2 && robot.intake.canStop) {
                 robot.intake.setPower(IntakeMotor.States.Wait);
@@ -149,7 +141,7 @@ public class TeleOpLm2 extends LinearOpMode {
             }
 
             if(gamepad1.dpadUpWasPressed()){
-                robot.setAction(Robot.Actions.ShootSequence);
+                robot.setAction(Robot.Actions.ShootFast);
             }
 
             if(gamepad2.dpadLeftWasPressed()){

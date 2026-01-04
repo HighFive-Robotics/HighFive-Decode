@@ -33,7 +33,7 @@ public class Intake extends HighModule {
     public boolean artifactPassThrough = false;
     public boolean breakBeamCollected = false, helpingSorter = false;
     private boolean colorAssignedToCurrentSample = false;
-    public boolean canStop = false;
+    public boolean canStop = true;
 
     States state = States.Collect;
     IntakeMotor.States lastPower = IntakeMotor.States.Wait;
@@ -144,6 +144,17 @@ public class Intake extends HighModule {
         helpingSorter = true;
         setPower(IntakeMotor.States.Collect);
         intakeHelper.reset();
+    }
+
+    public void findColor(Constants.Color color){
+        switch (color){
+            case Purple:
+                setAction(Actions.FindPurple);
+                break;
+            case Green:
+                setAction(Actions.FindGreen);
+                break;
+        }
     }
 
     public boolean atTarget(){
