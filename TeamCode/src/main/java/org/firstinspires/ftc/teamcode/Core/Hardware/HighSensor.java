@@ -95,7 +95,6 @@ public class HighSensor extends HighModule {
 
     @Override
     public void update() {
-
         if (colorThread == null || !colorThread.isAlive()) {
             colorThread = new Thread(this::processBatch);
             colorThread.setPriority(Thread.MAX_PRIORITY);
