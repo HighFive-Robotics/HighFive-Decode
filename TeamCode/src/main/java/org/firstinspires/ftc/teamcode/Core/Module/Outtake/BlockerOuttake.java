@@ -11,9 +11,9 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighServo;
 
 @Config
 public class BlockerOuttake extends HighModule {
-    HighServo servo;
-    public static double ClosedPosition = 0.25;
-    public static double OpenPosition = 0.74;
+    public HighServo servo;
+    public static double ClosedPosition = 0.65;
+    public static double OpenPosition = 0.2;
 
     public enum States {
         Open,
@@ -41,6 +41,18 @@ public class BlockerOuttake extends HighModule {
         }
     }
 
+    public void setState(BlockerOuttake.States state, double time){
+        this.state = state;
+        switch (state){
+            case Open:
+                setTarget(OpenPosition, time);
+                break;
+            case Close:
+                setTarget(ClosedPosition, time);
+                break;
+        }
+    }
+
     public void setTarget(double target) {
         this.target = target;
         servo.setPosition(target);
@@ -49,6 +61,11 @@ public class BlockerOuttake extends HighModule {
     public void setTarget(double target, double time) {
         this.target = target;
         servo.setPosition(target, time);
+    }
+
+    @Override
+    public boolean atTarget(){
+        return servo.atTarget();
     }
 
     public double getTarget() {

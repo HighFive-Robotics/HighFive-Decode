@@ -28,25 +28,28 @@ public class Intake extends HighModule {
     public Constants.Color currentColor;
     public int currentSlotNumber;
 
-    ElapsedTime timer = new ElapsedTime();
+    ElapsedTime timer = new ElapsedTime(),intakeHelper = new ElapsedTime();
 
     public boolean artifactPassThrough = false;
-    public boolean breakBeamCollected = false;
+    public boolean breakBeamCollected = false, helpingSorter = false;
     private boolean colorAssignedToCurrentSample = false;
+    public boolean canStop = false;
 
     States state = States.Collect;
     IntakeMotor.States lastPower = IntakeMotor.States.Wait;
     CollectTypes collectType = CollectTypes.Sorted;
-    FindColors findColor;
+    Actions currentAction;
 
     public enum States {
         Collect,
         Wait
     }
 
-    public enum FindColors{
+    public enum Actions{
         FindGreen,
-        FindPurple
+        FindPurple,
+        NextSlot,
+        PreviousSlot
     }
 
     public enum CollectTypes {
@@ -76,16 +79,16 @@ public class Intake extends HighModule {
         this.state = state;
     }
 
-    public void findColor(FindColors findColor){
-        this.findColor = findColor;
-        switch (findColor) {
+    public void setAction(Actions action){
+        this.currentAction = action;
+        switch (action) {
             case FindGreen: {
                 if (greenArtifactNumber > 0) {
                     if (currentColor != Green) {
                         if (sorter.getColor(sorter.getNextSlot()) == Green) {
-                            sorter.setNextSlot();
+                            setAction(Actions.NextSlot);
                         } else {
-                            sorter.setPreviousSlot();
+                            setAction(Actions.PreviousSlot);
                         }
                     }
                 }
@@ -95,12 +98,21 @@ public class Intake extends HighModule {
                 if (purpleArtifactNumber > 0) {
                     if (currentColor != Purple) {
                         if (sorter.getColor(sorter.getNextSlot()) == Purple) {
-                            sorter.setNextSlot();
+                            setAction(Actions.NextSlot);
                         } else {
-                            sorter.setPreviousSlot();
+                            setAction(Actions.PreviousSlot);
                         }
                     }
                 }
+            }
+            case NextSlot: {
+                sorter.setNextSlot();
+                setIntakeForSwitch();
+            }
+            break;
+            case PreviousSlot: {
+                sorter.setPreviousSlot();
+                setIntakeForSwitch();
             }
             break;
         }
@@ -125,6 +137,17 @@ public class Intake extends HighModule {
 
     public States getState(){
         return state;
+    }
+
+    public void setIntakeForSwitch(){
+        canStop = false;
+        helpingSorter = true;
+        setPower(IntakeMotor.States.Collect);
+        intakeHelper.reset();
+    }
+
+    public boolean atTarget(){
+        return sorter.atTarget();
     }
 
     public void updateColor() {
@@ -160,12 +183,16 @@ public class Intake extends HighModule {
             colorAssignedToCurrentSample = false;
         }
     }
-    public boolean atTarget(){
-        return sorter.atTarget();
-    }
+
     @Override
     public void update() {
         sorter.update();
+        if (helpingSorter && intakeHelper.milliseconds() >= 400) {
+            setPower(IntakeMotor.States.Wait);
+            helpingSorter = false;
+            canStop = true;
+        }
+
         currentSlot = sorter.getSlot();
         currentSlotNumber = sorter.getSlotNumber();
         currentColor = sorter.getColor(currentSlot);

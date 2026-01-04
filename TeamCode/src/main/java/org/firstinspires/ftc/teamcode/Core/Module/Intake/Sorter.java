@@ -41,7 +41,6 @@ public class Sorter extends HighModule {
             .setViscousGain(2.5)
             .build();
     public int slotNumber = 1;
-    private final double tolerance;
     public boolean isFull = false;
 
     public enum States {
@@ -60,13 +59,6 @@ public class Sorter extends HighModule {
 
     public Sorter(HardwareMap hwMap, DcMotorEx motor, double offset) {
         encoder = new HighEncoder(motor, offset, false);
-//        servo = HighServo.Builder.startBuilding()
-//                .setServo(hwMap.get(CRServo.class, sorterServoName))
-//                .setPIDRunMode()
-//                .setPIDCoefficients(kP, kI, kD, kF)
-//                .setEncoderResolution(ticksPerRotation)
-//                .setEncoder(encoder)
-//                .build();
         servo = HighServo.Builder.startBuilding()
                 .setServo(hwMap.get(CRServo.class, sorterServoName))
                 .setHighControllerRunMode()
@@ -75,8 +67,6 @@ public class Sorter extends HighModule {
                 .setEncoder(encoder)
                 .build();
 
-        tolerance = 2.5;
-        servo.pidfController.setTolerance(tolerance);
         setSlot(Slots.Slot1);
         slotNumber = 1;
         /// TODO DO NOT MAKE NONE
@@ -265,7 +255,7 @@ public class Sorter extends HighModule {
 
     @Override
     public boolean atTarget() {
-        return !servo.hControler.isBusy();
+        return Math.abs(servo.hControler.getError()) <= 7.5;
     }
 
     @Override

@@ -54,7 +54,7 @@ public class HighServo {
     public HighEncoder encoder;
     private double targetPosition, targetPositionMotionProfile, currentPosition, lastPosition = -1;
     private final double epsilon = 1e-5;
-    private boolean useAnalogInput = false, atTarget = false;
+    public boolean useAnalogInput = false, atTarget = false;
     private double error = epsilon, voltage, minPosition = 0, maxPosition = 1, minVoltage = 0, maxVoltage = 3.3;
     private double power, lastPower = -2;
     public boolean inInit = true;

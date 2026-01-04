@@ -30,7 +30,6 @@ public class TeleOpLm2 extends LinearOpMode {
 
     public static double littleVelo = 4 , bigVelo = 7.5 , negativeVelo = -2;
 
-
     public boolean intakeDriver2 = false, rumbled = false;
     Robot robot;
 
@@ -75,13 +74,13 @@ public class TeleOpLm2 extends LinearOpMode {
         while (opModeIsActive()) {
 
             if(gamepad1.left_trigger >= 0.8){
-                robot.isManualControl=true;
+                //robot.isManualControl=true;
                 robot.intake.setPower(IntakeMotor.States.Spit);
             } else if(gamepad1.right_trigger >= 0.8){
-                robot.isManualControl=true;
-                robot.shouldAutoCycle = true;
+                //robot.isManualControl=true;
+                //robot.shouldAutoCycle = true;
                 robot.intake.setPower(IntakeMotor.States.Collect);
-            } else if(!intakeDriver2 && robot.isManualControl) {
+            } else if(!intakeDriver2 && robot.intake.canStop) {
                 robot.intake.setPower(IntakeMotor.States.Wait);
             }
 
@@ -149,11 +148,15 @@ public class TeleOpLm2 extends LinearOpMode {
                 }
             }
 
+            if(gamepad1.dpadUpWasPressed()){
+                robot.setAction(Robot.Actions.ShootSequence);
+            }
+
             if(gamepad2.dpadLeftWasPressed()){
-                robot.setAction(Robot.Actions.PrevSlot);
+                robot.intake.setAction(Intake.Actions.PreviousSlot);
             }
             if(gamepad2.dpadRightWasPressed()){
-                robot.setAction(Robot.Actions.NextSlot);
+                robot.intake.setAction(Intake.Actions.NextSlot);
             }
             if(gamepad2.dpadUpWasPressed()){
                 robot.setAction(Robot.Actions.EmptySorter);
@@ -172,6 +175,7 @@ public class TeleOpLm2 extends LinearOpMode {
 
             if(gamepad2.dpadDownWasPressed()){
                 sorterColors = new Constants.Color[]{Constants.Color.None, Constants.Color.None, Constants.Color.None};
+                robot.intake.setState(Intake.States.Collect);
             }
 
             telemetry.addData("Color 1:", sorterColors[0]);
