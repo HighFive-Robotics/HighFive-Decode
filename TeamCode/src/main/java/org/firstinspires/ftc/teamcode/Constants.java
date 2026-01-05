@@ -78,7 +78,7 @@ public class Constants {
             public static double tolerance = 70;
             public static Color currentColor = Color.None;
 
-            public static float[] GreenValuesHSV = {155F,0.6F,20F};
+            public static float[] GreenValuesHSV = {125.0F,0.6F,20F};
             public static float[] PurpleValuesHSV = {217F,0.4F,5F};
             public static float[] Treshold = {17.85F, 0.2F, 5F};
 
@@ -90,7 +90,14 @@ public class Constants {
         @Config
         public static class SorterConstants{
 
-            public static double kP = 0.00137, kI = 0.00025, kD = 0.000001, kF=3.5e-9;
+            public static double kP = 0.00055,kD=0.00006,kI=0,
+                    staticGain=0.068,dynamicGain=0,inertialGain=0,
+                    bangBangZone=100, precisionZone= 10 ,slewRate=5,
+                    tolerance =2 , lookAhead= 0.05 , breakingGain = 2.0,
+                    spinOpposingGain=1.1 , spinOpposingPrefix=-1.0,
+                    bangBangGain = 0.92 , additionMin = 0.5 , additionMax=1,
+                    viscousGain = 2.5;
+            public static boolean shouldUpdateCoef = false;
             public static int artifactNumber = 0, purpleArtifactNumber = 0, greenArtifactNumber = 0;
             public static double ticksPerRotation = 8192;
             public static double targetSlot1 = 0, targetSlot2 = 120, targetSlot3 = 240;

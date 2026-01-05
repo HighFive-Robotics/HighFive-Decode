@@ -1,15 +1,30 @@
 package org.firstinspires.ftc.teamcode.Core.Module.Intake;
 
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.sorterServoName;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.additionMax;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.additionMin;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.bangBangGain;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.bangBangZone;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.breakingGain;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.dynamicGain;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.inertialGain;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kD;
-import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kF;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kI;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kP;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.lookAhead;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.precisionZone;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.shouldUpdateCoef;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.slewRate;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.sorterColors;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.spinOpposingGain;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.spinOpposingPrefix;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.staticGain;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.targetSlot1;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.targetSlot2;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.targetSlot3;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.ticksPerRotation;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.tolerance;
+import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.viscousGain;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -47,17 +62,17 @@ public class Sorter extends HighModule {
     public Sorter(HardwareMap hwMap, DcMotorEx motor, double offset) {
         encoder = new HighEncoder(motor, offset, false);
         HighController.Kernel ballKernel = new HighController.Kernel.Builder()
-                .setPID(0.00055, 0, 0.00006)
-                .setFeedforward(0.068, 0, 0)
-                .setBangBangRange(100)
-                .setTolerance(2)
-                .setPrecisionThreshold(10)
-                .setSlewRate(5)
-                .setOscillationDampener(0.05, 2)
-                .setOpposingCorrection(true, 1.1, -1.0)
-                .setBangBangGain(0.92)
-                .setPrecisionAddition(0.5, 1)
-                .setViscousGain(2.5)
+                .setPID(kP, kI, kD)
+                .setFeedforward(staticGain, dynamicGain, inertialGain)
+                .setBangBangRange(bangBangZone)
+                .setTolerance(tolerance)
+                .setPrecisionThreshold(precisionZone)
+                .setSlewRate(slewRate)
+                .setOscillationDampener(lookAhead, breakingGain)
+                .setOpposingCorrection(true, spinOpposingGain, spinOpposingPrefix)
+                .setBangBangGain(bangBangGain)
+                .setPrecisionAddition(additionMin, additionMax)
+                .setViscousGain(viscousGain)
                 .build();
         servo = HighServo.Builder.startBuilding()
                 .setServo(hwMap.get(CRServo.class, sorterServoName))
@@ -261,6 +276,22 @@ public class Sorter extends HighModule {
     @Override
     public void update() {
         isFull = sorterColors[0] != Constants.Color.None && sorterColors[1] != Constants.Color.None && sorterColors[2] != Constants.Color.None;
+        if(shouldUpdateCoef){
+            HighController.Kernel ballKernel = new HighController.Kernel.Builder()
+                    .setPID(kP, kI, kD)
+                    .setFeedforward(staticGain, dynamicGain, inertialGain)
+                    .setBangBangRange(bangBangZone)
+                    .setTolerance(tolerance)
+                    .setPrecisionThreshold(precisionZone)
+                    .setSlewRate(slewRate)
+                    .setOscillationDampener(lookAhead, breakingGain)
+                    .setOpposingCorrection(true, spinOpposingGain, spinOpposingPrefix)
+                    .setBangBangGain(bangBangGain)
+                    .setPrecisionAddition(additionMin, additionMax)
+                    .setViscousGain(viscousGain)
+                    .build();
+            servo.setKernel(ballKernel);
+        }
         servo.update();
     }
 }

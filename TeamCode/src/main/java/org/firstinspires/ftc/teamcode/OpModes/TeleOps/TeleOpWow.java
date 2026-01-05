@@ -4,7 +4,7 @@ import static org.firstinspires.ftc.teamcode.Constants.Globals.finalAutoPose;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.artifactNumber;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.greenArtifactNumber;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kD;
-import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kF;
+
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kI;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kP;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.purpleArtifactNumber;
@@ -164,7 +164,7 @@ public class TeleOpWow extends LinearOpMode {
                 sorterColors = new Constants.Color[]{Constants.Color.None, Constants.Color.None, Constants.Color.None};
             }
 
-            robot.intake.sorter.servo.setPIDCoefficients(kP,kI,kD,kF, HighServo.FeedForwardType.Arm,1);
+
             telemetry.addData("Angle:", robot.intake.sorter.servo.getCurrentPositionPID());
             telemetry.addData("Error:" , robot.intake.sorter.servo.pidfController.getPositionError()/100);
             telemetry.addData("Target:" , robot.intake.sorter.servo.getTargetPID());

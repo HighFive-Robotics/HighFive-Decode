@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.intakeMotorName;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kD;
-import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kF;
+
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kI;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.kP;
 
@@ -35,7 +35,7 @@ public class PIDSorterTest extends LinearOpMode{
         intake.sorter.setSlot(Sorter.Slots.Slot1);
         waitForStart();
         while(opModeIsActive()){
-            intake.sorter.servo.setPIDCoefficients(kP,kI,kD,kF, HighServo.FeedForwardType.Lift,1);
+
 
             if(gamepad1.psWasPressed()){
                 autoCycling = !autoCycling;

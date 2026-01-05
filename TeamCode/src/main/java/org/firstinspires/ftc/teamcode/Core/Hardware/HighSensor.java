@@ -31,11 +31,10 @@ public class HighSensor extends HighModule {
     private volatile float[] hsvValues = new float[3];
     private Thread colorThread;
     private final int burstSize = 9;
-
+    public static float sensorGain = 29.0f;
     public HighSensor(HardwareMap hardwareMap, String name) {
         sensor = hardwareMap.get(RevColorSensorV3.class, name);
-
-        sensor.setGain(25.0f);
+        sensor.setGain(sensorGain);
     }
 
     public double getDistance(DistanceUnit distanceUnit) {

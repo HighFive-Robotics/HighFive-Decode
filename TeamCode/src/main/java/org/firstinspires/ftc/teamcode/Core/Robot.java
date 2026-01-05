@@ -126,6 +126,7 @@ public class Robot extends HighModule {
                 startShootingSequence = true;
                 shootingState = 0;
                 sorterTimer.reset();
+                break;
             case StopShooting:
                 startShootingSequence = false;
                 intake.setPower(IntakeMotor.States.Wait);

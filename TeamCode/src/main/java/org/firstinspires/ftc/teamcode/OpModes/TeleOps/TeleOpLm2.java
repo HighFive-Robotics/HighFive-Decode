@@ -70,8 +70,10 @@ public class TeleOpLm2 extends LinearOpMode {
 
             if(gamepad1.left_trigger >= 0.8){
                 robot.intake.setPower(IntakeMotor.States.Spit);
+                robot.intake.setState(Intake.States.Collect);
             } else if(gamepad1.right_trigger >= 0.8){
                 robot.intake.setPower(IntakeMotor.States.Collect);
+                robot.intake.setState(Intake.States.Collect);
             } else if(!intakeDriver2 && robot.intake.canStop) {
                 robot.intake.setPower(IntakeMotor.States.Wait);
             }
