@@ -26,7 +26,6 @@ public class Constants {
         public static Pose finalAutoPose = new Pose();
         public static Color autoColor;
         public static Case randomizedCase = Case.None;
-        public static Color[] targetColors = {Color.None,Color.None,Color.None};
         public static Pose BlueGoal = new Pose(6,138), RedGoal = new Pose(138,138);
     }
 
@@ -75,16 +74,10 @@ public class Constants {
 
         @Config
         public static class ColorSensorConstants{
-            public static double tolerance = 70;
             public static Color currentColor = Color.None;
 
             public static float[] GreenValuesHSV = {125.0F,0.6F,20F};
             public static float[] PurpleValuesHSV = {217F,0.4F,5F};
-            public static float[] Treshold = {17.85F, 0.2F, 5F};
-
-            //We don't use this anymore
-            public static float[] targetGreenRGB = {26F, 100F, 70F};
-            public static float[] targetPurpleRGB = {62F, 60F, 105F};
         }
 
         @Config

@@ -178,7 +178,7 @@ public class Intake extends HighModule {
                         colorAssignedToCurrentSample = true;
                     }
                 }
-            } else if (intakeMotor.getPower() <= 0) {
+            } else if (intakeMotor.getPower() < 0) {
                 breakBeamCollected = breakBeam.getState();
                 if (breakBeamCollected) {
                     sorter.setColor(None, currentSlot);
@@ -189,7 +189,7 @@ public class Intake extends HighModule {
             breakBeamCollected = false;
         }
 
-        if (timer.milliseconds() >= 400) {
+        if (timer.milliseconds() >= 250) {
             artifactPassThrough = false;
             colorAssignedToCurrentSample = false;
         }
