@@ -170,6 +170,20 @@ public class Sorter extends HighModule {
         }
     }
 
+    public int getPreviousSlot() {
+        switch (slotNumber) {
+            case 1: {
+                return 3;
+            }
+            case 2: {
+                return 1;
+            }
+            default: {
+                return 2;
+            }
+        }
+    }
+
     public void setPreviousSlot() {
         switch (slotNumber) {
             case 1: {

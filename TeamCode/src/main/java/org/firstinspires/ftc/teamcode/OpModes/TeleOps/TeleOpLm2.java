@@ -156,6 +156,13 @@ public class TeleOpLm2 extends LinearOpMode {
                 robot.setAction(Robot.Actions.ShootPPG);
             }
 
+            if(gamepad1.dpadLeftWasPressed()){
+                robot.intake.setAction(Intake.Actions.FindGreen);
+            }
+            if(gamepad1.dpadRightWasPressed()){
+                robot.intake.setAction(Intake.Actions.FindPurple);
+            }
+
             if(gamepad2.dpadLeftWasPressed()){
                 robot.intake.setAction(Intake.Actions.PreviousSlot);
             }

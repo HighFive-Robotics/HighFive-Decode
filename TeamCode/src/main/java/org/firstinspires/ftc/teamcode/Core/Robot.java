@@ -251,7 +251,7 @@ public class Robot extends HighModule {
         telemetry.addData("startShootingSequenceQueue:", startShootingSequenceQueue);
         telemetry.addData("shootingStateQueue:", shootingStateQueue);
         telemetry.addData("colorsQueue:", Arrays.toString(colorsQueue));
-        telemetry.addData("colorsQueue:", Arrays.toString(colorsQueue));
+        telemetry.addData("Current color:", intake.currentColor);
         telemetry.addData("artifactNumber:", artifactNumber);
         telemetry.addData("purpleArtifactNumber:", purpleArtifactNumber);
         telemetry.addData("greenArtifactNumber:", greenArtifactNumber);

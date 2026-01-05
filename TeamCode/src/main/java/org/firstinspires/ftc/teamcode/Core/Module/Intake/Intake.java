@@ -105,6 +105,7 @@ public class Intake extends HighModule {
                     }
                 }
             }
+            break;
             case NextSlot: {
                 sorter.setNextSlot();
                 setIntakeForSwitch();
@@ -198,7 +199,7 @@ public class Intake extends HighModule {
     @Override
     public void update() {
         sorter.update();
-        if (helpingSorter && intakeHelper.milliseconds() >= 400) {
+        if (helpingSorter && intakeHelper.milliseconds() >= 550) {
             setPower(IntakeMotor.States.Wait);
             helpingSorter = false;
             canStop = true;
