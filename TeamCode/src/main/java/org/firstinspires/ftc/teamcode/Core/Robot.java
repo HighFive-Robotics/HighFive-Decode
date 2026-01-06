@@ -49,8 +49,7 @@ public class Robot extends HighModule {
     int shootingState = 0, shootingStateQueue = 0;
     Constants.Color allianceColor;
     public Constants.Color[] colorsQueue = {Constants.Color.None, Constants.Color.None, Constants.Color.None};
-    public int colorsQueueIndex = 0; //default
-    //TODO FSM for Shooting sequences
+    public int colorsQueueIndex = 0;
 
     public enum Actions {
         Shoot,
@@ -125,33 +124,29 @@ public class Robot extends HighModule {
                 break;
             case ShootFast:
                 startShootingSequence = true;
+                startShootingSequenceQueue = false;
                 shootingState = 0;
                 sorterTimer.reset();
                 break;
             case StopShooting:
                 startShootingSequence = false;
+                startShootingSequenceQueue = false;
                 intake.setPower(IntakeMotor.States.Wait);
                 intake.setState(Intake.States.Collect);
                 break;
             case AddPurpleToQueue:
-                if(artifactNumber > 0 && colorsQueueIndex < artifactNumber){ // < due to the fact that the index is from 0 to 2 and artifact number is from 1 to 3.
+                if(artifactNumber > 0 && colorsQueueIndex < artifactNumber){
                     if(purpleArtifactNumber > 0){
                         colorsQueue[colorsQueueIndex] = Constants.Color.Purple;
                         colorsQueueIndex++;
-                        startShootingSequenceQueue = true;
-                        shootingStateQueue = 0;
-                        sorterTimer.reset();
                     }
                 }
                 break;
             case AddGreenToQueue:
-                if(artifactNumber > 0 && colorsQueueIndex < artifactNumber){ // < due to the fact that the index is from 0 to 2 and artifact number is from 1 to 3.
+                if(artifactNumber > 0 && colorsQueueIndex < artifactNumber){
                     if(greenArtifactNumber > 0){
                         colorsQueue[colorsQueueIndex] = Constants.Color.Green;
                         colorsQueueIndex++;
-                        startShootingSequenceQueue = true;
-                        shootingStateQueue = 0;
-                        sorterTimer.reset();
                     }
                 }
                 break;
@@ -159,6 +154,7 @@ public class Robot extends HighModule {
                 if(artifactNumber == 3 && greenArtifactNumber == 1 && purpleArtifactNumber == 2){
                     setFullQueue(targetColors[0]);
                     startShootingSequenceQueue = true;
+                    startShootingSequence = false;
                     shootingStateQueue = 0;
                     sorterTimer.reset();
                 }
@@ -167,6 +163,7 @@ public class Robot extends HighModule {
                 if(artifactNumber == 3 && greenArtifactNumber == 1 && purpleArtifactNumber == 2) {
                     setFullQueue(targetColors[1]);
                     startShootingSequenceQueue = true;
+                    startShootingSequence = false;
                     shootingStateQueue = 0;
                     sorterTimer.reset();
                 }
@@ -175,6 +172,7 @@ public class Robot extends HighModule {
                 if(artifactNumber == 3 && greenArtifactNumber == 1 && purpleArtifactNumber == 2) {
                     setFullQueue(targetColors[2]);
                     startShootingSequenceQueue = true;
+                    startShootingSequence = false;
                     shootingStateQueue = 0;
                     sorterTimer.reset();
                 }
@@ -192,7 +190,7 @@ public class Robot extends HighModule {
             Constants.Globals.voltage = hardwareMap.voltageSensor.iterator().next().getVoltage();
             voltageTimer.reset();
         }
-        if (stopShoot && (timerShoot.milliseconds() > 800 || (timerShoot.milliseconds() > 125 && shooter.getVelocityError() >= 0.7))) {
+        if (stopShoot && (timerShoot.milliseconds() > 900 || (timerShoot.milliseconds() > 125 && shooter.getVelocityError() >= 0.7))) {
             intake.sorter.setColor(None, intake.currentSlot);
             stopShoot = false;
             if(!intake.helpingSorter){
@@ -256,7 +254,6 @@ public class Robot extends HighModule {
         telemetry.addData("purpleArtifactNumber:", purpleArtifactNumber);
         telemetry.addData("greenArtifactNumber:", greenArtifactNumber);
         telemetry.addData("colors index:", colorsQueueIndex);
-
         if(startShootingSequenceQueue){
             intake.setState(Intake.States.Wait);
             switch (shootingStateQueue){
@@ -267,7 +264,7 @@ public class Robot extends HighModule {
                             shootingStateQueue = 1;
                         }
                     } else {
-                        shootingStateQueue = 2;
+                        shootingStateQueue = 4;
                     }
                     break;
                 case 1:
@@ -276,25 +273,35 @@ public class Robot extends HighModule {
                         colorsQueue[0] = colorsQueue[1];
                         colorsQueue[1] = colorsQueue[2];
                         colorsQueue[2] = None;
-                        colorsQueueIndex--;
-                        shooter.blocker.setState(Close, 50);
+                        colorsQueueIndex = Math.max(0, colorsQueueIndex - 1);
+
                         shootingStateQueue = 2;
                     }
                     break;
                 case 2:
-                    if(intake.currentColor != colorsQueue[0]){
-                        intake.findColor(colorsQueue[0]);
+                    if(intake.currentColor == None){
+                        shooter.blocker.setState(Close, 50);
                         shootingStateQueue = 3;
                     }
                     break;
                 case 3:
                     if(shooter.blocker.atTarget()){
+                        if(colorsQueue[0] != None) {
+                            intake.findColor(colorsQueue[0]);
+                        }
                         shootingStateQueue = 0;
                         sorterTimer.reset();
                     }
                     break;
+                case 4:
+                    if(colorsQueue[0] != None){
+                        intake.findColor(colorsQueue[0]);
+                    }
+                    shootingStateQueue = 0;
+                    sorterTimer.reset();
+                    break;
             }
-            if(artifactNumber == 0 || colorsQueue[0] == None){
+            if(artifactNumber == 0 || (colorsQueueIndex == 0 && shootingStateQueue == 0 && intake.currentColor == None)){
                 startShootingSequenceQueue = false;
                 intake.setState(Intake.States.Collect);
             }

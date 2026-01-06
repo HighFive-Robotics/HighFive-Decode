@@ -30,8 +30,8 @@ public class HighSensor extends HighModule {
 
     private volatile float[] hsvValues = new float[3];
     private Thread colorThread;
-    private final int burstSize = 9;
-    public static float sensorGain = 29.0f;
+    private final int burstSize = 6;
+    public static float sensorGain = 27.0f;
     public HighSensor(HardwareMap hardwareMap, String name) {
         sensor = hardwareMap.get(RevColorSensorV3.class, name);
         sensor.setGain(sensorGain);
@@ -86,12 +86,10 @@ public class HighSensor extends HighModule {
             currentColor = Purple;
         }
     }
-
     private float getAngularDistance(float h1, float h2) {
         float diff = Math.abs(h1 - h2);
         return Math.min(diff, 360 - diff);
     }
-
     @Override
     public void update() {
         if (colorThread == null || !colorThread.isAlive()) {
@@ -100,7 +98,6 @@ public class HighSensor extends HighModule {
             colorThread.start();
         }
     }
-
     public Constants.Color getColor() {
         return currentColor;
     }

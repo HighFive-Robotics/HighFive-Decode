@@ -27,8 +27,9 @@ public class Intake extends HighModule {
     public Sorter.Slots currentSlot;
     public Constants.Color currentColor;
     public int currentSlotNumber;
+    public long count = 0;
 
-    ElapsedTime timer = new ElapsedTime(),intakeHelper = new ElapsedTime();
+    ElapsedTime timer = new ElapsedTime(), intakeHelper = new ElapsedTime();
 
     public boolean artifactPassThrough = false;
     public boolean breakBeamCollected = false, helpingSorter = false;
@@ -42,10 +43,10 @@ public class Intake extends HighModule {
 
     public enum States {
         Collect,
-        Wait
+        Wait,
     }
 
-    public enum Actions{
+    public enum Actions {
         FindGreen,
         FindPurple,
         NextSlot,
@@ -58,28 +59,28 @@ public class Intake extends HighModule {
         Mix
     }
 
-    public Intake(HardwareMap hwMap){
+    public Intake(HardwareMap hwMap) {
         intakeMotor = new IntakeMotor(hwMap);
-        sorter = new Sorter(hwMap,intakeMotor.motor.motor,0);
+        sorter = new Sorter(hwMap, intakeMotor.motor.motor, 0);
         sensor = new HighSensor(hwMap, intakeSensorName);
         breakBeam = hwMap.get(DigitalChannel.class, breakBeamIntakeName);
         breakBeam.setMode(DigitalChannel.Mode.INPUT);
     }
 
-    public Intake(HardwareMap hwMap, Sorter.Slots slot){
+    public Intake(HardwareMap hwMap, Sorter.Slots slot) {
         intakeMotor = new IntakeMotor(hwMap);
-        sorter = new Sorter(hwMap,intakeMotor.motor.motor,0);
+        sorter = new Sorter(hwMap, intakeMotor.motor.motor, 0);
         sensor = new HighSensor(hwMap, intakeSensorName);
         breakBeam = hwMap.get(DigitalChannel.class, breakBeamIntakeName);
         breakBeam.setMode(DigitalChannel.Mode.INPUT);
         sorter.setSlot(slot);
     }
 
-    public void setState(States state){
+    public void setState(States state) {
         this.state = state;
     }
 
-    public void setAction(Actions action){
+    public void setAction(Actions action) {
         this.currentAction = action;
         switch (action) {
             case FindGreen: {
@@ -119,12 +120,12 @@ public class Intake extends HighModule {
         }
     }
 
-    public void setPower(IntakeMotor.States state){
+    public void setPower(IntakeMotor.States state) {
         lastPower = state;
         intakeMotor.setState(state);
     }
 
-    public IntakeMotor.States getPower(){
+    public IntakeMotor.States getPower() {
         return lastPower;
     }
 
@@ -136,19 +137,20 @@ public class Intake extends HighModule {
         return collectType;
     }
 
-    public States getState(){
+    public States getState() {
         return state;
     }
 
-    public void setIntakeForSwitch(){
+    public void setIntakeForSwitch() {
         canStop = false;
         helpingSorter = true;
-        setPower(IntakeMotor.States.Collect);
+//        setPower(IntakeMotor.States.Collect);
+        intakeMotor.setPower(0.75);
         intakeHelper.reset();
     }
 
-    public void findColor(Constants.Color color){
-        switch (color){
+    public void findColor(Constants.Color color) {
+        switch (color) {
             case Purple:
                 setAction(Actions.FindPurple);
                 break;
@@ -158,34 +160,34 @@ public class Intake extends HighModule {
         }
     }
 
-    public boolean atTarget(){
+    public boolean atTarget() {
         return sorter.atTarget();
     }
 
     public void updateColor() {
         if (intakeMotor.getState() == IntakeMotor.States.Collect) {
-            if (intakeMotor.getPower() >= 0) {
-                breakBeamCollected = breakBeam.getState();
-                boolean artifactSeen = sensor.isInReach(1.3);
-                if (breakBeamCollected || artifactSeen) {
-                    artifactPassThrough = true;
-                    timer.reset();
-                }
-                if (artifactPassThrough) {
-                    sensor.update();
-                    if (sensor.getColor() != None && currentColor == None && !colorAssignedToCurrentSample) {
-                        Constants.Color color = sensor.getColor();
-                        sorter.setColor(color, currentSlot);
-                        colorAssignedToCurrentSample = true;
-                    }
-                }
-            } else if (intakeMotor.getPower() < 0) {
-                breakBeamCollected = breakBeam.getState();
-                if (breakBeamCollected) {
-                    sorter.setColor(None, currentSlot);
+            if(count < Integer.MAX_VALUE){
+                count++;
+            }else count = 0;
+            breakBeamCollected = breakBeam.getState();
+            boolean artifactSeen = sensor.isInReach(1.3);
+            if (breakBeamCollected || artifactSeen) {
+                artifactPassThrough = true;
+                timer.reset();
+            }
+            if (artifactPassThrough) {
+                sensor.update();
+                if (sensor.getColor() != None && currentColor == None && !colorAssignedToCurrentSample) {
+                    Constants.Color color = sensor.getColor();
+                    sorter.setColor(color, currentSlot);
+                    colorAssignedToCurrentSample = true;
                 }
             }
-
+        } else if (intakeMotor.getState() == IntakeMotor.States.Spit) {
+            breakBeamCollected = breakBeam.getState();
+            if (breakBeamCollected) {
+                sorter.setColor(None, currentSlot);
+            }
         } else {
             breakBeamCollected = false;
         }
@@ -212,7 +214,7 @@ public class Intake extends HighModule {
         purpleArtifactNumber = 0;
         greenArtifactNumber = 0;
 
-        switch(sorterColors[0]){
+        switch (sorterColors[0]) {
             case Purple:
                 purpleArtifactNumber++;
                 artifactNumber++;
@@ -222,7 +224,7 @@ public class Intake extends HighModule {
                 artifactNumber++;
                 break;
         }
-        switch(sorterColors[1]){
+        switch (sorterColors[1]) {
             case Purple:
                 purpleArtifactNumber++;
                 artifactNumber++;
@@ -232,7 +234,7 @@ public class Intake extends HighModule {
                 artifactNumber++;
                 break;
         }
-        switch(sorterColors[2]){
+        switch (sorterColors[2]) {
             case Purple:
                 purpleArtifactNumber++;
                 artifactNumber++;

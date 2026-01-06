@@ -144,7 +144,7 @@ public class TeleOpLm2 extends LinearOpMode {
                 robot.setAction(Robot.Actions.ShootFast);
             }
 
-            if(gamepad1.squareWasPressed()){
+            if(gamepad1.circleWasPressed()){
                 robot.setAction(Robot.Actions.ShootGPP);
             }
 
@@ -169,9 +169,6 @@ public class TeleOpLm2 extends LinearOpMode {
             if(gamepad2.dpadRightWasPressed()){
                 robot.intake.setAction(Intake.Actions.NextSlot);
             }
-            if(gamepad2.dpadUpWasPressed()){
-                robot.setAction(Robot.Actions.EmptySorter);
-            }
             if(gamepad1.psWasPressed()){
                 robot.drive.resetTeleOpHeading();
             }
@@ -192,13 +189,16 @@ public class TeleOpLm2 extends LinearOpMode {
             telemetry.addData("Color 1:", sorterColors[0]);
             telemetry.addData("Color 2:", sorterColors[1]);
             telemetry.addData("Color 3:", sorterColors[2]);
-            telemetry.addData("Shooter error velo", robot.shooter.getVelocityError());
-            telemetry.addData("Shooter target", robot.shooter.getTarget());
-            telemetry.addData("Shooter velocity", robot.shooter.motorUp.getCurrentVelocity());
-            telemetry.addData("Robot pose", robot.drive.getPose().toString());
-            telemetry.addData("Goal Red", RedGoal.toString());
-            telemetry.addData("Dist Red", robot.getDistance());
+//            telemetry.addData("Shooter error velo", robot.shooter.getVelocityError());
+//            telemetry.addData("Shooter target", robot.shooter.getTarget());
+//            telemetry.addData("Shooter velocity", robot.shooter.motorUp.getCurrentVelocity());
+//            telemetry.addData("Robot pose", robot.drive.getPose().toString());
+//            telemetry.addData("Goal Red", RedGoal.toString());
+//            telemetry.addData("Dist Red", robot.getDistance());
+            telemetry.addData("Update count" , robot.intake.count);
+            telemetry.addData("Intake Motor State" , robot.intake.getState());
             telemetry.addData("Hz", 1.0 / loopTimer.seconds());
+
             loopTimer.reset();
             telemetry.update();
             robot.update();
