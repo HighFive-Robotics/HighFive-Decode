@@ -44,6 +44,7 @@ public class Sorter extends HighModule {
     public HighEncoder encoder;
     public int slotNumber = 1;
     public boolean isFull = false;
+    public boolean isEmpty = false;
 
     public enum States {
         Manual,
@@ -290,6 +291,7 @@ public class Sorter extends HighModule {
     @Override
     public void update() {
         isFull = sorterColors[0] != Constants.Color.None && sorterColors[1] != Constants.Color.None && sorterColors[2] != Constants.Color.None;
+        isEmpty = sorterColors[0] == Constants.Color.None && sorterColors[1] == Constants.Color.None && sorterColors[2] == Constants.Color.None;
         if(shouldUpdateCoef){
             HighController.Kernel ballKernel = new HighController.Kernel.Builder()
                     .setPID(kP, kI, kD)

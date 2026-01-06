@@ -9,6 +9,8 @@ import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.Constants;
+
 import java.util.List;
 
 public class HighCamera{
@@ -50,7 +52,22 @@ public class HighCamera{
             return aprilTags.get(0).getFiducialId();
         }else return -1;
     }
-
+    public Constants.Color[] getMotif(){
+        int id = getAprilTagId();
+        switch (id){
+            case 21:
+                return new Constants.Color[]{Constants.Color.Green, Constants.Color.Purple, Constants.Color.Purple};
+            case 22:
+                return new Constants.Color[]{Constants.Color.Purple, Constants.Color.Green, Constants.Color.Purple};
+            case 23:
+                return new Constants.Color[]{Constants.Color.Purple, Constants.Color.Purple, Constants.Color.Green};
+            default:
+                return new Constants.Color[]{Constants.Color.None, Constants.Color.None, Constants.Color.None};
+        }
+    }
+    public boolean motifIsValid(Constants.Color[] motif){
+        return motif[0] != Constants.Color.None && motif[1] != Constants.Color.None && motif[2] != Constants.Color.None;
+    }
     public boolean resultIsValid(LLResult result){
         return result != null;
     }

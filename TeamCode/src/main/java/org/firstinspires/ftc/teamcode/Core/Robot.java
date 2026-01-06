@@ -361,4 +361,7 @@ public class Robot extends HighModule {
         }
         return -1;
     }
+    public boolean isSorterEmpty(){
+        return intake.sorter.isEmpty;
+    }
 }
