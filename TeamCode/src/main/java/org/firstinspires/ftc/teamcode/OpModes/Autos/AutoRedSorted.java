@@ -77,6 +77,7 @@ public class AutoRedSorted extends LinearOpMode {
         robot.intake.setState(Intake.States.Wait);
         autoColor = Constants.Color.Red;
         robot.drive.resetTeleOpHeading();
+        robot.camera.startCapture();
         robot.drive.setConstants(Constants.FConstants);
 
         PathChain preloadPath = robot.drive.pathBuilder()
