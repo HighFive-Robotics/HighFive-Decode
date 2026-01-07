@@ -8,16 +8,18 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Constants;
-import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
 @Autonomous(name = "🔵L🔵")
 public class AutoBlue extends LinearOpMode {
 
     public Robot robot;
-    public int state;
+    public int state = 0;
+    public double velocity = 3.3;
+
     public Pose startPose = new Pose(16, 112, Math.toRadians(0));
     public Pose shootPreloadPose = new Pose(44, 102.5, Math.toRadians(-42));
     public Pose shootPose = new Pose(60, 80, Math.toRadians(-37));
@@ -32,6 +34,11 @@ public class AutoBlue extends LinearOpMode {
     public Pose precollectSpikeMark3Pose = new Pose(52, 35, Math.toRadians(180));
     public Pose collectSpikeMark3Pose = new Pose(12, 35, Math.toRadians(180));
     public Pose park = new Pose(15, 83.5, Math.toRadians(180));
+
+    private Robot.Actions shootAction;
+
+    private final ElapsedTime autoTimer = new ElapsedTime();
+    private final ElapsedTime timer = new ElapsedTime();
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -121,5 +128,36 @@ public class AutoBlue extends LinearOpMode {
                 .addPath(new BezierLine(shootPose, park))
                 .setLinearHeadingInterpolation(shootPose.getHeading(), park.getHeading())
                 .build();
+
+
+        robot.intake.sorter.setColor(Constants.Color.Purple,1);
+        robot.intake.sorter.setColor(Constants.Color.Purple,2);
+        robot.intake.sorter.setColor(Constants.Color.Purple,3);
+        telemetry.addLine("Ready for Action");
+        telemetry.update();
+        waitForStart();
+        while (opModeIsActive()){
+            switch (state){
+                case 0:
+                    robot.drive.followPath(preloadPath, true);
+                    robot.shooter.setTargetVelocity(velocity);
+                    state++;
+                    break;
+                case 1:
+                    if((robot.isDone() && robot.shooter.atTarget()) || autoTimer.milliseconds() > 5000){
+                        robot.setAction(Robot.Actions.ShootFast);
+                        timer.reset();
+                        state++;
+                    }
+                    break;
+                case 2:
+                    if(robot.isSorterEmpty()){
+                        robot.drive.followPath(goForSpike2, true);
+                        state++;
+                    }
+                    break;
+            }
+            robot.update();
+        }
     }
 }

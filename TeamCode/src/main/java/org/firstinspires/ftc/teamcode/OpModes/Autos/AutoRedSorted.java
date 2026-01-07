@@ -205,8 +205,8 @@ public class AutoRedSorted extends LinearOpMode {
                         state = States.DriveToSpike1;
                     }
                 case DriveToSpike1:
-                    motif = robot.camera.getMotif();
-                    if (robot.isDone() && robot.camera.motifIsValid(motif)) {
+                    //motif = robot.camera.getMotif();
+                    if (robot.isDone() ) {
                         if(motif  == targetColors[0]){
                             shootAction = Robot.Actions.ShootGPP;
                         }else if (motif == targetColors[1]){

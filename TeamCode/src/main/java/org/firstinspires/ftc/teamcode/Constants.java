@@ -26,7 +26,7 @@ public class Constants {
         public static Pose finalAutoPose = new Pose();
         public static Color autoColor;
         public static Case randomizedCase = Case.None;
-        public static Pose BlueGoal = new Pose(6,138), RedGoal = new Pose(138,138);
+        public static Pose BlueGoal = new Pose(10,134), RedGoal = new Pose(138,138);
     }
 
     public enum Case {
@@ -115,7 +115,7 @@ public class Constants {
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
 
     public static FollowerConstants FConstants = new FollowerConstants()
-            .mass(16.5)
+            .mass(15.5)
             .forwardZeroPowerAcceleration(-36.6917641)
             .lateralZeroPowerAcceleration(-62.2850712)
             .useSecondaryTranslationalPIDF(false)
@@ -124,9 +124,9 @@ public class Constants {
             .translationalPIDFCoefficients(new PIDFCoefficients(0.125,0,0.0175,0))
             .headingPIDFCoefficients(new PIDFCoefficients(2,0,0.15,0))
             .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(3,0,0.05,0))
-            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.01,0, 0.00004,0.6,0.01))
-            .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(0.05,0, 0.0007,0.6,0.01))
-            .centripetalScaling(0.00025)
+            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.1,0, 0.001,0.6,0.01))
+            .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(0.01,0, 0.0001,0.6,0.01))
+            .centripetalScaling(0.0004)
             ;
 
     public static MecanumConstants driveConstants = new MecanumConstants()
