@@ -32,10 +32,7 @@ import org.firstinspires.ftc.teamcode.Core.Module.Intake.Sorter;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Shooter;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Queue;
 
 public class Robot extends HighModule {
 
@@ -53,7 +50,9 @@ public class Robot extends HighModule {
     public boolean startShootingSequence = false, startShootingSequenceQueue = false;
     int shootingState = 0, shootingStateQueue = 0;
     Constants.Color allianceColor;
-    public Queue <Constants.Color> colorsQueue = new LinkedList<>();
+
+    public Constants.Color[] colorsQueue = {None, None, None};
+    public int queueCount = 0;
 
     public enum Actions {
         Shoot,
@@ -87,7 +86,6 @@ public class Robot extends HighModule {
         }
         shooter = new Shooter(hardwareMap);
         intake = new Intake(hardwareMap);
-        colorsQueue.add(None);
         allHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
@@ -106,10 +104,30 @@ public class Robot extends HighModule {
         }
         shooter = new Shooter(hardwareMap);
         intake = new Intake(hardwareMap);
-        colorsQueue.add(None);
         allHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
+    }
+
+    private void clearQueue() {
+        Arrays.fill(colorsQueue, None);
+        queueCount = 0;
+    }
+
+    private void addToQueue(Constants.Color color) {
+        if (queueCount < 3) {
+            colorsQueue[queueCount] = color;
+            queueCount++;
+        }
+    }
+
+    private void shiftQueue() {
+        if (queueCount > 0) {
+            colorsQueue[0] = colorsQueue[1];
+            colorsQueue[1] = colorsQueue[2];
+            colorsQueue[2] = None;
+            queueCount--;
         }
     }
 
@@ -142,7 +160,8 @@ public class Robot extends HighModule {
                 break;
             case AddPurpleToQueue:
                 if(purpleArtifactNumber > 0){
-                    colorsQueue.add(Purple);
+                    clearQueue();
+                    addToQueue(Purple);
                     startShootingSequenceQueue = true;
                     startShootingSequence = false;
                     shootingStateQueue = 0;
@@ -151,7 +170,8 @@ public class Robot extends HighModule {
                 break;
             case AddGreenToQueue:
                 if(greenArtifactNumber > 0){
-                    colorsQueue.add(Green);
+                    clearQueue();
+                    addToQueue(Green);
                     startShootingSequenceQueue = true;
                     startShootingSequence = false;
                     shootingStateQueue = 0;
@@ -160,12 +180,10 @@ public class Robot extends HighModule {
                 break;
             case ShootGPP:
                 if(artifactNumber == 3 && greenArtifactNumber == 1 && purpleArtifactNumber == 2){
-                    while(!colorsQueue.isEmpty()){
-                        colorsQueue.poll();
-                    }
-                    colorsQueue.add(Green);
-                    colorsQueue.add(Purple);
-                    colorsQueue.add(Purple);
+                    clearQueue();
+                    addToQueue(Green);
+                    addToQueue(Purple);
+                    addToQueue(Purple);
                     startShootingSequenceQueue = true;
                     startShootingSequence = false;
                     shootingStateQueue = 0;
@@ -174,12 +192,10 @@ public class Robot extends HighModule {
                 break;
             case ShootPGP:
                 if(artifactNumber == 3 && greenArtifactNumber == 1 && purpleArtifactNumber == 2) {
-                    while(!colorsQueue.isEmpty()){
-                        colorsQueue.remove();
-                    }
-                    colorsQueue.add(Purple);
-                    colorsQueue.add(Green);
-                    colorsQueue.add(Purple);
+                    clearQueue();
+                    addToQueue(Purple);
+                    addToQueue(Green);
+                    addToQueue(Purple);
                     startShootingSequenceQueue = true;
                     startShootingSequence = false;
                     shootingStateQueue = 0;
@@ -188,9 +204,10 @@ public class Robot extends HighModule {
                 break;
             case ShootPPG:
                 if(artifactNumber == 3 && greenArtifactNumber == 1 && purpleArtifactNumber == 2) {
-                    colorsQueue.add(Purple);
-                    colorsQueue.add(Purple);
-                    colorsQueue.add(Green);
+                    clearQueue();
+                    addToQueue(Purple);
+                    addToQueue(Purple);
+                    addToQueue(Green);
                     startShootingSequenceQueue = true;
                     startShootingSequence = false;
                     shootingStateQueue = 0;
@@ -272,25 +289,25 @@ public class Robot extends HighModule {
         telemetry.addData("artifactNumber:", artifactNumber);
         telemetry.addData("purpleArtifactNumber:", purpleArtifactNumber);
         telemetry.addData("greenArtifactNumber:", greenArtifactNumber);
+        telemetry.addData("queueCount:", queueCount);
+
         if(startShootingSequenceQueue){
             intake.setState(Intake.States.Wait);
             switch (shootingStateQueue){
                 case 0:
-                    if(intake.currentColor == colorsQueue.peek()){
+                    if(intake.currentColor == colorsQueue[0]){
                         if(intake.atTarget() || sorterTimer.milliseconds() >= 350){
                             shooter.blocker.setState(Open,50);
                             shootingStateQueue = 1;
                         }
                     } else {
-
                         shootingStateQueue = 4;
                     }
                     break;
                 case 1:
-
-                    if(shooter.blocker.atTarget() && shooter.atTarget()){
+                    if((shooter.blocker.atTarget() && shooter.atTarget()) || sorterTimer.milliseconds() >= 1000){
                         setAction(Actions.Shoot);
-                        colorsQueue.poll();
+                        shiftQueue();
                         shootingStateQueue = 2;
                     }
                     break;
@@ -302,22 +319,23 @@ public class Robot extends HighModule {
                     break;
                 case 3:
                     if(shooter.blocker.atTarget()){
-                        if(!colorsQueue.isEmpty()) {
-                            intake.findColor(Objects.requireNonNull(colorsQueue.peek()));
+                        if(queueCount > 0 && colorsQueue[0] != None) {
+                            intake.findColor(colorsQueue[0]);
                         }
                         shootingStateQueue = 0;
                         sorterTimer.reset();
                     }
                     break;
                 case 4:
-                    if(colorsQueue.peek() != None){
-                        intake.findColor(Objects.requireNonNull(colorsQueue.peek()));
+                    if(colorsQueue[0] != None){
+                        intake.findColor(colorsQueue[0]);
                     }
                     shootingStateQueue = 0;
                     sorterTimer.reset();
                     break;
             }
-            if(artifactNumber == 0 || (shootingStateQueue == 0 && colorsQueue.isEmpty())){
+
+            if(artifactNumber == 0 || (shootingStateQueue == 0 && queueCount == 0)){
                 startShootingSequenceQueue = false;
                 intake.setState(Intake.States.Collect);
             }
@@ -348,10 +366,6 @@ public class Robot extends HighModule {
                 case Normal:
                     break;
             }
-        }
-
-        if(colorsQueue.isEmpty()){
-            colorsQueue.add(None);
         }
 
         intake.update();
