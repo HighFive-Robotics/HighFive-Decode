@@ -201,6 +201,20 @@ public class TeleOpusMaximus extends LinearOpMode {
                 rumbled = true;
             }
 
+            if(gamepad2.crossWasPressed()){
+                robot.shooter.setTargetVelocity(littleVelo);
+                timers.get("rumble").reset();
+                rumbled = true;
+            }
+
+            if(gamepad2.rightStickButtonWasPressed()){
+                robot.intake.sorter.setState(Sorter.States.Automated);
+            }
+
+            if(gamepad2.leftStickButtonWasPressed()){
+                robot.intake.sorter.setState(Sorter.States.Manual);
+            }
+
             if(gamepad2.psWasPressed()){
                 if(robot.intake.getCollectType() != Intake.CollectTypes.Normal){
                     robot.intake.setCollectType(Intake.CollectTypes.Normal);

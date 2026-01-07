@@ -52,21 +52,21 @@ public class HighCamera{
             return aprilTags.get(0).getFiducialId();
         }else return -1;
     }
-    public Constants.Color[] getMotif(){
+    public Constants.Case getMotif(){
         int id = getAprilTagId();
         switch (id){
             case 21:
-                return new Constants.Color[]{Constants.Color.Green, Constants.Color.Purple, Constants.Color.Purple};
+                return Constants.Case.GPP;
             case 22:
-                return new Constants.Color[]{Constants.Color.Purple, Constants.Color.Green, Constants.Color.Purple};
+                return Constants.Case.PGP;
             case 23:
-                return new Constants.Color[]{Constants.Color.Purple, Constants.Color.Purple, Constants.Color.Green};
+                return Constants.Case.PPG;
             default:
-                return new Constants.Color[]{Constants.Color.None, Constants.Color.None, Constants.Color.None};
+                return Constants.Case.None;
         }
     }
-    public boolean motifIsValid(Constants.Color[] motif){
-        return motif[0] != Constants.Color.None && motif[1] != Constants.Color.None && motif[2] != Constants.Color.None;
+    public boolean motifIsValid(Constants.Case motif){
+        return motif != Constants.Case.None;
     }
     public boolean resultIsValid(LLResult result){
         return result != null;

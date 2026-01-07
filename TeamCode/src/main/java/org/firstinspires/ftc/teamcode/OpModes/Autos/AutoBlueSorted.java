@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.OpModes.Autos;
 
 import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.finalAutoPose;
+import static org.firstinspires.ftc.teamcode.Constants.Globals.randomizedCase;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.targetColors;
 
 import com.pedropathing.geometry.BezierCurve;
@@ -69,7 +70,6 @@ public class AutoBlueSorted extends LinearOpMode {
     public boolean justStarted = true;
     private final double reverseVelocity = -1.35;
     private Robot.Actions shootAction;
-    private Constants.Color[] motif = {Constants.Color.None, Constants.Color.None, Constants.Color.None};
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -205,13 +205,13 @@ public class AutoBlueSorted extends LinearOpMode {
                         state = States.DriveToSpike1;
                     }
                 case DriveToSpike1:
-                    motif = robot.camera.getMotif();
-                    if (robot.isDone() && robot.camera.motifIsValid(motif)) {
-                        if(motif  == targetColors[0]){
+                    randomizedCase = robot.camera.getMotif();
+                    if (robot.isDone() && robot.camera.motifIsValid(randomizedCase)) {
+                        if(randomizedCase  == Constants.Case.GPP){
                             shootAction = Robot.Actions.ShootGPP;
-                        }else if (motif == targetColors[1]){
+                        }else if (randomizedCase == Constants.Case.PGP){
                             shootAction = Robot.Actions.ShootPGP;
-                        }else if (motif == targetColors[2]){
+                        }else if (randomizedCase ==  Constants.Case.PPG){
                             shootAction = Robot.Actions.ShootPPG;
                         }
                         robot.drive.followPath(goForSpike1, true);
