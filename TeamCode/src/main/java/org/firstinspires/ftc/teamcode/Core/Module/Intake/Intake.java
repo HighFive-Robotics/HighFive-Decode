@@ -201,7 +201,7 @@ public class Intake extends HighModule {
     @Override
     public void update() {
         sorter.update();
-        if (helpingSorter && intakeHelper.milliseconds() >= 550) {
+        if (helpingSorter && intakeHelper.milliseconds() >= 450) {
             setPower(IntakeMotor.States.Wait);
             helpingSorter = false;
             canStop = true;

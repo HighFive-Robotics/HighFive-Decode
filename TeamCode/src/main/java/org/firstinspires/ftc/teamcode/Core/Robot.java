@@ -138,6 +138,9 @@ public class Robot extends HighModule {
                 if(artifactNumber > 0 && colorsQueueIndex < artifactNumber){
                     if(purpleArtifactNumber > 0){
                         colorsQueue[colorsQueueIndex] = Constants.Color.Purple;
+                        startShootingSequenceQueue = true;
+                        shootingStateQueue = 0;
+                        sorterTimer.reset();
                         colorsQueueIndex++;
                     }
                 }
@@ -146,6 +149,9 @@ public class Robot extends HighModule {
                 if(artifactNumber > 0 && colorsQueueIndex < artifactNumber){
                     if(greenArtifactNumber > 0){
                         colorsQueue[colorsQueueIndex] = Constants.Color.Green;
+                        startShootingSequenceQueue = true;
+                        shootingStateQueue = 0;
+                        sorterTimer.reset();
                         colorsQueueIndex++;
                     }
                 }
@@ -212,7 +218,7 @@ public class Robot extends HighModule {
             switch (shootingState){
                 case 0:
                     if(intake.currentColor != None){
-                        if(intake.atTarget() || sorterTimer.milliseconds() >= 300){
+                        if(intake.atTarget() || sorterTimer.milliseconds() >= 30){
                             shooter.blocker.setState(Open,50);
                             shootingState = 1;
                         }
@@ -259,7 +265,7 @@ public class Robot extends HighModule {
             switch (shootingStateQueue){
                 case 0:
                     if(intake.currentColor == colorsQueue[0]){
-                        if(intake.atTarget() || sorterTimer.milliseconds() >= 300){
+                        if(intake.atTarget() || sorterTimer.milliseconds() >= 350){
                             shooter.blocker.setState(Open,50);
                             shootingStateQueue = 1;
                         }

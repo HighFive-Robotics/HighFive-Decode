@@ -24,7 +24,7 @@ import java.util.HashMap;
 @SuppressWarnings("All")
 public class TeleOpusMaximus extends LinearOpMode {
 
-    public static double littleVelo = 4 , bigVelo = 5.1 , negativeVelo = -2;
+    public static double littleVelo = 4 , bigVelo = 4.8 , negativeVelo = -2;
 
     public boolean intakeDriver2 = false, rumbled = false;
     Robot robot;
@@ -76,7 +76,7 @@ public class TeleOpusMaximus extends LinearOpMode {
                     if(gamepad2.dpadRightWasPressed()){
                         robot.intake.setAction(Intake.Actions.NextSlot);
                     }
-                    if(gamepad2.dpadDownWasPressed()){
+                    if(gamepad2.leftBumperWasReleased()){
                         sorterColors = new Constants.Color[]{Constants.Color.None, Constants.Color.None, Constants.Color.None};
                         robot.intake.setState(Intake.States.Collect);
                     }
@@ -84,6 +84,15 @@ public class TeleOpusMaximus extends LinearOpMode {
                         robot.shooter.setTargetVelocity(bigVelo);
                         timers.get("rumble").reset();
                         rumbled = true;
+                    }
+                    if(gamepad2.rightBumperWasPressed()){
+                        robot.setAction(Robot.Actions.ShootFast);
+                    }
+                    if(gamepad2.dpadUpWasPressed()){
+                        robot.setAction(Robot.Actions.AddGreenToQueue);
+                    }
+                    if(gamepad2.dpadDownWasPressed()){
+                        robot.setAction(Robot.Actions.AddPurpleToQueue);
                     }
                     break;
                 case Normal:
@@ -146,7 +155,7 @@ public class TeleOpusMaximus extends LinearOpMode {
                     if(gamepad2.dpadRightWasPressed()){
                         robot.intake.setAction(Intake.Actions.NextSlot);
                     }
-                    if(gamepad2.dpadDownWasPressed()){
+                    if(gamepad2.leftBumperWasReleased()){
                         sorterColors = new Constants.Color[]{Constants.Color.None, Constants.Color.None, Constants.Color.None};
                         robot.intake.setState(Intake.States.Collect);
                     }
@@ -204,29 +213,6 @@ public class TeleOpusMaximus extends LinearOpMode {
                     gamepad1.setLedColor(132 / 255.0, 88 / 255.0, 164 / 255.0, 2147483647);
                     gamepad2.setLedColor(132 / 255.0, 88 / 255.0, 164 / 255.0, 2147483647);
                 }
-            }
-
-            if(gamepad1.dpadUpWasPressed()){
-                robot.setAction(Robot.Actions.ShootFast);
-            }
-
-            if(gamepad1.circleWasPressed()){
-                robot.setAction(Robot.Actions.ShootGPP);
-            }
-
-            if(gamepad1.triangleWasPressed()){
-                robot.setAction(Robot.Actions.ShootPGP);
-            }
-
-            if(gamepad1.squareWasPressed()){
-                robot.setAction(Robot.Actions.ShootPPG);
-            }
-
-            if(gamepad1.dpadLeftWasPressed()){
-                robot.intake.setAction(Intake.Actions.FindGreen);
-            }
-            if(gamepad1.dpadRightWasPressed()){
-                robot.intake.setAction(Intake.Actions.FindPurple);
             }
 
             if(gamepad1.psWasPressed()){
