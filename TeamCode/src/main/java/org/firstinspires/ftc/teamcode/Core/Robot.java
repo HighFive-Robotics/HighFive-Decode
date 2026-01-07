@@ -135,25 +135,33 @@ public class Robot extends HighModule {
                 intake.setState(Intake.States.Collect);
                 break;
             case AddPurpleToQueue:
-                if(artifactNumber > 0 && colorsQueueIndex < artifactNumber){
-                    if(purpleArtifactNumber > 0){
-                        colorsQueue[colorsQueueIndex] = Constants.Color.Purple;
-                        startShootingSequenceQueue = true;
-                        shootingStateQueue = 0;
-                        sorterTimer.reset();
-                        colorsQueueIndex++;
-                    }
+
+                if(purpleArtifactNumber > 0){
+                    colorsQueue[0] = Constants.Color.Purple;
+                    colorsQueue[1] = Constants.Color.None;
+                    colorsQueue[2] = Constants.Color.None;
+                    colorsQueueIndex = 1;
+
+                    startShootingSequenceQueue = true;
+                    startShootingSequence = false;
+
+                    shootingStateQueue = 0;
+                    sorterTimer.reset();
                 }
                 break;
             case AddGreenToQueue:
-                if(artifactNumber > 0 && colorsQueueIndex < artifactNumber){
-                    if(greenArtifactNumber > 0){
-                        colorsQueue[colorsQueueIndex] = Constants.Color.Green;
-                        startShootingSequenceQueue = true;
-                        shootingStateQueue = 0;
-                        sorterTimer.reset();
-                        colorsQueueIndex++;
-                    }
+
+                if(greenArtifactNumber > 0){
+                    colorsQueue[0] = Constants.Color.Green;
+                    colorsQueue[1] = Constants.Color.None;
+                    colorsQueue[2] = Constants.Color.None;
+                    colorsQueueIndex = 1;
+
+                    startShootingSequenceQueue = true;
+                    startShootingSequence = false;
+
+                    shootingStateQueue = 0;
+                    sorterTimer.reset();
                 }
                 break;
             case ShootGPP:
@@ -264,16 +272,20 @@ public class Robot extends HighModule {
             intake.setState(Intake.States.Wait);
             switch (shootingStateQueue){
                 case 0:
+
                     if(intake.currentColor == colorsQueue[0]){
+
                         if(intake.atTarget() || sorterTimer.milliseconds() >= 350){
                             shooter.blocker.setState(Open,50);
                             shootingStateQueue = 1;
                         }
                     } else {
+
                         shootingStateQueue = 4;
                     }
                     break;
                 case 1:
+
                     if(shooter.blocker.atTarget() && shooter.atTarget()){
                         setAction(Actions.Shoot);
                         colorsQueue[0] = colorsQueue[1];
@@ -300,6 +312,7 @@ public class Robot extends HighModule {
                     }
                     break;
                 case 4:
+
                     if(colorsQueue[0] != None){
                         intake.findColor(colorsQueue[0]);
                     }
