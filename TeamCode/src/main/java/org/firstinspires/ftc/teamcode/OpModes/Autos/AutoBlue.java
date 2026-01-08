@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.OpModes.Autos;
 
 import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
+import static org.firstinspires.ftc.teamcode.Constants.Globals.finalAutoPose;
+import static org.firstinspires.ftc.teamcode.Constants.Globals.randomizedCase;
 
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
@@ -11,6 +13,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
 @Autonomous(name = "🔵L🔵")
@@ -18,7 +21,7 @@ public class AutoBlue extends LinearOpMode {
 
     public Robot robot;
     public int state = 0;
-    public double velocity = 3.3;
+    public double velocity1 = 3.3, velocity2 = 3.75;
 
     public Pose startPose = new Pose(16, 112, Math.toRadians(0));
     public Pose shootPreloadPose = new Pose(44, 102.5, Math.toRadians(-42));
@@ -124,6 +127,10 @@ public class AutoBlue extends LinearOpMode {
                 .setTangentHeadingInterpolation()
                 .build();
 
+        PathChain shoot3 = robot.drive.pathBuilder()
+                .addPath(new BezierLine(shootPose, shootPose))
+                .build();
+
         PathChain parkPath = robot.drive.pathBuilder()
                 .addPath(new BezierLine(shootPose, park))
                 .setLinearHeadingInterpolation(shootPose.getHeading(), park.getHeading())
@@ -140,7 +147,7 @@ public class AutoBlue extends LinearOpMode {
             switch (state){
                 case 0:
                     robot.drive.followPath(preloadPath, true);
-                    robot.shooter.setTargetVelocity(velocity);
+                    robot.shooter.setTargetVelocity(velocity1);
                     state++;
                     break;
                 case 1:
@@ -151,12 +158,165 @@ public class AutoBlue extends LinearOpMode {
                     }
                     break;
                 case 2:
-                    if(robot.isSorterEmpty()){
+                    if(robot.isSorterEmpty() || timer.milliseconds() >= 3000){
+                        robot.shooter.setTargetVelocity(0);
                         robot.drive.followPath(goForSpike2, true);
                         state++;
                     }
                     break;
+                case 3://TODO Might not work
+                    if(robot.isDone()){
+                        robot.drive.followPath(collectSpike2, true);
+                        robot.drive.setMaxPower(0.6);
+                        robot.intake.setPower(IntakeMotor.States.Collect);
+                        state++;
+                        timer.reset();
+                    }
+                    break;
+                case 4:
+                    if(robot.isDone() || robot.intake.sorter.isFull){
+                        robot.drive.setMaxPower(1);
+                        robot.intake.setPower(IntakeMotor.States.Wait);
+                        robot.drive.followPath(openGate, true);
+                        state++;
+                    }
+                    break;
+                case 5:
+                    if(robot.isDone()){
+                        timer.reset();
+                        state++;
+                    }
+                    break;
+                case 6:
+                    if(timer.milliseconds() >= 1000 && robot.camera.motifIsValid(randomizedCase)){
+                        robot.drive.followPath(openGate, true);
+                        switch (randomizedCase){
+                            case GPP:
+                                shootAction = Robot.Actions.ShootGPP;
+                                break;
+                            case PGP:
+                                shootAction = Robot.Actions.ShootPGP;
+                                break;
+                            case PPG:
+                                shootAction = Robot.Actions.ShootPPG;
+                                break;
+                        }
+                        state++;
+                    } else {
+                        randomizedCase = robot.camera.getMotif();
+                    }
+                    break;
+                case 7:
+                    if(robot.isDone()){
+                        robot.drive.followPath(goShoot2, true);
+                        robot.shooter.setTargetVelocity(velocity2);
+                        state++;
+                    }
+                    break;
+                case 8:
+                    if(robot.isDone()){
+                        robot.setAction(shootAction);
+                        timer.reset();
+                        state++;
+                    }
+                    break;
+                case 9:
+                    if(robot.isSorterEmpty() || timer.milliseconds() >= 3000){
+                        robot.shooter.setTargetVelocity(0);
+                        robot.drive.followPath(rotateForSpike1, true);
+                        state++;
+                    }
+                    break;
+                case 10://TODO Might not work
+                    if(robot.isDone()){
+                        robot.drive.followPath(goForSpike1, true);
+                        state++;
+                    }
+                    break;
+                case 11:
+                    if(robot.isDone()){
+                        robot.drive.setMaxPower(0.6);
+                        robot.intake.setPower(IntakeMotor.States.Collect);
+                        robot.drive.followPath(collectSpike1, true);
+                        timer.reset();
+                        state++;
+                    }
+                    break;
+                case 12:
+                    if(robot.isDone() || robot.intake.sorter.isFull){
+                        robot.drive.setMaxPower(1);
+                        robot.intake.setPower(IntakeMotor.States.Wait);
+                        robot.drive.followPath(goForShoot1, true);
+                        state++;
+                    }
+                    break;
+                case 13:
+                    if(robot.isDone()){
+                        robot.drive.followPath(rotateShoot1, true);
+                        state++;
+                    }
+                    break;
+                case 14:
+                    if(robot.isDone()){
+                        robot.setAction(shootAction);
+                        timer.reset();
+                        state = 15;
+                    }
+                    break;
+                case 15:
+                    if(robot.isSorterEmpty() || timer.milliseconds() >= 3000){
+                        robot.shooter.setTargetVelocity(0);
+                        robot.drive.followPath(goForSpike3, true);
+                        state++;
+                    }
+                    break;
+                case 16://TODO Might not work
+                    if(robot.isDone()){
+                        robot.drive.followPath(collectSpike3, true);
+                        robot.drive.setMaxPower(0.6);
+                        robot.intake.setPower(IntakeMotor.States.Collect);
+                        state++;
+                    }
+                    break;
+                case 17:
+                    if(robot.isDone() || robot.intake.sorter.isFull){
+                        robot.drive.setMaxPower(1);
+                        robot.intake.setPower(IntakeMotor.States.Wait);
+                        robot.drive.followPath(goShootZbrrrrVrumVrum, true);
+                        state++;
+                    }
+                    break;
+                case 18:
+                    if(robot.isDone()){
+                        robot.drive.followPath(shoot3, true);
+                        state++;
+                    }
+                    break;
+                case 19:
+                    if(robot.isDone()){
+                        robot.setAction(shootAction);
+                        timer.reset();
+                        state = 20;
+                    }
+                    break;
+                case 20:
+                    if(robot.isSorterEmpty() || timer.milliseconds() >= 3000){
+                        robot.shooter.setTargetVelocity(0);
+                        robot.drive.followPath(parkPath);
+                        state = 100;
+                    }
+                    break;
+                case 21:
+                    robot.drive.followPath(parkPath);
+                    state = 100;
+                    break;
             }
+            if(autoTimer.milliseconds() >= 28000 && state >= 18){
+                robot.shooter.setTargetVelocity(0);
+                robot.intake.setPower(IntakeMotor.States.Spit);
+                state = 21;
+            }
+            finalAutoPose = robot.drive.getPose();
             robot.update();
         }
     }
