@@ -36,7 +36,7 @@ import java.util.List;
 
 public class Robot extends HighModule {
 
-    ElapsedTime timerShoot = new ElapsedTime(), timerIntake = new ElapsedTime(), voltageTimer = new ElapsedTime(), intakeHelper = new ElapsedTime(), sorterTimer = new ElapsedTime();
+    ElapsedTime timerShoot = new ElapsedTime(), timerIntake = new ElapsedTime(), voltageTimer = new ElapsedTime(), intakeHelper = new ElapsedTime(), sorterTimer = new ElapsedTime(), timerNormal = new ElapsedTime();
     Telemetry telemetry;
     public Actions lastAction = Actions.None;
     public Follower drive;
@@ -47,8 +47,8 @@ public class Robot extends HighModule {
     public HighCamera camera;
     boolean isAuto;
     boolean stopShoot = false, stopIntake = false;
-    public boolean startShootingSequence = false, startShootingSequenceQueue = false;
-    int shootingState = 0, shootingStateQueue = 0;
+    public boolean startShootingSequence = false, startShootingSequenceQueue = false, shootNormal = false;
+    int shootingState = 0, shootingStateQueue = 0, stateNormal = 0, cycles = 0;
     Constants.Color allianceColor;
 
     public Constants.Color[] colorsQueue = {None, None, None};
@@ -58,6 +58,7 @@ public class Robot extends HighModule {
         Shoot,
         PrepareForShooting,
         ShootFast,
+        ShootFastNormal,
         EmptySorter,
         StopShooting,
         AddPurpleToQueue,
@@ -151,6 +152,13 @@ public class Robot extends HighModule {
                 startShootingSequenceQueue = false;
                 shootingState = 0;
                 sorterTimer.reset();
+                break;
+            case ShootFastNormal:
+                shootNormal = true;
+                intake.setPower(IntakeMotor.States.Wait);
+                stateNormal = 0;
+                cycles = 0;
+                timerNormal.reset();
                 break;
             case StopShooting:
                 startShootingSequence = false;
@@ -338,6 +346,29 @@ public class Robot extends HighModule {
             if(artifactNumber == 0 || (shootingStateQueue == 0 && queueCount == 0)){
                 startShootingSequenceQueue = false;
                 intake.setState(Intake.States.Collect);
+            }
+        }
+
+        if(shootNormal){
+            switch (stateNormal){
+                    case 0:
+                        if (shooter.atTarget() && timerNormal.milliseconds() >= 210) {
+                            intake.intakeMotor.setPower(0.66);
+                            timerNormal.reset();
+                            shootingState = 1;
+                        }
+                        break;
+                    case 1:
+                        if (timerNormal.milliseconds() > 800 || (shooter.getVelocityError() >= 0.7 && timerNormal.milliseconds() >= 150)) {
+                            intake.setPower(IntakeMotor.States.Wait);
+                            timerNormal.reset();
+                            shootingState = 0;
+                            cycles++;
+                            if (cycles >= 3) {
+                                shootNormal = false;
+                            }
+                        }
+                        break;
             }
         }
 

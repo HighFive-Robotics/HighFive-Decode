@@ -2,10 +2,7 @@ package org.firstinspires.ftc.teamcode.OpModes.Autos;
 
 import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.finalAutoPose;
-import static org.firstinspires.ftc.teamcode.Constants.Globals.randomizedCase;
-import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.targetColors;
 
-import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
@@ -16,10 +13,11 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor;
+import org.firstinspires.ftc.teamcode.Core.Module.Outtake.BlockerOuttake;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
 @Autonomous(name = "🔴🔝AutoRedCloseLm2🔝🔴")
-public class AutoBlueSorted extends LinearOpMode {
+public class AutoRedCloseLm2 extends LinearOpMode {
     private enum States {
         DriveToPreload,
         ResetForShootPreload,
@@ -40,7 +38,7 @@ public class AutoBlueSorted extends LinearOpMode {
         ResetForShoot3,
         ShootSequence3,
         DriveToPark,
-        DriveToAux, DriveToAuxGate, DriveToGate, Park
+        DriveToAux, Park
     }
 
     public Robot robot;
@@ -48,59 +46,45 @@ public class AutoBlueSorted extends LinearOpMode {
     private int cycles = 0;
     private int shootingState = 0;
 
-    public Pose startPose = new Pose(16, 112, Math.toRadians(0));
-    public Pose gatePose = new Pose(16, 72, Math.toRadians(-90));
-    public Pose gatePoseAux = new Pose(44, 72, Math.toRadians(-90));
-    private final Pose shootPose1 = new Pose(44, 102.5, Math.toRadians(-42));
-    private final Pose shootPose2 = new Pose(44, 102.5, Math.toRadians(-42));
-    private final Pose shootPose3 = new Pose(44, 102.5, Math.toRadians(-42));
-    private final Pose shootPosePreload = new Pose(44, 102.5, Math.toRadians(-42));
-    private final Pose spike1Pose = new Pose(52, 83.5, Math.toRadians(180));
-    private final Pose collect1Pose = new Pose(22, 83.5, Math.toRadians(180));
-    private final Pose spike2Pose = new Pose(52, 54, Math.toRadians(180));
-    private final Pose collect2Pose = new Pose(12, 54, Math.toRadians(180));
-    private final Pose auxPose = new Pose(23, 54, Math.toRadians(180));
-    private final Pose spike3Pose = new Pose(52, 35, Math.toRadians(180));
-    private final Pose collect3Pose = new Pose(12, 35, Math.toRadians(180));
-    private final Pose finalPose = new Pose(15, 83.5, Math.toRadians(180));
+    public Pose startPose = new Pose(16, 112, Math.toRadians(0)).mirror();
+    private final Pose shootPose1 = new Pose(44, 102.5, Math.toRadians(-42)).mirror();
+    private final Pose shootPose2 = new Pose(44, 102.5, Math.toRadians(-42)).mirror();
+    private final Pose shootPose3 = new Pose(44, 102.5, Math.toRadians(-42)).mirror();
+    private final Pose shootPosePreload = new Pose(44, 102.5, Math.toRadians(-42)).mirror();
+    private final Pose spike1Pose = new Pose(52, 83.5, Math.toRadians(180)).mirror();
+    private final Pose collect1Pose = new Pose(22, 83.5, Math.toRadians(180)).mirror();
+    private final Pose spike2Pose = new Pose(52, 54, Math.toRadians(180)).mirror();
+    private final Pose collect2Pose = new Pose(12, 54, Math.toRadians(180)).mirror();
+    private final Pose auxPose = new Pose(23, 54, Math.toRadians(180)).mirror();
+    private final Pose spike3Pose = new Pose(52, 35, Math.toRadians(180)).mirror();
+    private final Pose collect3Pose = new Pose(12, 35, Math.toRadians(180)).mirror();
+    private final Pose finalPose = new Pose(15, 83.5, Math.toRadians(180)).mirror();
+
+
+
     private final ElapsedTime opModeTimer = new ElapsedTime();
     private final ElapsedTime stateTimer = new ElapsedTime();
     private final ElapsedTime actionTimer = new ElapsedTime();
-    private final double velocity = 3.22;
+    private final double velocity = 3.3;
     public boolean justStarted = true;
     private final double reverseVelocity = -1.35;
-    private Robot.Actions shootAction;
 
     @Override
     public void runOpMode() throws InterruptedException {
         robot = new Robot(hardwareMap, startPose, true, Constants.Color.Red, telemetry, gamepad1);
+        robot.intake.setCollectType(Intake.CollectTypes.Normal);
         robot.intake.setState(Intake.States.Wait);
         autoColor = Constants.Color.Red;
         robot.drive.resetTeleOpHeading();
-        robot.camera.startCapture();
         robot.drive.setConstants(Constants.FConstants);
 
         PathChain preloadPath = robot.drive.pathBuilder()
                 .addPath(new BezierLine(startPose, shootPosePreload))
                 .setLinearHeadingInterpolation(startPose.getHeading(), shootPosePreload.getHeading())
                 .build();
-        PathChain goToGateAux = robot.drive.pathBuilder()
-                .addPath(new BezierLine(shootPose1, gatePoseAux))
-                .setLinearHeadingInterpolation(shootPose1.getHeading(), gatePoseAux.getHeading())
-                .build();
-        PathChain goToGate = robot.drive.pathBuilder()
-                .addPath(new BezierLine(gatePoseAux, gatePose))
-                .setLinearHeadingInterpolation(gatePoseAux.getHeading(), gatePose.getHeading())
-                .build();
         PathChain goForSpike1 = robot.drive.pathBuilder()
-                .addPath( new BezierCurve(
-                        gatePose,
-                        new Pose(62.000, 71.000),
-                        new Pose(47.000, 70.000),
-                        new Pose(53.000, 78.000),
-                        spike1Pose
-                ))
-                .setLinearHeadingInterpolation(gatePose.getHeading(), spike1Pose.getHeading())
+                .addPath(new BezierLine(shootPose1, spike1Pose))
+                .setLinearHeadingInterpolation(shootPosePreload.getHeading(), spike1Pose.getHeading())
                 .build();
 
         PathChain collectSpike1 = robot.drive.pathBuilder()
@@ -158,11 +142,12 @@ public class AutoBlueSorted extends LinearOpMode {
         opModeTimer.reset();
         stateTimer.reset();
         actionTimer.reset();
-        state = AutoBlueSorted.States.DriveToPreload;
+        state = AutoRedCloseLm2.States.DriveToPreload;
         while (opModeIsActive()) {
             if (justStarted) {
                 opModeTimer.reset();
                 justStarted = false;
+                robot.shooter.blocker.setState(BlockerOuttake.States.Open);
             }
             switch (state) {
                 case DriveToPreload:
@@ -170,7 +155,7 @@ public class AutoBlueSorted extends LinearOpMode {
                     robot.drive.followPath(preloadPath, true);
                     robot.shooter.setTargetVelocity(velocity);
                     stateTimer.reset();
-                    state = States.ResetForShootPreload;
+                    state = AutoRedCloseLm2.States.ResetForShootPreload;
                     break;
                 case ResetForShootPreload:
                     if (robot.isDone() || stateTimer.milliseconds() > 5000) {
@@ -178,54 +163,33 @@ public class AutoBlueSorted extends LinearOpMode {
                         robot.intake.setPower(IntakeMotor.States.Wait);
                         stateTimer.reset();
                         actionTimer.reset();
-                        robot.shooter.setTargetVelocity(velocity);
-                        robot.setAction(Robot.Actions.ShootFast);
-                        state = States.ShootSequencePreload;
+                        cycles = 0;
+                        shootingState = 0;
+                        state = AutoRedCloseLm2.States.ShootSequencePreload;
                     }
                     break;
                 case ShootSequencePreload:
-                    if (robot.isSorterEmpty()){
-                        state = States.DriveToAuxGate;
+                    if (runShootingSequence()) {
+                        robot.drive.setMaxPower(1);
+                        robot.intake.setPower(IntakeMotor.States.Collect);
                         stateTimer.reset();
+                        state = AutoRedCloseLm2.States.DriveToSpike1;
                     }
                     break;
-                case DriveToAuxGate:
-                    if (robot.isDone() || stateTimer.milliseconds() >=5000){
-                        robot.drive.setMaxPower(1);
-                        robot.drive.followPath(goToGateAux, true);
-                        stateTimer.reset();
-                        state = States.DriveToGate;
-                    }
-                    break;
-                case DriveToGate:
-                    if (robot.isDone() || stateTimer.milliseconds() >= 5000){
-                        robot.drive.setMaxPower(1);
-                        robot.drive.followPath(goToGate, true);
-                        stateTimer.reset();
-                        state = States.DriveToSpike1;
-                    }
                 case DriveToSpike1:
-                    randomizedCase = robot.camera.getMotif();
-                    if (robot.isDone() && robot.camera.motifIsValid(randomizedCase)) {
-                        if(randomizedCase  == Constants.Case.GPP){
-                            shootAction = Robot.Actions.ShootGPP;
-                        }else if (randomizedCase == Constants.Case.PGP){
-                            shootAction = Robot.Actions.ShootPGP;
-                        }else if (randomizedCase ==  Constants.Case.PPG){
-                            shootAction = Robot.Actions.ShootPPG;
-                        }
+                    if (stateTimer.milliseconds() >= 300) {
                         robot.drive.followPath(goForSpike1, true);
                         robot.shooter.setTargetVelocity(reverseVelocity);
                         stateTimer.reset();
-                        state = States.CollectSpike1;
+                        state = AutoRedCloseLm2.States.CollectSpike1;
                     }
                     break;
                 case CollectSpike1:
                     if (robot.isDone() || stateTimer.milliseconds() > 5000) {
-                        robot.drive.setMaxPower(0.50);
+                        robot.drive.setMaxPower(0.65);
                         robot.drive.followPath(collectSpike1, true);
                         stateTimer.reset();
-                        state = States.DriveToShoot1;
+                        state = AutoRedCloseLm2.States.DriveToShoot1;
                     }
                     break;
                 case DriveToShoot1:
@@ -233,24 +197,25 @@ public class AutoBlueSorted extends LinearOpMode {
                         robot.drive.setMaxPower(1);
                         robot.drive.followPath(shootFromSpike1, true);
                         stateTimer.reset();
-                        state = States.ResetForShoot1;
+                        state = AutoRedCloseLm2.States.ResetForShoot1;
                     }
                     break;
                 case ResetForShoot1:
                     if (robot.isDone() || stateTimer.milliseconds() > 5000) {
+                        robot.intake.intakeMotor.setPower(-0.7);
                         stateTimer.reset();
                         actionTimer.reset();
-                        robot.shooter.setTargetVelocity(velocity);
-                        robot.setAction(shootAction);
-                        state = States.ShootSequence1;
+                        cycles = 0;
+                        shootingState = -1;
+                        state = AutoRedCloseLm2.States.ShootSequence1;
                     }
                     break;
                 case ShootSequence1:
-                    if (robot.isSorterEmpty()) {
+                    if (runShootingSequence()) {
                         robot.drive.setMaxPower(1);
                         robot.intake.setPower(IntakeMotor.States.Wait);
                         stateTimer.reset();
-                        state = States.DriveToSpike2;
+                        state = AutoRedCloseLm2.States.DriveToSpike2;
                     }
                     break;
                 case DriveToSpike2:
@@ -259,7 +224,7 @@ public class AutoBlueSorted extends LinearOpMode {
                         robot.shooter.setTargetVelocity(reverseVelocity);
                         robot.intake.setPower(IntakeMotor.States.Collect);
                         stateTimer.reset();
-                        state = States.CollectSpike2;
+                        state = AutoRedCloseLm2.States.CollectSpike2;
                     }
                     break;
                 case CollectSpike2:
@@ -267,37 +232,38 @@ public class AutoBlueSorted extends LinearOpMode {
                         robot.drive.setMaxPower(0.72);
                         robot.drive.followPath(collectSpike2, true);
                         stateTimer.reset();
-                        state = States.DriveToAux;
+                        state = AutoRedCloseLm2.States.DriveToAux;
                     }
                     break;
                 case DriveToAux:
                     if (robot.isDone()) {
                         robot.drive.setMaxPower(1);
                         robot.drive.followPath(goToAux, false);
-                        state = States.DriveToShoot2;
+                        state = AutoRedCloseLm2.States.DriveToShoot2;
                     }
                 case DriveToShoot2:
                     if (robot.isDone() || stateTimer.milliseconds() > 5000) {
                         robot.drive.followPath(shootFromSpike2, true);
                         stateTimer.reset();
-                        state = States.ResetForShoot2;
+                        state = AutoRedCloseLm2.States.ResetForShoot2;
                     }
                     break;
                 case ResetForShoot2:
                     if (robot.isDone() || stateTimer.milliseconds() > 5000) {
+                        robot.intake.intakeMotor.setPower(-0.7);
                         stateTimer.reset();
                         actionTimer.reset();
-                        robot.shooter.setTargetVelocity(velocity);
-                        robot.setAction(shootAction);
-                        state = States.ShootSequence2;
+                        cycles = 0;
+                        shootingState = -1;
+                        state = AutoRedCloseLm2.States.ShootSequence2;
                     }
                     break;
                 case ShootSequence2:
-                    if (robot.isSorterEmpty()) {
+                    if (runShootingSequence()) {
                         robot.drive.setMaxPower(1);
                         robot.intake.setPower(IntakeMotor.States.Collect);
                         stateTimer.reset();
-                        state = States.DriveToSpike3;
+                        state = AutoRedCloseLm2.States.DriveToSpike3;
                     }
                     break;
                 case DriveToSpike3:
@@ -305,7 +271,7 @@ public class AutoBlueSorted extends LinearOpMode {
                         robot.drive.followPath(goForSpike3, true);
                         robot.shooter.setTargetVelocity(reverseVelocity);
                         stateTimer.reset();
-                        state = States.CollectSpike3;
+                        state = AutoRedCloseLm2.States.CollectSpike3;
                     }
                     break;
                 case CollectSpike3:
@@ -313,7 +279,7 @@ public class AutoBlueSorted extends LinearOpMode {
                         robot.drive.setMaxPower(0.72);
                         robot.drive.followPath(collectSpike3, true);
                         stateTimer.reset();
-                        state = States.DriveToShoot3;
+                        state = AutoRedCloseLm2.States.DriveToShoot3;
                     }
                     break;
                 case DriveToShoot3:
@@ -321,23 +287,24 @@ public class AutoBlueSorted extends LinearOpMode {
                         robot.drive.setMaxPower(1);
                         robot.drive.followPath(shootFromSpike3, true);
                         stateTimer.reset();
-                        state = States.ResetForShoot3;
+                        state = AutoRedCloseLm2.States.ResetForShoot3;
                     }
                     break;
                 case ResetForShoot3:
                     if (robot.isDone() || stateTimer.milliseconds() > 5000) {
+                        robot.intake.intakeMotor.setPower(-0.7);
                         stateTimer.reset();
                         actionTimer.reset();
-                        robot.shooter.setTargetVelocity(velocity);
-                        robot.setAction(shootAction);
-                        state = States.ShootSequence3;
+                        cycles = 0;
+                        shootingState = -1;
+                        state = AutoRedCloseLm2.States.ShootSequence3;
                     }
                     break;
                 case ShootSequence3:
-                    if (robot.isSorterEmpty()) {
+                    if (runShootingSequence()) {
                         robot.drive.setMaxPower(1);
                         stateTimer.reset();
-                        state = States.DriveToPark;
+                        state = AutoRedCloseLm2.States.DriveToPark;
                     }
                     break;
                 case DriveToPark:
@@ -345,7 +312,7 @@ public class AutoBlueSorted extends LinearOpMode {
                         robot.drive.followPath(goToPark, true);
                         robot.shooter.setTargetVelocity(0);
                         stateTimer.reset();
-                        state = States.Park;
+                        state = AutoRedCloseLm2.States.Park;
                         finalAutoPose = robot.drive.getPose();
                     }
                     break;
@@ -356,18 +323,53 @@ public class AutoBlueSorted extends LinearOpMode {
                     }
                     break;
             }
-            if (opModeTimer.milliseconds() > 27000 && state != States.DriveToPark && state != States.Park) {
-                state = States.DriveToPark;
+            if (opModeTimer.milliseconds() > 27000 && state != AutoRedCloseLm2.States.DriveToPark && state != AutoRedCloseLm2.States.Park) {
+                state = AutoRedCloseLm2.States.DriveToPark;
                 finalAutoPose = robot.drive.getPose();
                 stateTimer.reset();
             }
             telemetry.addData("State", state);
-            telemetry.addData("Shoot Action", shootAction);
+            telemetry.addData("Cycles", cycles);
             telemetry.addData("Shooter Velocity", robot.shooter.motorUp.getCurrentVelocity());
             telemetry.addData("Robot Pose", robot.drive.getPose());
             telemetry.update();
             finalAutoPose = robot.drive.getPose();
             robot.update();
         }
+    }
+
+    public boolean runShootingSequence() {
+        switch (shootingState) {
+            case -1:
+                if (actionTimer.milliseconds() >= 185) {
+                    robot.shooter.setTargetVelocity(velocity);
+                    robot.intake.intakeMotor.setPower(0);
+                    actionTimer.reset();
+                    shootingState = 0;
+                }
+                break;
+            case 0:
+                if (robot.shooter.atTarget() && actionTimer.milliseconds() >= 210) {
+                    robot.intake.intakeMotor.setPower(0.66);
+                    actionTimer.reset();
+                    stateTimer.reset();
+                    shootingState = 1;
+                }
+                break;
+            case 1:
+                if (actionTimer.milliseconds() > 800 || (robot.shooter.getVelocityError() >= 0.7 && stateTimer.milliseconds() >= 150)) {
+                    robot.shooter.setTargetVelocity(velocity);
+                    robot.intake.setPower(IntakeMotor.States.Wait);
+                    actionTimer.reset();
+                    stateTimer.reset();
+                    shootingState = 0;
+                    cycles++;
+                    if (cycles >= 3) {
+                        return true;
+                    }
+                }
+                break;
+        }
+        return false;
     }
 }
