@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.OpModes.Autos;
 
 import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.finalAutoPose;
-
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
@@ -315,7 +314,6 @@ public class AutoBlueClose extends LinearOpMode {
                 case Park:
                     if (robot.isDone() || stateTimer.milliseconds() > 4000) {
                         robot.drive.breakFollowing();
-                        finalAutoPose = robot.drive.getPose();
                     }
                     break;
             }
@@ -323,10 +321,13 @@ public class AutoBlueClose extends LinearOpMode {
                 state = AutoBlueClose.States.DriveToPark;
                 stateTimer.reset();
             }
+            finalAutoPose = robot.drive.getPose();
+
             telemetry.addData("State", state);
             telemetry.addData("Cycles", cycles);
             telemetry.addData("Shooter Velocity", robot.shooter.motorUp.getCurrentVelocity());
             telemetry.addData("Robot Pose", robot.drive.getPose());
+            telemetry.addData("Final Robot Auto Pose", finalAutoPose);
             telemetry.update();
             robot.update();
         }

@@ -23,10 +23,11 @@ public class Constants {
     @Config
     public static class Globals{
         public static double voltage = 12.0;
-        public static Pose finalAutoPose = new Pose();
-        public static Color autoColor;
+        public static Pose finalAutoPose = new Pose(0,0,0);
+//        public static double x=0,y=0,heading=0;
+        public static Color autoColor = Color.Red;
         public static Case randomizedCase = Case.None;
-        public static Pose BlueGoal = new Pose(10,134), RedGoal = new Pose(138,138);
+        public static Pose BlueGoal = new Pose(16,118), RedGoal = new Pose(120,124);
     }
 
     public enum Case {
@@ -63,6 +64,7 @@ public class Constants {
         public static String liftServoLB = "SLB";
         public static String liftServoRB = "SRB";
         public static String liftServoRF = "SRF";
+        public static String ledName = "L";
         public static String cameraName = "limelight";
     }
 

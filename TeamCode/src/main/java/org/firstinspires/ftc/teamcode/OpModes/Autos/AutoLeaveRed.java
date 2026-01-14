@@ -16,8 +16,8 @@ import org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.BlockerOuttake;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
-@Autonomous(name = "🔴🔝AutoRedCloseLm2🔝🔴")
-public class AutoRedCloseLm2 extends LinearOpMode {
+@Autonomous(name = "Red Far")
+public class AutoLeaveRed extends LinearOpMode {
     private enum States {
         DriveToPreload,
         ResetForShootPreload,
@@ -45,12 +45,11 @@ public class AutoRedCloseLm2 extends LinearOpMode {
     public States state;
     private int cycles = 0;
     private int shootingState = 0;
-
-    public Pose startPose = new Pose(16, 112, Math.toRadians(0)).mirror();
+    public Pose startPose = new Pose(55, 8, Math.toRadians(0)).mirror();
     private final Pose shootPose1 = new Pose(44, 102.5, Math.toRadians(-42)).mirror();
     private final Pose shootPose2 = new Pose(44, 102.5, Math.toRadians(-42)).mirror();
     private final Pose shootPose3 = new Pose(44, 102.5, Math.toRadians(-42)).mirror();
-    private final Pose shootPosePreload = new Pose(44, 102.5, Math.toRadians(-42)).mirror();
+    private final Pose shootPosePreload = new Pose(55, 10, Math.toRadians(-42)).mirror();
     private final Pose spike1Pose = new Pose(52, 83.5, Math.toRadians(180)).mirror();
     private final Pose collect1Pose = new Pose(22, 83.5, Math.toRadians(180)).mirror();
     private final Pose spike2Pose = new Pose(52, 57, Math.toRadians(180)).mirror();
@@ -142,7 +141,7 @@ public class AutoRedCloseLm2 extends LinearOpMode {
         opModeTimer.reset();
         stateTimer.reset();
         actionTimer.reset();
-        state = AutoRedCloseLm2.States.DriveToPreload;
+        state = States.DriveToPreload;
         while (opModeIsActive()) {
             if (justStarted) {
                 opModeTimer.reset();
@@ -155,7 +154,7 @@ public class AutoRedCloseLm2 extends LinearOpMode {
                     robot.drive.followPath(preloadPath, true);
                     robot.shooter.setTargetVelocity(velocity);
                     stateTimer.reset();
-                    state = AutoRedCloseLm2.States.ResetForShootPreload;
+                    state = States.Park;
                     break;
                 case ResetForShootPreload:
                     if (robot.isDone() || stateTimer.milliseconds() > 5000) {
@@ -165,7 +164,7 @@ public class AutoRedCloseLm2 extends LinearOpMode {
                         actionTimer.reset();
                         cycles = 0;
                         shootingState = 0;
-                        state = AutoRedCloseLm2.States.ShootSequencePreload;
+                        state = States.ShootSequencePreload;
                     }
                     break;
                 case ShootSequencePreload:
@@ -174,14 +173,14 @@ public class AutoRedCloseLm2 extends LinearOpMode {
                         robot.intake.setPower(IntakeMotor.States.Collect);
                         robot.shooter.setTargetVelocity(reverseVelocity);
                         stateTimer.reset();
-                        state = AutoRedCloseLm2.States.DriveToSpike1;
+                        state = States.DriveToSpike1;
                     }
                     break;
                 case DriveToSpike1:
                     if (stateTimer.milliseconds() >= 300) {
                         robot.drive.followPath(goForSpike1, true);
                         stateTimer.reset();
-                        state = AutoRedCloseLm2.States.CollectSpike1;
+                        state = States.CollectSpike1;
                     }
                     break;
                 case CollectSpike1:
@@ -189,7 +188,7 @@ public class AutoRedCloseLm2 extends LinearOpMode {
                         robot.drive.setMaxPower(0.65);
                         robot.drive.followPath(collectSpike1, true);
                         stateTimer.reset();
-                        state = AutoRedCloseLm2.States.DriveToShoot1;
+                        state = States.DriveToShoot1;
                     }
                     break;
                 case DriveToShoot1:
@@ -197,7 +196,7 @@ public class AutoRedCloseLm2 extends LinearOpMode {
                         robot.drive.setMaxPower(1);
                         robot.drive.followPath(shootFromSpike1, true);
                         stateTimer.reset();
-                        state = AutoRedCloseLm2.States.ResetForShoot1;
+                        state = States.ResetForShoot1;
                     }
                     break;
                 case ResetForShoot1:
@@ -207,7 +206,7 @@ public class AutoRedCloseLm2 extends LinearOpMode {
                         actionTimer.reset();
                         cycles = 0;
                         shootingState = -1;
-                        state = AutoRedCloseLm2.States.ShootSequence1;
+                        state = States.ShootSequence1;
                     }
                     break;
                 case ShootSequence1:
@@ -215,7 +214,7 @@ public class AutoRedCloseLm2 extends LinearOpMode {
                         robot.drive.setMaxPower(1);
                         robot.intake.setPower(IntakeMotor.States.Wait);
                         stateTimer.reset();
-                        state = AutoRedCloseLm2.States.DriveToSpike2;
+                        state = States.DriveToSpike2;
                     }
                     break;
                 case DriveToSpike2:
@@ -224,7 +223,7 @@ public class AutoRedCloseLm2 extends LinearOpMode {
                         robot.shooter.setTargetVelocity(reverseVelocity);
                         robot.intake.setPower(IntakeMotor.States.Collect);
                         stateTimer.reset();
-                        state = AutoRedCloseLm2.States.CollectSpike2;
+                        state = States.CollectSpike2;
                     }
                     break;
                 case CollectSpike2:
@@ -232,20 +231,20 @@ public class AutoRedCloseLm2 extends LinearOpMode {
                         robot.drive.setMaxPower(0.72);
                         robot.drive.followPath(collectSpike2, true);
                         stateTimer.reset();
-                        state = AutoRedCloseLm2.States.DriveToAux;
+                        state = States.DriveToAux;
                     }
                     break;
                 case DriveToAux:
                     if (robot.isDone()) {
                         robot.drive.setMaxPower(1);
                         robot.drive.followPath(goToAux, false);
-                        state = AutoRedCloseLm2.States.DriveToShoot2;
+                        state = States.DriveToShoot2;
                     }
                 case DriveToShoot2:
                     if (robot.isDone() || stateTimer.milliseconds() > 5000) {
                         robot.drive.followPath(shootFromSpike2, true);
                         stateTimer.reset();
-                        state = AutoRedCloseLm2.States.ResetForShoot2;
+                        state = States.ResetForShoot2;
                     }
                     break;
                 case ResetForShoot2:
@@ -255,7 +254,7 @@ public class AutoRedCloseLm2 extends LinearOpMode {
                         actionTimer.reset();
                         cycles = 0;
                         shootingState = -1;
-                        state = AutoRedCloseLm2.States.ShootSequence2;
+                        state = States.ShootSequence2;
                     }
                     break;
                 case ShootSequence2:
@@ -263,7 +262,7 @@ public class AutoRedCloseLm2 extends LinearOpMode {
                         robot.drive.setMaxPower(1);
                         robot.intake.setPower(IntakeMotor.States.Collect);
                         stateTimer.reset();
-                        state = AutoRedCloseLm2.States.DriveToSpike3;
+                        state = States.DriveToSpike3;
                     }
                     break;
                 case DriveToSpike3:
@@ -271,7 +270,7 @@ public class AutoRedCloseLm2 extends LinearOpMode {
                         robot.drive.followPath(goForSpike3, true);
                         robot.shooter.setTargetVelocity(reverseVelocity);
                         stateTimer.reset();
-                        state = AutoRedCloseLm2.States.CollectSpike3;
+                        state = States.CollectSpike3;
                     }
                     break;
                 case CollectSpike3:
@@ -279,7 +278,7 @@ public class AutoRedCloseLm2 extends LinearOpMode {
                         robot.drive.setMaxPower(0.72);
                         robot.drive.followPath(collectSpike3, true);
                         stateTimer.reset();
-                        state = AutoRedCloseLm2.States.DriveToShoot3;
+                        state = States.DriveToShoot3;
                     }
                     break;
                 case DriveToShoot3:
@@ -287,7 +286,7 @@ public class AutoRedCloseLm2 extends LinearOpMode {
                         robot.drive.setMaxPower(1);
                         robot.drive.followPath(shootFromSpike3, true);
                         stateTimer.reset();
-                        state = AutoRedCloseLm2.States.ResetForShoot3;
+                        state = States.ResetForShoot3;
                     }
                     break;
                 case ResetForShoot3:
@@ -297,14 +296,14 @@ public class AutoRedCloseLm2 extends LinearOpMode {
                         actionTimer.reset();
                         cycles = 0;
                         shootingState = -1;
-                        state = AutoRedCloseLm2.States.ShootSequence3;
+                        state = States.ShootSequence3;
                     }
                     break;
                 case ShootSequence3:
                     if (runShootingSequence()) {
                         robot.drive.setMaxPower(1);
                         stateTimer.reset();
-                        state = AutoRedCloseLm2.States.DriveToPark;
+                        state = States.DriveToPark;
                     }
                     break;
                 case DriveToPark:
@@ -312,7 +311,7 @@ public class AutoRedCloseLm2 extends LinearOpMode {
                         robot.drive.followPath(goToPark, true);
                         robot.shooter.setTargetVelocity(0);
                         stateTimer.reset();
-                        state = AutoRedCloseLm2.States.Park;
+                        state = States.Park;
                         finalAutoPose = robot.drive.getPose();
                     }
                     break;
@@ -323,8 +322,8 @@ public class AutoRedCloseLm2 extends LinearOpMode {
                     }
                     break;
             }
-            if (opModeTimer.milliseconds() > 27000 && state != AutoRedCloseLm2.States.DriveToPark && state != AutoRedCloseLm2.States.Park) {
-                state = AutoRedCloseLm2.States.DriveToPark;
+            if (opModeTimer.milliseconds() > 27000 && state != States.DriveToPark && state != States.Park) {
+                state = States.DriveToPark;
                 stateTimer.reset();
             }
             finalAutoPose = robot.drive.getPose();

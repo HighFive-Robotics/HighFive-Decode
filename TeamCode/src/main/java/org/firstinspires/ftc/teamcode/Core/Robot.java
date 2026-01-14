@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Core;
 
+import static org.firstinspires.ftc.teamcode.Constants.Color.Blue;
 import static org.firstinspires.ftc.teamcode.Constants.Color.Green;
 import static org.firstinspires.ftc.teamcode.Constants.Color.None;
 import static org.firstinspires.ftc.teamcode.Constants.Color.Purple;
@@ -9,7 +10,6 @@ import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.artifactNumber;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.greenArtifactNumber;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.purpleArtifactNumber;
-import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.targetColors;
 import static org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake.Actions.NextSlot;
 import static org.firstinspires.ftc.teamcode.Core.Module.Outtake.BlockerOuttake.States.Close;
 import static org.firstinspires.ftc.teamcode.Core.Module.Outtake.BlockerOuttake.States.Open;
@@ -29,6 +29,7 @@ import org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
 
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Sorter;
+import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Led;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Shooter;
 
 import java.util.Arrays;
@@ -45,11 +46,12 @@ public class Robot extends HighModule {
     public Shooter shooter;
     public Intake intake;
     public HighCamera camera;
+    public Led led;
     boolean isAuto;
     boolean stopShoot = false, stopIntake = false;
     public boolean startShootingSequence = false, startShootingSequenceQueue = false, shootNormal = false;
     int shootingState = 0, shootingStateQueue = 0, stateNormal = 0, cycles = 0;
-    Constants.Color allianceColor;
+    public Constants.Color allianceColor;
 
     public Constants.Color[] colorsQueue = {None, None, None};
     public int queueCount = 0;
@@ -76,17 +78,18 @@ public class Robot extends HighModule {
         this.allianceColor = allianceColor;
         drive = Constants.createFollower(hardwareMap);
         camera = new HighCamera(hardwareMap, HighCamera.Pipelines.AprilTagId);
-        if (isAuto) {
-            drive.setStartingPose(startPose);
-        } else {
-            if (autoColor == Constants.Color.Blue) {
-                drive.startFieldCentricDrive(gamepad, true, Math.PI + startPose.getHeading());
-            } else {
-                drive.startFieldCentricDrive(gamepad, true, startPose.getHeading());
-            }
+        drive.setStartingPose(startPose);
+        drive.setPose(startPose);
+        if (!isAuto) {
+                if(allianceColor == Blue){
+                    drive.startFieldCentricDrive(gamepad, true, Math.PI);
+                }else {
+                    drive.startFieldCentricDrive(gamepad, true, 0);
+                }
         }
         shooter = new Shooter(hardwareMap);
         intake = new Intake(hardwareMap);
+        led = new Led(hardwareMap);
         allHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
@@ -100,11 +103,10 @@ public class Robot extends HighModule {
         this.allianceColor = allianceColor;
         drive = Constants.createFollower(hardwareMap);
         camera = new HighCamera(hardwareMap, HighCamera.Pipelines.AprilTagId);
-        if (isAuto) {
-            drive.setStartingPose(startPose);
-        }
+        drive.setStartingPose(startPose);
         shooter = new Shooter(hardwareMap);
         intake = new Intake(hardwareMap);
+        led = new Led(hardwareMap);
         allHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
@@ -402,6 +404,7 @@ public class Robot extends HighModule {
         intake.update();
         shooter.update();
         drive.update();
+        led.update();
         telemetry.addData("Timer", intakeHelper.milliseconds());
         for (LynxModule hub : allHubs) {
             hub.clearBulkCache();
@@ -418,6 +421,30 @@ public class Robot extends HighModule {
             }
         }
         return -1;
+    }
+
+    public boolean isAligned() {
+        switch (allianceColor) {
+            case Blue: {
+                double degOffset = Math.abs(Math.toDegrees(drive.getPose().rotate(Math.PI,true).getHeading()- Math.atan2(BlueGoal.getY() - drive.getPose().getY(), BlueGoal.getX() - drive.getPose().getX())));
+                double calculatedAngle = Math.atan2(BlueGoal.getY() - drive.getPose().getY(), BlueGoal.getX() - drive.getPose().getX());
+                telemetry.addData("Angle Offset", degOffset);
+                telemetry.addData("ATAN2 angle", Math.toDegrees(calculatedAngle));
+                telemetry.addData("Blue dist", 2.54 * Math.hypot(BlueGoal.getX() - drive.getPose().getX() - 8, BlueGoal.getY() - drive.getPose().getY() - 8));
+                telemetry.addData("Red dist", 2.54 * Math.hypot(RedGoal.getX() - drive.getPose().getX() - 8, RedGoal.getY() - drive.getPose().getY() - 8));
+                return Math.abs(Math.toDegrees(drive.getPose().rotate(Math.PI,true).getHeading() - Math.atan2(BlueGoal.getY() - drive.getPose().getY(), BlueGoal.getX() - drive.getPose().getX()))) <= 3.5;
+            }
+            case Red: {
+                double degOffset = Math.abs(Math.toDegrees(drive.getPose().rotate(Math.PI,true).getHeading() - Math.atan2(RedGoal.getY() - drive.getPose().getY(), RedGoal.getX() - drive.getPose().getX()))) ;
+                double calculatedAngle = Math.atan2(RedGoal.getY() - drive.getPose().getY(), RedGoal.getX() - drive.getPose().getX());
+                telemetry.addData("Angle Offset", degOffset);
+                telemetry.addData("ATAN2 angle", Math.toDegrees(calculatedAngle));
+                telemetry.addData("Blue dist", 2.54 * Math.hypot(BlueGoal.getX() - drive.getPose().getX() - 8, BlueGoal.getY() - drive.getPose().getY() - 8));
+                telemetry.addData("Red dist", 2.54 * Math.hypot(RedGoal.getX() - drive.getPose().getX() - 8, RedGoal.getY() - drive.getPose().getY() - 8));
+                return Math.abs(Math.toDegrees(drive.getPose().rotate(Math.PI,true).getHeading() - Math.atan2(RedGoal.getY() - drive.getPose().getY(), RedGoal.getX() - drive.getPose().getX()))) <= 3.5;
+            }
+        }
+        return false;
     }
     public boolean isSorterEmpty(){
         return intake.sorter.isEmpty;

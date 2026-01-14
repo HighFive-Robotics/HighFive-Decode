@@ -385,7 +385,9 @@ public class Follower {
     public void setTeleOpDrive(double forward, double strafe, double turn, boolean isRobotCentric, double offsetHeading) {
         vectorCalculator.setTeleOpMovementVectors(forward, strafe, turn, isRobotCentric, offsetHeading);
     }
-
+    public void setTeleOpHeadingOffset(double teleOpHeadingOffset){
+        this.teleOpHeadingOffset = teleOpHeadingOffset;
+    }
     /**
      * This sets the Teleop drive movement vectors
      *

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.OpModes.TeleOps;
 
+import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.finalAutoPose;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.sorterColors;
 import static org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor.States.Wait;
@@ -25,16 +26,13 @@ import java.util.HashMap;
 public class TeleOpusMaximus extends LinearOpMode {
 
     public static double littleVelo = 4 , bigVelo = 4.8 , negativeVelo = -2;
-
     public boolean intakeDriver2 = false, rumbled = false;
     Robot robot;
-
     public HashMap<String , ElapsedTime> timers = new HashMap<>();
     ElapsedTime loopTimer = new ElapsedTime();
-
     @Override
     public void runOpMode() throws InterruptedException {
-        robot = new Robot(hardwareMap ,finalAutoPose, false , Constants.Color.Blue , telemetry,gamepad1);
+        robot = new Robot(hardwareMap ,finalAutoPose, false , autoColor , telemetry,gamepad1);
         finalAutoPose = new Pose();
         timers.put("rightBumper1" , new ElapsedTime());
         timers.put("leftBumper1" , new ElapsedTime());
@@ -230,6 +228,10 @@ public class TeleOpusMaximus extends LinearOpMode {
             }
 
             if(gamepad1.psWasPressed()){
+                if(gamepad1.dpad_up){
+                    robot.drive.setPose(new Pose(8,8,robot.drive.getHeading()));
+                    robot.allianceColor = Constants.Color.Red;
+                }
                 robot.drive.resetTeleOpHeading();
             }
 
@@ -238,13 +240,21 @@ public class TeleOpusMaximus extends LinearOpMode {
                 rumbled = false;
             }
 
+            if(robot.shooter.atTarget() && robot.isAligned()){
+                robot.led.setColor(Constants.Color.Green);
+            } else if(robot.shooter.atTarget()){
+                robot.led.setColor(Constants.Color.Purple);
+            } else {
+                robot.led.setColor(Constants.Color.Red);
+            }
+            telemetry.addData("Final Auto Pose Heading" , finalAutoPose.getHeading());
             telemetry.addData("Color 1:", sorterColors[0]);
             telemetry.addData("Color 2:", sorterColors[1]);
             telemetry.addData("Color 3:", sorterColors[2]);
             telemetry.addData("Update count" , robot.intake.count);
             telemetry.addData("Intake Motor State" , robot.intake.getState());
+            telemetry.addData("Pose", robot.drive.getPose().toString());
             telemetry.addData("Hz", 1.0 / loopTimer.seconds());
-
             loopTimer.reset();
             telemetry.update();
             robot.update();
