@@ -24,7 +24,6 @@ public class Constants {
     public static class Globals{
         public static double voltage = 12.0;
         public static Pose finalAutoPose = new Pose(0,0,0);
-//        public static double x=0,y=0,heading=0;
         public static Color autoColor = Color.Red;
         public static Case randomizedCase = Case.None;
         public static Pose BlueGoal = new Pose(16,118), RedGoal = new Pose(120,124);

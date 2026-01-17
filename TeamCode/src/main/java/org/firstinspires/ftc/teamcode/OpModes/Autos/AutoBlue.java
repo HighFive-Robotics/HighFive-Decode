@@ -6,9 +6,9 @@ import static org.firstinspires.ftc.teamcode.Constants.Globals.finalAutoPose;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
+
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -16,7 +16,6 @@ import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
-@Disabled
 @Autonomous(name = "🔵L🔵")
 public class AutoBlue extends LinearOpMode {
 
@@ -25,18 +24,18 @@ public class AutoBlue extends LinearOpMode {
     public double velocity1 = 3.3, velocity2 = 3.65;
     boolean spikeMark3 = true;
 
-    public Pose startPose = new Pose(15, 111, Math.toRadians(0));// TODO REMAKE ALL POSES
-    public Pose shootPose = new Pose(60, 80, Math.toRadians(-50));
+    public Pose startPose = new Pose(15, 111, Math.toRadians(0));
+    public Pose shootPose = new Pose(55, 75, Math.toRadians(-50));
     public Pose lastShootPose = new Pose(60, 105, Math.toRadians(-37.5));
     public Pose preOpenGatePose = new Pose(20, 72, Math.toRadians(-90));
     public Pose openGatePose = new Pose(16, 72, Math.toRadians(-90));
     public Pose controlPoint1 = new Pose(60, 60);
-    public Pose controlPoint2 = new Pose(42, 38);
+    public Pose controlPoint2 = new Pose(20, 30);
     public Pose preCollectSpikeMark2Pose = new Pose(42.5, 60, Math.toRadians(180));
     public Pose collectSpikeMark2Pose = new Pose(20, 60, Math.toRadians(180));
     public Pose preCollectSpikeMark1Pose = new Pose(42.5, 85, Math.toRadians(180));
     public Pose collectSpikeMark1Pose = new Pose(20, 85, Math.toRadians(180));
-    public Pose preCollectSpikeMark3Pose = new Pose(42.5, 35, Math.toRadians(180));
+    public Pose preCollectSpikeMark3Pose = new Pose(37.5, 35, Math.toRadians(180));
     public Pose collectSpikeMark3Pose = new Pose(20, 35, Math.toRadians(180));
 
     private final ElapsedTime autoTimer = new ElapsedTime();
@@ -107,6 +106,7 @@ public class AutoBlue extends LinearOpMode {
                         controlPoint2,
                         preCollectSpikeMark3Pose
                 ))
+                .setReversed()
                 .setTangentHeadingInterpolation()
                 .build();
 
@@ -121,7 +121,6 @@ public class AutoBlue extends LinearOpMode {
                         controlPoint2,
                         lastShootPose
                 ))
-                .setReversed()
                 .setTangentHeadingInterpolation()
                 .build();
 
@@ -133,54 +132,54 @@ public class AutoBlue extends LinearOpMode {
 
             switch (state){
                 case 0:
-                    robot.drive.followPath(preloadPath);
+                    robot.drive.followPath(preloadPath,true);
                     state++;
                     break;
                 case 1:
                     if(robot.isDone()){
-                        robot.drive.followPath(goForSpike2);
+                        robot.drive.followPath(goForSpike2,true);
                         state++;
                     }
                     break;
                 case 2:
-                    if(robot.isDone()){
-                        robot.drive.followPath(collectSpike2);
+                    if(robot.drive.atParametricEnd()){
+                        robot.drive.followPath(collectSpike2,true);
                         state++;
                     }
                     break;
                 case 3:
-                    if(robot.isDone()){
-                        robot.drive.followPath(openGate);
+                    if(robot.drive.atParametricEnd()){
+                        robot.drive.followPath(openGate,true);
                         state++;
                     }
                     break;
                 case 4:
                     if(robot.isDone()){
-                        robot.drive.followPath(holdGate);
+                        robot.drive.followPath(holdGate,true);
                         state++;
                     }
                     break;
                 case 5:
                     if(robot.isDone()){
-                        robot.drive.followPath(goShoot2);
+                        robot.drive.followPath(goShoot2,true);
                         state++;
                     }
                     break;
                 case 6:
                     if(robot.isDone()){
-                        robot.drive.followPath(goForSpike1);
+                        robot.drive.followPath(goForSpike1,true);
                         state++;
                     }
                     break;
                 case 7:
-                    if(robot.isDone()){
-                        robot.drive.followPath(collectSpike1);
+                    if(robot.drive.atParametricEnd()){
+                        robot.drive.followPath(collectSpike1,true);
                         state++;
                     }
                     break;
                 case 8:
                     if(robot.isDone()){
-                        robot.drive.followPath(goForShoot1);
+                        robot.drive.followPath(goForShoot1,true);
                         state++;
                     }
                     break;
@@ -191,20 +190,20 @@ public class AutoBlue extends LinearOpMode {
                     }
                     break;
                 case 10:
-                    if(robot.isDone()){
-                        robot.drive.followPath(goForSpike3);
+                    if(robot.drive.atParametricEnd()){
+                        robot.drive.followPath(goForSpike3,true);
                         state++;
                     }
                     break;
                 case 11:
                     if(robot.isDone()){
-                        robot.drive.followPath(collectSpike3);
+                        robot.drive.followPath(collectSpike3,true);
                         state++;
                     }
                     break;
                 case 12:
                     if(robot.isDone()){
-                        robot.drive.followPath(goShootSpike3);
+                        robot.drive.followPath(goShootSpike3,true);
                         state++;
                     }
                     break;
@@ -216,6 +215,8 @@ public class AutoBlue extends LinearOpMode {
                     break;
             }
 
+            telemetry.addData("State: ", state);
+            telemetry.update();
             finalAutoPose = robot.drive.getPose();
             robot.update();
         }
