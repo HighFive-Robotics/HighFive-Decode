@@ -2,10 +2,6 @@ package org.firstinspires.ftc.teamcode.OpModes.Autos;
 
 import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.finalAutoPose;
-import static org.firstinspires.ftc.teamcode.Constants.Globals.randomizedCase;
-import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.sorterColors;
-import static org.firstinspires.ftc.teamcode.Core.Robot.Actions.PrepareForShooting;
-import static org.firstinspires.ftc.teamcode.Core.Robot.Actions.ShootFastNormal;
 
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
@@ -18,9 +14,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
-import org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor;
-import org.firstinspires.ftc.teamcode.Core.Module.Intake.Sorter;
-import org.firstinspires.ftc.teamcode.Core.Module.Outtake.BlockerOuttake;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
 @Disabled
@@ -32,18 +25,19 @@ public class AutoBlue extends LinearOpMode {
     public double velocity1 = 3.3, velocity2 = 3.65;
     boolean spikeMark3 = true;
 
-    public Pose startPose = new Pose(16, 112, Math.toRadians(0));// TODO REMAKE ALL POSES
+    public Pose startPose = new Pose(15, 111, Math.toRadians(0));// TODO REMAKE ALL POSES
     public Pose shootPose = new Pose(60, 80, Math.toRadians(-50));
-    public Pose openGatePose = new Pose(14, 70);
-    public Pose gatePose = new Pose(14, 70, Math.toRadians(135));
-    public Pose controlPointGate = new Pose(55, 45);
-    public Pose controlPoint1 = new Pose(70, 80);
+    public Pose lastShootPose = new Pose(60, 105, Math.toRadians(-37.5));
+    public Pose preOpenGatePose = new Pose(20, 72, Math.toRadians(-90));
+    public Pose openGatePose = new Pose(16, 72, Math.toRadians(-90));
+    public Pose controlPoint1 = new Pose(60, 60);
     public Pose controlPoint2 = new Pose(42, 38);
-    public Pose precollectSpikeMark2Pose = new Pose(50, 60, Math.toRadians(180));
-    public Pose collectSpikeMark2Pose = new Pose(12, 60, Math.toRadians(180));
-    public Pose collectSpikeMark1Pose = new Pose(22, 80, Math.toRadians(180));
-    public Pose precollectSpikeMark3Pose = new Pose(52, 35, Math.toRadians(180));
-    public Pose collectSpikeMark3Pose = new Pose(12, 35, Math.toRadians(180));
+    public Pose preCollectSpikeMark2Pose = new Pose(42.5, 60, Math.toRadians(180));
+    public Pose collectSpikeMark2Pose = new Pose(20, 60, Math.toRadians(180));
+    public Pose preCollectSpikeMark1Pose = new Pose(42.5, 85, Math.toRadians(180));
+    public Pose collectSpikeMark1Pose = new Pose(20, 85, Math.toRadians(180));
+    public Pose preCollectSpikeMark3Pose = new Pose(42.5, 35, Math.toRadians(180));
+    public Pose collectSpikeMark3Pose = new Pose(20, 35, Math.toRadians(180));
 
     private final ElapsedTime autoTimer = new ElapsedTime();
     private final ElapsedTime timer = new ElapsedTime();
@@ -58,7 +52,7 @@ public class AutoBlue extends LinearOpMode {
         robot.intake.setCollectType(Intake.CollectTypes.Normal);
         robot.intake.setState(Intake.States.Wait);
 
-        PathChain preloadPath = robot.drive.pathBuilder()//TODO BEZIER
+        PathChain preloadPath = robot.drive.pathBuilder()
                 .addPath(new BezierLine(startPose, shootPose))
                 .setLinearHeadingInterpolation(startPose.getHeading(), shootPose.getHeading())
                 .build();
@@ -67,31 +61,41 @@ public class AutoBlue extends LinearOpMode {
                 .addPath( new BezierCurve(
                         shootPose,
                         controlPoint1,
-                        precollectSpikeMark2Pose
+                        preCollectSpikeMark2Pose
                 ))
                 .setTangentHeadingInterpolation()
                 .build();
 
         PathChain collectSpike2 = robot.drive.pathBuilder()
-                .addPath(new BezierLine(precollectSpikeMark2Pose, collectSpikeMark2Pose))
-                .setLinearHeadingInterpolation(precollectSpikeMark2Pose.getHeading(), collectSpikeMark2Pose.getHeading())
+                .addPath(new BezierLine(preCollectSpikeMark2Pose, collectSpikeMark2Pose))
+                .setLinearHeadingInterpolation(preCollectSpikeMark2Pose.getHeading(), collectSpikeMark2Pose.getHeading())
                 .build();
+
+        PathChain openGate = robot.drive.pathBuilder()
+                .addPath(new BezierLine(collectSpikeMark2Pose, preOpenGatePose))
+                .setLinearHeadingInterpolation(collectSpikeMark2Pose.getHeading(), preOpenGatePose.getHeading())
+                .build();
+
+        PathChain holdGate = robot.drive.pathBuilder()
+                .addPath(new BezierLine(preOpenGatePose, openGatePose))
+                .setLinearHeadingInterpolation(preOpenGatePose.getHeading(), openGatePose.getHeading())
+                .build();
+
         PathChain goShoot2 = robot.drive.pathBuilder()
-                .addPath(new BezierLine(gatePose, shootPose))
-                .setLinearHeadingInterpolation(gatePose.getHeading(), shootPose.getHeading())
+                .addPath(new BezierLine(openGatePose, shootPose))
+                .setLinearHeadingInterpolation(openGatePose.getHeading(), shootPose.getHeading())
                 .build();
-        PathChain openGate = robot.drive.pathBuilder()//TODO Make another pose
-                .addPath( new BezierCurve(
-                        collectSpikeMark2Pose,
-                        controlPointGate,
-                        gatePose
-                ))
-                .setLinearHeadingInterpolation(collectSpikeMark2Pose.getHeading(),gatePose.getHeading())
+
+        PathChain goForSpike1 = robot.drive.pathBuilder()
+                .addPath(new BezierLine(shootPose, preCollectSpikeMark1Pose))
+                .setLinearHeadingInterpolation(collectSpikeMark1Pose.getHeading(), preCollectSpikeMark1Pose.getHeading())
                 .build();
+
         PathChain collectSpike1 = robot.drive.pathBuilder()
-                .addPath(new BezierLine(shootPose, collectSpikeMark1Pose))
-                .setLinearHeadingInterpolation(collectSpikeMark1Pose.getHeading(), collectSpikeMark1Pose.getHeading())
+                .addPath(new BezierLine(preCollectSpikeMark1Pose, collectSpikeMark1Pose))
+                .setLinearHeadingInterpolation(preCollectSpikeMark1Pose.getHeading(), collectSpikeMark1Pose.getHeading())
                 .build();
+
         PathChain goForShoot1 = robot.drive.pathBuilder()
                 .addPath(new BezierLine(collectSpikeMark1Pose, shootPose))
                 .setLinearHeadingInterpolation(collectSpikeMark1Pose.getHeading(), Math.toRadians(180))
@@ -101,38 +105,116 @@ public class AutoBlue extends LinearOpMode {
                 .addPath( new BezierCurve(
                         shootPose,
                         controlPoint2,
-                        precollectSpikeMark3Pose
+                        preCollectSpikeMark3Pose
                 ))
                 .setTangentHeadingInterpolation()
                 .build();
 
         PathChain collectSpike3 = robot.drive.pathBuilder()
-                .addPath(new BezierLine(precollectSpikeMark3Pose, collectSpikeMark3Pose))
-                .setLinearHeadingInterpolation(precollectSpikeMark3Pose.getHeading(), collectSpikeMark3Pose.getHeading())
+                .addPath(new BezierLine(preCollectSpikeMark3Pose, collectSpikeMark3Pose))
+                .setLinearHeadingInterpolation(preCollectSpikeMark3Pose.getHeading(), collectSpikeMark3Pose.getHeading())
                 .build();
 
         PathChain goShootSpike3 = robot.drive.pathBuilder()
                 .addPath( new BezierCurve(
                         collectSpikeMark3Pose,
                         controlPoint2,
-                        shootPose
+                        lastShootPose
                 ))
+                .setReversed()
                 .setTangentHeadingInterpolation()
                 .build();
 
-        PathChain shoot3 = robot.drive.pathBuilder()
-                .addPath(new BezierLine(shootPose, shootPose))
-                .setLinearHeadingInterpolation(shootPose.getHeading(), shootPose.getHeading())
-                .build();
 
-
-        robot.intake.sorter.setColor(Constants.Color.Purple,1);
-        robot.intake.sorter.setColor(Constants.Color.Purple,2);
-        robot.intake.sorter.setColor(Constants.Color.Purple,3);
         telemetry.addLine("Ready for Action");
         telemetry.update();
         waitForStart();
         while (opModeIsActive()){
+
+            switch (state){
+                case 0:
+                    robot.drive.followPath(preloadPath);
+                    state++;
+                    break;
+                case 1:
+                    if(robot.isDone()){
+                        robot.drive.followPath(goForSpike2);
+                        state++;
+                    }
+                    break;
+                case 2:
+                    if(robot.isDone()){
+                        robot.drive.followPath(collectSpike2);
+                        state++;
+                    }
+                    break;
+                case 3:
+                    if(robot.isDone()){
+                        robot.drive.followPath(openGate);
+                        state++;
+                    }
+                    break;
+                case 4:
+                    if(robot.isDone()){
+                        robot.drive.followPath(holdGate);
+                        state++;
+                    }
+                    break;
+                case 5:
+                    if(robot.isDone()){
+                        robot.drive.followPath(goShoot2);
+                        state++;
+                    }
+                    break;
+                case 6:
+                    if(robot.isDone()){
+                        robot.drive.followPath(goForSpike1);
+                        state++;
+                    }
+                    break;
+                case 7:
+                    if(robot.isDone()){
+                        robot.drive.followPath(collectSpike1);
+                        state++;
+                    }
+                    break;
+                case 8:
+                    if(robot.isDone()){
+                        robot.drive.followPath(goForShoot1);
+                        state++;
+                    }
+                    break;
+                case 9:
+                    if(robot.isDone()){
+                        robot.drive.turnTo(shootPose.getHeading());
+                        state++;
+                    }
+                    break;
+                case 10:
+                    if(robot.isDone()){
+                        robot.drive.followPath(goForSpike3);
+                        state++;
+                    }
+                    break;
+                case 11:
+                    if(robot.isDone()){
+                        robot.drive.followPath(collectSpike3);
+                        state++;
+                    }
+                    break;
+                case 12:
+                    if(robot.isDone()){
+                        robot.drive.followPath(goShootSpike3);
+                        state++;
+                    }
+                    break;
+                case 13:
+                    if(robot.isDone()){
+                        robot.drive.turnTo(lastShootPose.getHeading());
+                        state++;
+                    }
+                    break;
+            }
 
             finalAutoPose = robot.drive.getPose();
             robot.update();
