@@ -14,6 +14,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
+import org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor;
+import org.firstinspires.ftc.teamcode.Core.Module.Outtake.BlockerOuttake;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
 @Autonomous(name = "🔵L🔵")
@@ -21,18 +23,18 @@ public class AutoBlue extends LinearOpMode {
 
     public Robot robot;
     public int state = 0;
-    public double velocity1 = 3.3, velocity2 = 3.65;
-    boolean spikeMark3 = true;
+    public double velocityLast = 3.3, velocityPreload = 3.6, velocityFar = 3.5, velocityNeg = - 1.5;
 
     public Pose startPose = new Pose(15, 111, Math.toRadians(0));
-    public Pose shootPose = new Pose(55, 75, Math.toRadians(-50));
-    public Pose lastShootPose = new Pose(50, 105, Math.toRadians(-37.5));
+    public Pose shootPose = new Pose(55, 85, Math.toRadians(-42));
+    public Pose lastShootPose = new Pose(50, 112.5, Math.toRadians(-25));
     public Pose preOpenGatePose = new Pose(20, 68, Math.toRadians(-90));
-    public Pose openGatePose = new Pose(16, 68, Math.toRadians(-90));
+    public Pose openGatePose = new Pose(13.5, 68, Math.toRadians(-90));
     public Pose controlPoint1 = new Pose(60, 60);
-    public Pose controlPoint2 = new Pose(60, 40);
+    public Pose controlPoint2 = new Pose(45, 65);
+    public Pose controlPoint3 = new Pose(60, 40);
     public Pose preCollectSpikeMark2Pose = new Pose(42.5, 60, Math.toRadians(180));
-    public Pose collectSpikeMark2Pose = new Pose(20, 60, Math.toRadians(180));
+    public Pose collectSpikeMark2Pose = new Pose(17, 60, Math.toRadians(180));
     public Pose preCollectSpikeMark1Pose = new Pose(42.5, 85, Math.toRadians(180));
     public Pose collectSpikeMark1Pose = new Pose(20, 85, Math.toRadians(180));
     public Pose preCollectSpikeMark3Pose = new Pose(42.5, 35, Math.toRadians(180));
@@ -80,9 +82,12 @@ public class AutoBlue extends LinearOpMode {
                 .setLinearHeadingInterpolation(preOpenGatePose.getHeading(), openGatePose.getHeading())
                 .build();
 
-        PathChain goShoot2 = robot.drive.pathBuilder()
-                .addPath(new BezierLine(openGatePose, shootPose))
-                .setLinearHeadingInterpolation(openGatePose.getHeading(), shootPose.getHeading())
+        PathChain goShoot2 =  robot.drive.pathBuilder()
+                .addPath(new BezierCurve(
+                        openGatePose,
+                        controlPoint2,
+                        shootPose
+                )).setLinearHeadingInterpolation(openGatePose.getHeading(),shootPose.getHeading())
                 .build();
 
         PathChain goForSpike1 = robot.drive.pathBuilder()
@@ -103,7 +108,7 @@ public class AutoBlue extends LinearOpMode {
         PathChain goForSpike3 = robot.drive.pathBuilder()
                 .addPath(new BezierCurve(
                         shootPose,
-                        controlPoint2,
+                        controlPoint3,
                         preCollectSpikeMark3Pose
                 )).setTangentHeadingInterpolation()
                 .build();
@@ -114,110 +119,177 @@ public class AutoBlue extends LinearOpMode {
                 .build();
 
         PathChain goShootSpike3 = robot.drive.pathBuilder()
-                .addPath(new BezierCurve(
-                        collectSpikeMark3Pose,
-                        lastShootPose
-                )).setTangentHeadingInterpolation()
+                .addPath(new BezierLine(collectSpikeMark3Pose, lastShootPose))
+                .setTangentHeadingInterpolation()
                 .setReversed()
                 .build();
 
 
+        robot.intake.sorter.setColor(Constants.Color.Purple,1);
+        robot.intake.sorter.setColor(Constants.Color.Purple,2);
+        robot.intake.sorter.setColor(Constants.Color.Purple,3);
         telemetry.addLine("Ready for Action");
         telemetry.update();
         waitForStart();
+        autoTimer.reset();
         while (opModeIsActive()) {
             switch (state) {
                 case 0:
                     robot.drive.followPath(preloadPath, true);
+                    robot.shooter.setTargetVelocity(velocityPreload);
                     state++;
                     break;
                 case 1:
-                    if (robot.isDone()) {
-                        robot.drive.followPath(goForSpike2, true);
+                    if((robot.isDone() && robot.shooter.atTarget()) || autoTimer.milliseconds() > 5000) {
+                        robot.setAction(Robot.Actions.ShootFast);
+                        timer.reset();
                         state++;
                     }
                     break;
                 case 2:
-                    if (robot.drive.atParametricEnd()) {
-                        robot.drive.followPath(collectSpike2, true);
+                    if(robot.isSorterEmpty() || timer.milliseconds() >= 3000){
+                        robot.drive.followPath(goForSpike2, true);
                         state++;
                     }
                     break;
                 case 3:
                     if (robot.drive.atParametricEnd()) {
-                        robot.drive.followPath(openGate, true);
+                        robot.intake.setState(Intake.States.Wait);
+                        robot.intake.setCollectType(Intake.CollectTypes.Normal);
+                        robot.shooter.blocker.setState(BlockerOuttake.States.Open);
+                        robot.intake.setPower(IntakeMotor.States.Collect);
+                        robot.shooter.setTargetVelocity(velocityNeg);
+                        robot.drive.followPath(collectSpike2, true);
                         state++;
                     }
                     break;
                 case 4:
-                    if (robot.isDone()) {
-                        robot.drive.followPath(holdGate, true);
+                    if (robot.drive.atParametricEnd()) {
+                        robot.drive.followPath(openGate, true);
                         state++;
                     }
                     break;
                 case 5:
                     if (robot.isDone()) {
-                        robot.drive.followPath(goShoot2, true);
+                        robot.drive.followPath(holdGate, true);
+                        timer.reset();
                         state++;
                     }
                     break;
                 case 6:
-                    if (robot.isDone()) {
-                        robot.drive.followPath(goForSpike1, true);
+                    if ((robot.isDone() && timer.milliseconds() >= 1500) || timer.milliseconds() >= 2000) {
+                        robot.intake.setPower(IntakeMotor.States.Collect);
+                        robot.drive.followPath(goShoot2, true);
                         state++;
+                    } else {
+                        robot.intake.setPower(IntakeMotor.States.Wait);
                     }
                     break;
                 case 7:
-                    if (robot.drive.atParametricEnd()) {
-                        robot.drive.followPath(collectSpike1, true);
+                    if (robot.isDone()) {
+                        robot.setAction(Robot.Actions.PrepareForShooting);
+                        timer.reset();
                         state++;
                     }
                     break;
                 case 8:
-                    if (robot.isDone()) {
-                        robot.drive.followPath(goForShoot1, true);
+                    if (timer.milliseconds() >= 200) {
+                        robot.shooter.setTargetVelocity(velocityFar);
+                        robot.setAction(Robot.Actions.ShootFastNormal);
+                        timer.reset();
                         state++;
                     }
                     break;
                 case 9:
-                    if (robot.isDone()) {
-                        robot.drive.turnTo(shootPose.getHeading());
+                    if (!robot.shootNormal || timer.milliseconds() >= 5000) {
+                        robot.drive.followPath(goForSpike1, true);
+                        robot.shooter.setTargetVelocity(0);
                         state++;
                     }
                     break;
                 case 10:
-                    if (!robot.drive.isTurning()) {
-                        robot.drive.followPath(goForSpike3, true);
+                    if (robot.drive.atParametricEnd()) {
+                        robot.intake.setPower(IntakeMotor.States.Collect);
+                        robot.shooter.setTargetVelocity(velocityNeg);
+                        robot.drive.followPath(collectSpike1, true);
                         state++;
                     }
                     break;
                 case 11:
                     if (robot.isDone()) {
-                        robot.drive.followPath(collectSpike3, true);
+                        robot.drive.followPath(goForShoot1, true);
                         state++;
                     }
                     break;
                 case 12:
-                    if (robot.isDone()) {
-                        robot.drive.followPath(goShootSpike3, true);
+                    if (robot.drive.atParametricEnd()) {
+                        robot.drive.turnTo(shootPose.getHeading());
                         state++;
                     }
                     break;
                 case 13:
                     if (robot.isDone()) {
+                        robot.setAction(Robot.Actions.PrepareForShooting);
+                        timer.reset();
+                        state = 14;
+                    }
+                    break;
+                case 14:
+                    if (timer.milliseconds() >= 200) {
+                        robot.shooter.setTargetVelocity(velocityFar);
+                        robot.setAction(Robot.Actions.ShootFastNormal);
+                        timer.reset();
+                        state = 15;
+                    }
+                    break;
+                case 15:
+                    if (!robot.shootNormal || timer.milliseconds() >= 5000) {
+                        robot.shooter.setTargetVelocity(0);
+                        robot.drive.followPath(goForSpike3, true);
+                        state++;
+                    }
+                    break;
+                case 16:
+                    if (robot.isDone()) {
+                        robot.intake.setPower(IntakeMotor.States.Collect);
+                        robot.shooter.setTargetVelocity(velocityNeg);
+                        robot.drive.followPath(collectSpike3, true);
+                        state++;
+                    }
+                    break;
+                case 17:
+                    if (robot.isDone()) {
+                        robot.drive.followPath(goShootSpike3, true);
+                        state++;
+                    }
+                    break;
+                case 18:
+                    if (robot.drive.atParametricEnd()) {
                         robot.drive.turnTo(lastShootPose.getHeading());
                         state++;
                     }
                     break;
-                case 14:
-                    if(!robot.drive.isTurning())
-                        break;
+                case 19:
+                    if (robot.isDone()) {
+                        robot.setAction(Robot.Actions.PrepareForShooting);
+                        timer.reset();
+                        state = 20;
+                    }
+                    break;
+                case 20:
+                    if (timer.milliseconds() >= 200) {
+                        robot.shooter.setTargetVelocity(velocityLast);
+                        robot.setAction(Robot.Actions.ShootFastNormal);
+                        timer.reset();
+                        state++;
+                    }
+                    break;
             }
 
-            telemetry.addData("State: ", state);
-            telemetry.update();
             finalAutoPose = robot.drive.getPose();
             robot.update();
+            telemetry.addData("State: ", state);
+            telemetry.update();
         }
     }
 }

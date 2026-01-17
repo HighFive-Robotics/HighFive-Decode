@@ -5,7 +5,9 @@ import static org.firstinspires.ftc.teamcode.Constants.Color.Green;
 import static org.firstinspires.ftc.teamcode.Constants.Color.None;
 import static org.firstinspires.ftc.teamcode.Constants.Color.Purple;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.BlueGoal;
+import static org.firstinspires.ftc.teamcode.Constants.Globals.BlueGoalDistance;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.RedGoal;
+import static org.firstinspires.ftc.teamcode.Constants.Globals.RedGoalDistance;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.artifactNumber;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.greenArtifactNumber;
@@ -293,14 +295,6 @@ public class Robot extends HighModule {
             }
         }
 
-        telemetry.addData("startShootingSequenceQueue:", startShootingSequenceQueue);
-        telemetry.addData("shootingStateQueue:", shootingStateQueue);
-        telemetry.addData("Current color:", intake.currentColor);
-        telemetry.addData("artifactNumber:", artifactNumber);
-        telemetry.addData("purpleArtifactNumber:", purpleArtifactNumber);
-        telemetry.addData("greenArtifactNumber:", greenArtifactNumber);
-        telemetry.addData("queueCount:", queueCount);
-
         if(startShootingSequenceQueue){
             intake.setState(Intake.States.Wait);
             switch (shootingStateQueue){
@@ -357,14 +351,14 @@ public class Robot extends HighModule {
                         if (shooter.atTarget() && timerNormal.milliseconds() >= 210) {
                             intake.intakeMotor.setPower(0.66);
                             timerNormal.reset();
-                            shootingState = 1;
+                            stateNormal = 1;
                         }
                         break;
                     case 1:
                         if (timerNormal.milliseconds() > 800 || (shooter.getVelocityError() >= 0.7 && timerNormal.milliseconds() >= 150)) {
                             intake.setPower(IntakeMotor.States.Wait);
                             timerNormal.reset();
-                            shootingState = 0;
+                            stateNormal = 0;
                             cycles++;
                             if (cycles >= 3) {
                                 shootNormal = false;
@@ -373,6 +367,11 @@ public class Robot extends HighModule {
                         break;
             }
         }
+
+        telemetry.addData("time:", timerNormal.milliseconds());
+        telemetry.addData("state:", stateNormal);
+        telemetry.addData("should shoot:", shootNormal);
+        telemetry.addData("cycles:", cycles);
 
         if (intake.getState() == Intake.States.Collect) {
             switch (intake.getCollectType()) {
@@ -405,7 +404,7 @@ public class Robot extends HighModule {
         shooter.update();
         drive.update();
         led.update();
-        telemetry.addData("Timer", intakeHelper.milliseconds());
+
         for (LynxModule hub : allHubs) {
             hub.clearBulkCache();
         }
@@ -414,10 +413,10 @@ public class Robot extends HighModule {
     public double getDistance(){
         switch (allianceColor){
             case Blue:{
-                return 2.54 * Math.hypot(BlueGoal.getX() - drive.getPose().getX(),BlueGoal.getY() - drive.getPose().getY());
+                return 2.54 * Math.hypot(BlueGoalDistance.getX() - drive.getPose().getX(),BlueGoalDistance.getY() - drive.getPose().getY());
             }
             case Red:{
-                return 2.54 * Math.hypot(RedGoal.getX() - drive.getPose().getX(),RedGoal.getY() - drive.getPose().getY());
+                return 2.54 * Math.hypot(RedGoalDistance.getX() - drive.getPose().getX(),RedGoalDistance.getY() - drive.getPose().getY());
             }
         }
         return -1;
@@ -426,13 +425,9 @@ public class Robot extends HighModule {
     public boolean isAligned() {
         switch (allianceColor) {
             case Blue: {
-                double degOffset = Math.abs(Math.toDegrees(drive.getPose().rotate(Math.PI,true).getHeading()- Math.atan2(BlueGoal.getY() - drive.getPose().getY(), BlueGoal.getX() - drive.getPose().getX())));
-                double calculatedAngle = Math.atan2(BlueGoal.getY() - drive.getPose().getY(), BlueGoal.getX() - drive.getPose().getX());
                 return Math.abs(Math.toDegrees(drive.getPose().rotate(Math.PI,true).getHeading() - Math.atan2(BlueGoal.getY() - drive.getPose().getY(), BlueGoal.getX() - drive.getPose().getX()))) <= 3.5;
             }
             case Red: {
-                double degOffset = Math.abs(Math.toDegrees(drive.getPose().rotate(Math.PI,true).getHeading() - Math.atan2(RedGoal.getY() - drive.getPose().getY(), RedGoal.getX() - drive.getPose().getX()))) ;
-                double calculatedAngle = Math.atan2(RedGoal.getY() - drive.getPose().getY(), RedGoal.getX() - drive.getPose().getX());
                 return Math.abs(Math.toDegrees(drive.getPose().rotate(Math.PI,true).getHeading() - Math.atan2(RedGoal.getY() - drive.getPose().getY(), RedGoal.getX() - drive.getPose().getX()))) <= 3.5;
             }
         }
