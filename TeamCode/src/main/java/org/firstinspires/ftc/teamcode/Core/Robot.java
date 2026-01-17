@@ -368,11 +368,6 @@ public class Robot extends HighModule {
             }
         }
 
-        telemetry.addData("time:", timerNormal.milliseconds());
-        telemetry.addData("state:", stateNormal);
-        telemetry.addData("should shoot:", shootNormal);
-        telemetry.addData("cycles:", cycles);
-
         if (intake.getState() == Intake.States.Collect) {
             switch (intake.getCollectType()) {
                 case Sorted:

@@ -1,12 +1,13 @@
 package org.firstinspires.ftc.teamcode.OpModes.Autos;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.finalAutoPose;
 
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
-
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -18,35 +19,34 @@ import org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.BlockerOuttake;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
-@Autonomous(name = "🔵AutoClose🔵")
-public class AutoBlue extends LinearOpMode {
+@Autonomous(name = "🔴AutoClose🔴")
+public class AutoRed extends LinearOpMode {
 
     public Robot robot;
     public int state = 0;
     public double velocityLast = 3.3, velocityPreload = 3.6, velocityFar = 3.5, velocityNeg = - 1.5;
 
-    public Pose startPose = new Pose(15, 111, Math.toRadians(0));
-    public Pose shootPose = new Pose(55, 85, Math.toRadians(-42));
-    public Pose lastShootPose = new Pose(50, 112.5, Math.toRadians(-25));
-    public Pose preOpenGatePose = new Pose(20, 68, Math.toRadians(-90));
-    public Pose openGatePose = new Pose(13.5, 68, Math.toRadians(-90));
-    public Pose controlPoint1 = new Pose(60, 60);
-    public Pose controlPoint2 = new Pose(45, 65);
-    public Pose controlPoint3 = new Pose(60, 40);
-    public Pose preCollectSpikeMark2Pose = new Pose(42.5, 60, Math.toRadians(180));
-    public Pose collectSpikeMark2Pose = new Pose(17, 60, Math.toRadians(180));
-    public Pose preCollectSpikeMark1Pose = new Pose(42.5, 85, Math.toRadians(180));
-    public Pose collectSpikeMark1Pose = new Pose(20, 85, Math.toRadians(180));
-    public Pose preCollectSpikeMark3Pose = new Pose(42.5, 35, Math.toRadians(180));
-    public Pose collectSpikeMark3Pose = new Pose(20, 35, Math.toRadians(180));
-
+    public Pose startPose = new Pose(127, 113, Math.toRadians(180));//public Pose startPose = new Pose(15, 111, Math.toRadians(0));
+    public Pose shootPose = new Pose(87, 85, Math.toRadians(-138));
+    public Pose lastShootPose = new Pose(92, 114.5, Math.toRadians(-155));
+    public Pose preOpenGatePose = new Pose(123, 70, Math.toRadians(-90));
+    public Pose openGatePose = new Pose(128.5, 70, Math.toRadians(-90));
+    public Pose controlPoint1 = new Pose(84, 62);
+    public Pose controlPoint2 = new Pose(95, 67);
+    public Pose controlPoint3 = new Pose(60, 42);
+    public Pose preCollectSpikeMark2Pose = new Pose(99.5, 62,0);
+    public Pose collectSpikeMark2Pose = new Pose(125, 62, 0);
+    public Pose preCollectSpikeMark1Pose = new Pose(99.5, 87, 0);
+    public Pose collectSpikeMark1Pose = new Pose(122, 87, 0);
+    public Pose preCollectSpikeMark3Pose = new Pose(99.5, 37, 0);
+    public Pose collectSpikeMark3Pose = new Pose(122, 37, 0);
     private final ElapsedTime autoTimer = new ElapsedTime();
     private final ElapsedTime timer = new ElapsedTime();
 
     @Override
     public void runOpMode() throws InterruptedException {
-        robot = new Robot(hardwareMap, startPose, true, Constants.Color.Blue, telemetry, gamepad1);
-        autoColor = Constants.Color.Blue;
+        robot = new Robot(hardwareMap, startPose, true, Constants.Color.Red, telemetry, gamepad1);
+        autoColor = Constants.Color.Red;
         robot.drive.resetTeleOpHeading();
         robot.camera.startCapture();
         robot.drive.setConstants(Constants.FConstants);
