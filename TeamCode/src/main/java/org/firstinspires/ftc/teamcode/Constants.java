@@ -116,6 +116,7 @@ public class Constants {
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
 
     public static FollowerConstants FConstants = new FollowerConstants()
+            .holdPointHeadingScaling(1)
             .mass(15.5)
             .forwardZeroPowerAcceleration(-36.6917641)
             .lateralZeroPowerAcceleration(-62.2850712)

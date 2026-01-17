@@ -148,14 +148,15 @@ public class AutoRedCloseLm2 extends LinearOpMode {
                 opModeTimer.reset();
                 justStarted = false;
                 robot.shooter.blocker.setState(BlockerOuttake.States.Open);
+                robot.drive.turnTo(0);
             }
             switch (state) {
                 case DriveToPreload:
-                    robot.drive.setMaxPower(0.93);
+                    /*robot.drive.setMaxPower(0.93);
                     robot.drive.followPath(preloadPath, true);
                     robot.shooter.setTargetVelocity(velocity);
                     stateTimer.reset();
-                    state = AutoRedCloseLm2.States.ResetForShootPreload;
+                    state = AutoRedCloseLm2.States.ResetForShootPreload;*/
                     break;
                 case ResetForShootPreload:
                     if (robot.isDone() || stateTimer.milliseconds() > 5000) {

@@ -26,16 +26,16 @@ public class AutoBlue extends LinearOpMode {
 
     public Pose startPose = new Pose(15, 111, Math.toRadians(0));
     public Pose shootPose = new Pose(55, 75, Math.toRadians(-50));
-    public Pose lastShootPose = new Pose(60, 105, Math.toRadians(-37.5));
-    public Pose preOpenGatePose = new Pose(20, 72, Math.toRadians(-90));
-    public Pose openGatePose = new Pose(16, 72, Math.toRadians(-90));
+    public Pose lastShootPose = new Pose(50, 105, Math.toRadians(-37.5));
+    public Pose preOpenGatePose = new Pose(20, 68, Math.toRadians(-90));
+    public Pose openGatePose = new Pose(16, 68, Math.toRadians(-90));
     public Pose controlPoint1 = new Pose(60, 60);
-    public Pose controlPoint2 = new Pose(20, 30);
+    public Pose controlPoint2 = new Pose(60, 40);
     public Pose preCollectSpikeMark2Pose = new Pose(42.5, 60, Math.toRadians(180));
     public Pose collectSpikeMark2Pose = new Pose(20, 60, Math.toRadians(180));
     public Pose preCollectSpikeMark1Pose = new Pose(42.5, 85, Math.toRadians(180));
     public Pose collectSpikeMark1Pose = new Pose(20, 85, Math.toRadians(180));
-    public Pose preCollectSpikeMark3Pose = new Pose(37.5, 35, Math.toRadians(180));
+    public Pose preCollectSpikeMark3Pose = new Pose(42.5, 35, Math.toRadians(180));
     public Pose collectSpikeMark3Pose = new Pose(20, 35, Math.toRadians(180));
 
     private final ElapsedTime autoTimer = new ElapsedTime();
@@ -57,7 +57,7 @@ public class AutoBlue extends LinearOpMode {
                 .build();
 
         PathChain goForSpike2 = robot.drive.pathBuilder()
-                .addPath( new BezierCurve(
+                .addPath(new BezierCurve(
                         shootPose,
                         controlPoint1,
                         preCollectSpikeMark2Pose
@@ -101,13 +101,11 @@ public class AutoBlue extends LinearOpMode {
                 .build();
 
         PathChain goForSpike3 = robot.drive.pathBuilder()
-                .addPath( new BezierCurve(
+                .addPath(new BezierCurve(
                         shootPose,
                         controlPoint2,
                         preCollectSpikeMark3Pose
-                ))
-                .setReversed()
-                .setTangentHeadingInterpolation()
+                )).setTangentHeadingInterpolation()
                 .build();
 
         PathChain collectSpike3 = robot.drive.pathBuilder()
@@ -116,103 +114,104 @@ public class AutoBlue extends LinearOpMode {
                 .build();
 
         PathChain goShootSpike3 = robot.drive.pathBuilder()
-                .addPath( new BezierCurve(
+                .addPath(new BezierCurve(
                         collectSpikeMark3Pose,
-                        controlPoint2,
                         lastShootPose
-                ))
-                .setTangentHeadingInterpolation()
+                )).setTangentHeadingInterpolation()
+                .setReversed()
                 .build();
 
 
         telemetry.addLine("Ready for Action");
         telemetry.update();
         waitForStart();
-        while (opModeIsActive()){
-
-            switch (state){
+        while (opModeIsActive()) {
+            switch (state) {
                 case 0:
-                    robot.drive.followPath(preloadPath,true);
+                    robot.drive.followPath(preloadPath, true);
                     state++;
                     break;
                 case 1:
-                    if(robot.isDone()){
-                        robot.drive.followPath(goForSpike2,true);
+                    if (robot.isDone()) {
+                        robot.drive.followPath(goForSpike2, true);
                         state++;
                     }
                     break;
                 case 2:
-                    if(robot.drive.atParametricEnd()){
-                        robot.drive.followPath(collectSpike2,true);
+                    if (robot.drive.atParametricEnd()) {
+                        robot.drive.followPath(collectSpike2, true);
                         state++;
                     }
                     break;
                 case 3:
-                    if(robot.drive.atParametricEnd()){
-                        robot.drive.followPath(openGate,true);
+                    if (robot.drive.atParametricEnd()) {
+                        robot.drive.followPath(openGate, true);
                         state++;
                     }
                     break;
                 case 4:
-                    if(robot.isDone()){
-                        robot.drive.followPath(holdGate,true);
+                    if (robot.isDone()) {
+                        robot.drive.followPath(holdGate, true);
                         state++;
                     }
                     break;
                 case 5:
-                    if(robot.isDone()){
-                        robot.drive.followPath(goShoot2,true);
+                    if (robot.isDone()) {
+                        robot.drive.followPath(goShoot2, true);
                         state++;
                     }
                     break;
                 case 6:
-                    if(robot.isDone()){
-                        robot.drive.followPath(goForSpike1,true);
+                    if (robot.isDone()) {
+                        robot.drive.followPath(goForSpike1, true);
                         state++;
                     }
                     break;
                 case 7:
-                    if(robot.drive.atParametricEnd()){
-                        robot.drive.followPath(collectSpike1,true);
+                    if (robot.drive.atParametricEnd()) {
+                        robot.drive.followPath(collectSpike1, true);
                         state++;
                     }
                     break;
                 case 8:
-                    if(robot.isDone()){
-                        robot.drive.followPath(goForShoot1,true);
+                    if (robot.isDone()) {
+                        robot.drive.followPath(goForShoot1, true);
                         state++;
                     }
                     break;
                 case 9:
-                    if(robot.isDone()){
+                    if (robot.isDone()) {
                         robot.drive.turnTo(shootPose.getHeading());
                         state++;
                     }
                     break;
                 case 10:
-                    if(robot.drive.atParametricEnd()){
-                        robot.drive.followPath(goForSpike3,true);
+                    if (!robot.drive.isTurning()) {
+                        robot.drive.followPath(goForSpike3, true);
                         state++;
                     }
                     break;
                 case 11:
-                    if(robot.isDone()){
-                        robot.drive.followPath(collectSpike3,true);
+                    if (robot.isDone()) {
+                        robot.drive.followPath(collectSpike3, true);
                         state++;
                     }
                     break;
                 case 12:
-                    if(robot.isDone()){
-                        robot.drive.followPath(goShootSpike3,true);
+                    if (robot.isDone()) {
+                        robot.drive.followPath(goShootSpike3, true);
                         state++;
                     }
                     break;
                 case 13:
-                    if(robot.isDone()){
+                    if (robot.isDone()) {
                         robot.drive.turnTo(lastShootPose.getHeading());
                         state++;
                     }
                     break;
+                case 14:
+                    if(!robot.drive.isTurning())
+                        break;
             }
 
             telemetry.addData("State: ", state);

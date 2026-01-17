@@ -428,19 +428,11 @@ public class Robot extends HighModule {
             case Blue: {
                 double degOffset = Math.abs(Math.toDegrees(drive.getPose().rotate(Math.PI,true).getHeading()- Math.atan2(BlueGoal.getY() - drive.getPose().getY(), BlueGoal.getX() - drive.getPose().getX())));
                 double calculatedAngle = Math.atan2(BlueGoal.getY() - drive.getPose().getY(), BlueGoal.getX() - drive.getPose().getX());
-                telemetry.addData("Angle Offset", degOffset);
-                telemetry.addData("ATAN2 angle", Math.toDegrees(calculatedAngle));
-                telemetry.addData("Blue dist", 2.54 * Math.hypot(BlueGoal.getX() - drive.getPose().getX() - 8, BlueGoal.getY() - drive.getPose().getY() - 8));
-                telemetry.addData("Red dist", 2.54 * Math.hypot(RedGoal.getX() - drive.getPose().getX() - 8, RedGoal.getY() - drive.getPose().getY() - 8));
                 return Math.abs(Math.toDegrees(drive.getPose().rotate(Math.PI,true).getHeading() - Math.atan2(BlueGoal.getY() - drive.getPose().getY(), BlueGoal.getX() - drive.getPose().getX()))) <= 3.5;
             }
             case Red: {
                 double degOffset = Math.abs(Math.toDegrees(drive.getPose().rotate(Math.PI,true).getHeading() - Math.atan2(RedGoal.getY() - drive.getPose().getY(), RedGoal.getX() - drive.getPose().getX()))) ;
                 double calculatedAngle = Math.atan2(RedGoal.getY() - drive.getPose().getY(), RedGoal.getX() - drive.getPose().getX());
-                telemetry.addData("Angle Offset", degOffset);
-                telemetry.addData("ATAN2 angle", Math.toDegrees(calculatedAngle));
-                telemetry.addData("Blue dist", 2.54 * Math.hypot(BlueGoal.getX() - drive.getPose().getX() - 8, BlueGoal.getY() - drive.getPose().getY() - 8));
-                telemetry.addData("Red dist", 2.54 * Math.hypot(RedGoal.getX() - drive.getPose().getX() - 8, RedGoal.getY() - drive.getPose().getY() - 8));
                 return Math.abs(Math.toDegrees(drive.getPose().rotate(Math.PI,true).getHeading() - Math.atan2(RedGoal.getY() - drive.getPose().getY(), RedGoal.getX() - drive.getPose().getX()))) <= 3.5;
             }
         }
