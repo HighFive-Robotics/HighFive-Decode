@@ -59,12 +59,12 @@ public class Follower {
     public boolean useCentripetal = true;
     public boolean useHeading = true;
     public boolean useDrive = true;
-    public boolean isFieldCentric = false;
     private Timer zeroVelocityDetectedTimer = null;
-    public boolean fieldCentric = true;
-    private Gamepad gamepad;
     private Runnable resetFollowing = null;
-    private double teleOpHeadingOffset=0;
+
+    private Gamepad gamepad;
+    private double teleOpHeadingOffset = 0;
+    private boolean isFieldCentric = false;
 
     /**
      * This creates a new Follower given a HardwareMap.
@@ -102,10 +102,6 @@ public class Follower {
         this.automaticHoldEnd = constants.automaticHoldEnd;
     }
 
-    public void setGamepad(Gamepad gamepad) {
-        this.gamepad = gamepad;
-    }
-
     /**
      * This creates a new Follower given a HardwareMap.
      * @param constants FollowerConstants to use
@@ -114,6 +110,27 @@ public class Follower {
      */
     public Follower(FollowerConstants constants, Localizer localizer, Drivetrain drivetrain) {
         this(constants, localizer, drivetrain, PathConstraints.defaultConstraints);
+    }
+
+    public void setGamepad(Gamepad gamepad) {
+        this.gamepad = gamepad;
+    }
+
+    public void startFieldCentricDrive(Gamepad gamepad, boolean useBreakMode, double teleOpHeadingOffset){
+        breakFollowing();
+        manualDrive = true;
+        isFieldCentric = true;
+        this.teleOpHeadingOffset = teleOpHeadingOffset;
+        this.gamepad = gamepad;
+        drivetrain.startTeleopDrive(useBreakMode);
+    }
+
+    public void setTeleOpHeadingOffset(double teleOpHeadingOffset){
+        this.teleOpHeadingOffset = teleOpHeadingOffset;
+    }
+
+    public void resetTeleOpHeading() {
+        this.teleOpHeadingOffset = -poseTracker.getPose().getHeading();
     }
 
     public void setCentripetalScaling(double set) {
@@ -150,6 +167,30 @@ public class Follower {
      */
     public void setPose(Pose pose) {
         poseTracker.setPose(pose);
+    }
+
+    /**
+     * This sets the current x-position estimate of the localizer. Units are inferred from localizer constants where necessary.
+     * @param x the x-position estimate to set
+     */
+    public void setX(double x) {
+        poseTracker.getLocalizer().setX(x);
+    }
+
+    /**
+     * This sets the current y-position estimate of the localizer. Units are inferred from localizer constants where necessary.
+     * @param y the y-position estimate to set
+     */
+    public void setY(double y) {
+        poseTracker.getLocalizer().setY(y);
+    }
+
+    /**
+     * This sets the current heading estimate of the localizer, in radians.
+     * @param heading the heading estimate to set
+     */
+    public void setHeading(double heading) {
+        poseTracker.getLocalizer().setHeading(heading);
     }
 
     /**
@@ -198,6 +239,7 @@ public class Follower {
         closestPose = currentPath.updateClosestPose(poseTracker.getPose(), 1);
     }
 
+
     /**
      * This holds a Point.
      *
@@ -208,13 +250,17 @@ public class Follower {
         holdPoint(point, heading, true);
     }
 
+    public void holdPoint(Pose pose, boolean useHoldScaling) {
+        holdPoint(new BezierPoint(pose), pose.getHeading(), useHoldScaling);
+    }
+
     /**
      * This holds a Point.
      *
      * @param pose the Point (as a Pose) to stay at.
      */
     public void holdPoint(Pose pose) {
-        holdPoint(new BezierPoint(pose), pose.getHeading());
+        holdPoint(new BezierPoint(pose), pose.getHeading(), true);
     }
 
     /**
@@ -343,6 +389,7 @@ public class Follower {
     public void startTeleopDrive() {
         breakFollowing();
         manualDrive = true;
+        isFieldCentric = false;
         update();
         drivetrain.startTeleopDrive();
     }
@@ -353,16 +400,9 @@ public class Follower {
     public void startTeleopDrive(boolean useBrakeMode) {
         breakFollowing();
         manualDrive = true;
+        isFieldCentric = false;
         update();
         drivetrain.startTeleopDrive(useBrakeMode);
-    }
-    public void startFieldCentricDrive(Gamepad gamepad ,boolean useBreakMode,double teleOpHeadingOffset){
-        breakFollowing();
-        manualDrive = true;
-        isFieldCentric = true;
-        this.teleOpHeadingOffset = teleOpHeadingOffset;
-        this.gamepad = gamepad;
-        drivetrain.startTeleopDrive(useBreakMode);
     }
 
     public void startTeleOpDrive(boolean useBrakeMode) {
@@ -385,9 +425,7 @@ public class Follower {
     public void setTeleOpDrive(double forward, double strafe, double turn, boolean isRobotCentric, double offsetHeading) {
         vectorCalculator.setTeleOpMovementVectors(forward, strafe, turn, isRobotCentric, offsetHeading);
     }
-    public void setTeleOpHeadingOffset(double teleOpHeadingOffset){
-        this.teleOpHeadingOffset = teleOpHeadingOffset;
-    }
+
     /**
      * This sets the Teleop drive movement vectors
      *
@@ -447,11 +485,7 @@ public class Follower {
     }
 
     public void updateErrorAndVectors() {updateErrors(); updateVectors();}
-    public void resetTeleOpHeading() {
-        // Set the offset to the negative of the current heading,
-        // so that (currentHeading + offset) = 0.
-        this.teleOpHeadingOffset = -poseTracker.getPose().getHeading();
-    }
+
 
     /**
      * This calls an update to the PoseTracker, which updates the robot's current position estimate.
@@ -467,14 +501,14 @@ public class Follower {
         if (manualDrive) {
             if(isFieldCentric){
                 double robotHeading = getHeading() + teleOpHeadingOffset;
-                drivetrain.runFieldCentricDrive(gamepad,robotHeading);
-            }else {
+                drivetrain.runFieldCentricDrive(gamepad, robotHeading);
+            } else {
                 previousClosestPose = closestPose;
                 closestPose = new PathPoint();
                 updateErrorAndVectors();
                 drivetrain.runDrive(getCentripetalForceCorrection(), getTeleopHeadingVector(), getTeleopDriveVector(), poseTracker.getPose().getHeading());
-                return;
             }
+            return;
         }
 
         if (currentPath == null) {
@@ -488,7 +522,7 @@ public class Follower {
             updateErrorAndVectors();
             drivetrain.runDrive(useHoldScaling? getTranslationalCorrection().times(holdPointTranslationalScaling) : getTranslationalCorrection(), useHoldScaling? getHeadingVector().times(holdPointHeadingScaling) : getHeadingVector(), new Vector(), poseTracker.getPose().getHeading());
 
-            if(getHeadingError() < turnHeadingErrorThreshold && isTurning) {
+            if(Math.abs(getHeadingError()) < turnHeadingErrorThreshold && isTurning) {
                 isTurning = false;
                 isBusy = false;
             }
@@ -540,22 +574,22 @@ public class Follower {
 
         updateErrorAndVectors();
         if (!(
-            (
-                System.currentTimeMillis() - reachedParametricPathEndTime
-                > currentPath.getPathEndTimeoutConstraint()
-            )
-            || (
-                poseTracker.getVelocity().getMagnitude()
-                < currentPath.getPathEndVelocityConstraint()
-            )
-            && (
-                poseTracker.getPose().distanceFrom(closestPose.getPose())
-                < currentPath.getPathEndTranslationalConstraint()
-            )
-            && (
-                MathFunctions.getSmallestAngleDifference(poseTracker.getPose().getHeading(), getClosestPointHeadingGoal())
-                < currentPath.getPathEndHeadingConstraint()
-            )
+                (
+                        System.currentTimeMillis() - reachedParametricPathEndTime
+                                > currentPath.getPathEndTimeoutConstraint()
+                )
+                        || (
+                        poseTracker.getVelocity().getMagnitude()
+                                < currentPath.getPathEndVelocityConstraint()
+                )
+                        && (
+                        poseTracker.getPose().distanceFrom(closestPose.getPose())
+                                < currentPath.getPathEndTranslationalConstraint()
+                )
+                        && (
+                        MathFunctions.getSmallestAngleDifference(poseTracker.getPose().getHeading(), getClosestPointHeadingGoal())
+                                < currentPath.getPathEndHeadingConstraint()
+                )
         )) {
             return;
         }
@@ -692,7 +726,7 @@ public class Follower {
      */
     public void turn(double radians, boolean isLeft) {
         Pose temp = new Pose(getPose().getX(), getPose().getY(), getPose().getHeading() + (isLeft ? radians : -radians));
-        holdPoint(temp);
+        holdPoint(temp, false);
         isTurning = true;
         isBusy = true;
     }
@@ -701,7 +735,7 @@ public class Follower {
      * @param radians the heading in radians to turn to
      */
     public void turnTo(double radians) {
-        holdPoint(new Pose(getPose().getX(), getPose().getY(), radians));
+        holdPoint(new Pose(getPose().getX(), getPose().getY(), radians), false);
         isTurning = true;
         isBusy = true;
     }
@@ -709,6 +743,7 @@ public class Follower {
     /** Turns to a specific heading in degrees
      * @param degrees the heading in degrees to turn to
      */
+    @Deprecated
     public void turnToDegrees(double degrees) {
         turnTo(Math.toRadians(degrees));
     }
@@ -717,6 +752,7 @@ public class Follower {
      * @param degrees the amount of degrees to turn
      * @param isLeft true if turning left, false if turning right
      */
+    @Deprecated
     public void turnDegrees(double degrees, boolean isLeft) {
         turn(Math.toRadians(degrees), isLeft);
     }
@@ -814,14 +850,16 @@ public class Follower {
     public double getHeadingError() { return errorCalculator.getHeadingError(); }
 
     /**
-     * This returns the translational error, which is the difference between the robot's current position and the closest point's position.
+     * This returns the translational error, which is the distance between the robot's current position and the closest point's position.
      * @return returns the translational error as a Vector.
      */
     public Vector getTranslationalError() { return errorCalculator.getTranslationalError(); }
 
     /**
-     * This returns the drive error, which is the difference between the robot's current position and the closest point's position projected onto the tangent vector.
-     * @return returns the drive error as a double.
+     * This returns the drive error, which is computed by taking the distance to the goal. Using this distance,
+     * Pedro uses a predictive model to determine what the target velocity should be in order to reach the goal without overshooting.
+     * The drive error is taken to be a modified form of the difference between the target velocity and the current velocity, which is then infused with a Kalman Filter
+     * @return The drive error as a double.
      */
     public double getDriveError() { return errorCalculator.getDriveError(); }
 
@@ -993,7 +1031,8 @@ public class Follower {
      */
     public double getClosestPointHeadingGoal() {
         if (currentPath == null) return 0;
-        if (currentPathChain != null) return currentPathChain.getClosestPointHeadingGoal(new PathChain.PathT(chainIndex, closestPose.tValue));
+        if (followingPathChain && currentPathChain != null)
+            return currentPathChain.getClosestPointHeadingGoal(new PathChain.PathT(chainIndex, closestPose.tValue));
         return currentPath.getHeadingGoal(closestPose);
     }
 

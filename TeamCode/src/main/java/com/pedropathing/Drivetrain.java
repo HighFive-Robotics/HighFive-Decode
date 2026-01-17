@@ -47,8 +47,6 @@ public abstract class Drivetrain {
      */
     public abstract double[] calculateDrive(Vector correctivePower, Vector headingPower, Vector pathingPower, double robotHeading);
 
-
-    public abstract void runFieldCentricDrive(Gamepad gamepad, double robotHeading);
     /**
      * This sets the maximum power scaling for the drivetrain. This is used to limit the maximum
      * power that can be applied to the motors, which is useful for preventing damage to the
@@ -89,6 +87,7 @@ public abstract class Drivetrain {
      * @param drivePowers this is an Array of doubles with a length of 4, which contains the wheel powers.
      */
     public abstract void runDrive(double[] drivePowers);
+    public abstract void runFieldCentricDrive(Gamepad gamepad, double robotHeading);
 
     /**
      * This gets the drive powers and runs them immediately.

@@ -90,35 +90,24 @@ public class Mecanum extends Drivetrain {
         this.staticFrictionCoefficient = constants.staticFrictionCoefficient;
     }
 
-
-    public void runFieldCentricDrive(Gamepad gamepad, double robotHeading) {
-        double[] wheelPowers;
-        robotHeading = -robotHeading;
-        double forward = -gamepad.left_stick_y * driveMultiplier;
-        double strafe = gamepad.left_stick_x * driveMultiplier;
-        double turn = gamepad.right_stick_x * driveMultiplier;
-
-        double rotX = strafe * Math.cos(robotHeading) - forward * Math.sin(robotHeading);
-        double rotY = strafe * Math.sin(robotHeading) + forward * Math.cos(robotHeading);
-
-        double denominator = Math.max(Math.abs(forward) + Math.abs(strafe) + Math.abs(turn), 1);
-
-        wheelPowers = new double[4];
-        wheelPowers[0] = (rotY + rotX + turn) / denominator; // LFM
-        wheelPowers[1] = (rotY - rotX + turn) / denominator; // LBM
-        wheelPowers[2] = (rotY - rotX - turn) / denominator; // RFM
-        wheelPowers[3] = (rotY + rotX - turn) / denominator; // RBM
-
-        if (voltageCompensation) {
-            double voltageNormalized = getVoltageNormalized();
-            for (int i = 0; i < wheelPowers.length; i++) {
-                wheelPowers[i] *= voltageNormalized;
-            }
-        }
-
-        runDrive(wheelPowers);
-    }
-
+    /**
+     * This takes in vectors for corrective power, heading power, and pathing power and outputs
+     * an Array of four doubles, one for each wheel's motor power.
+     * <p>
+     * IMPORTANT NOTE: all vector inputs are clamped between 0 and 1 inclusive in magnitude.
+     *
+     * @param correctivePower this Vector includes the centrifugal force scaling Vector as well as a
+     *                        translational power Vector to correct onto the Bezier curve the Follower
+     *                        is following.
+     * @param headingPower    this Vector points in the direction of the robot's current heading, and
+     *                        the magnitude tells the robot how much it should turn and in which
+     *                        direction.
+     * @param pathingPower    this Vector points in the direction the robot needs to go to continue along
+     *                        the Path.
+     * @param robotHeading    this is the current heading of the robot, which is used to calculate how
+     *                        much power to allocate to each wheel.
+     * @return this returns an Array of doubles with a length of 4, which contains the wheel powers.
+     */
     public double[] calculateDrive(Vector correctivePower, Vector headingPower, Vector pathingPower, double robotHeading) {
         // clamps down the magnitudes of the input vectors
         if (correctivePower.getMagnitude() > maxPowerScaling)
@@ -173,7 +162,7 @@ public class Mecanum extends Drivetrain {
         truePathingVectors[1] = truePathingVectors[1].times(2.0);
 
         for (int i = 0; i < mecanumVectorsCopy.length; i++) {
-
+            // this copies the vectors from mecanumVectors but creates new references for them
             mecanumVectorsCopy[i] = vectors[i].copy();
 
             mecanumVectorsCopy[i].rotateVector(robotHeading);
@@ -236,7 +225,34 @@ public class Mecanum extends Drivetrain {
         }
     }
 
+    @Override
+    public void runFieldCentricDrive(Gamepad gamepad, double robotHeading) {
+        double[] wheelPowers;
+        robotHeading = -robotHeading;
+        double forward = -gamepad.left_stick_y * driveMultiplier;
+        double strafe = gamepad.left_stick_x * driveMultiplier;
+        double turn = gamepad.right_stick_x * driveMultiplier;
 
+        double rotX = strafe * Math.cos(robotHeading) - forward * Math.sin(robotHeading);
+        double rotY = strafe * Math.sin(robotHeading) + forward * Math.cos(robotHeading);
+
+        double denominator = Math.max(Math.abs(forward) + Math.abs(strafe) + Math.abs(turn), 1);
+
+        wheelPowers = new double[4];
+        wheelPowers[0] = (rotY + rotX + turn) / denominator; // LFM
+        wheelPowers[1] = (rotY - rotX + turn) / denominator; // LBM
+        wheelPowers[2] = (rotY - rotX - turn) / denominator; // RFM
+        wheelPowers[3] = (rotY + rotX - turn) / denominator; // RBM
+
+        if (voltageCompensation) {
+            double voltageNormalized = getVoltageNormalized();
+            for (int i = 0; i < wheelPowers.length; i++) {
+                wheelPowers[i] *= voltageNormalized;
+            }
+        }
+
+        runDrive(wheelPowers);
+    }
 
     @Override
     public void startTeleopDrive() {
