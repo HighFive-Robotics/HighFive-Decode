@@ -8,7 +8,6 @@ import static org.firstinspires.ftc.teamcode.Constants.Globals.BlueGoal;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.BlueGoalDistance;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.RedGoal;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.RedGoalDistance;
-import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.artifactNumber;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.greenArtifactNumber;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.purpleArtifactNumber;
@@ -31,7 +30,7 @@ import org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
 
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Sorter;
-import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Led;
+import org.firstinspires.ftc.teamcode.Core.Module.Others.Led;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Shooter;
 
 import java.util.Arrays;
@@ -395,6 +394,20 @@ public class Robot extends HighModule {
             }
         }
 
+        if(isAligned()){
+            if(shooter.atTarget()){
+                led.setColor(Constants.Color.Green);
+            } else {
+                led.setColor(Constants.Color.Yellow);
+            }
+        } else {
+            if(shooter.atTarget()){
+                led.setColor(Purple);
+            } else {
+                led.setColor(Constants.Color.Red);
+            }
+        }
+
         intake.update();
         shooter.update();
         drive.update();
@@ -420,15 +433,19 @@ public class Robot extends HighModule {
     public boolean isAligned() {
         switch (allianceColor) {
             case Blue: {
-                return Math.abs(Math.toDegrees(drive.getPose().rotate(Math.PI,true).getHeading() - Math.atan2(BlueGoal.getY() - drive.getPose().getY(), BlueGoal.getX() - drive.getPose().getX()))) <= 3.5;
+                return Math.abs(Math.toDegrees(drive.getPose().rotate(Math.PI,true).getHeading() - Math.atan2(BlueGoal.getY() - drive.getPose().getY(), BlueGoal.getX() - drive.getPose().getX()))) <= errorAngleFromDistance(getDistance());
             }
             case Red: {
-                return Math.abs(Math.toDegrees(drive.getPose().rotate(Math.PI,true).getHeading() - Math.atan2(RedGoal.getY() - drive.getPose().getY(), RedGoal.getX() - drive.getPose().getX()))) <= 3.5;
+                return Math.abs(Math.toDegrees(drive.getPose().rotate(Math.PI,true).getHeading() - Math.atan2(RedGoal.getY() - drive.getPose().getY(), RedGoal.getX() - drive.getPose().getX()))) <= errorAngleFromDistance(getDistance());
             }
         }
         return false;
     }
     public boolean isSorterEmpty(){
         return intake.sorter.isEmpty;
+    }
+
+    public double errorAngleFromDistance(double dist){
+        return 0.00000666667 * dist * dist - 0.0183333 * dist + 8.4;
     }
 }

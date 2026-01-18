@@ -25,19 +25,18 @@ public class AutoRed extends LinearOpMode {
     public Robot robot;
     public int state = 0;
     public double velocityLast = 3.3, velocityPreload = 3.6, velocityFar = 3.5, velocityNeg = - 1.5;
-
     public Pose startPose = new Pose(127, 113, Math.toRadians(180));//public Pose startPose = new Pose(15, 111, Math.toRadians(0));
-    public Pose shootPose = new Pose(87, 85, Math.toRadians(-138));
-    public Pose lastShootPose = new Pose(92, 114.5, Math.toRadians(-155));
-    public Pose preOpenGatePose = new Pose(123, 70, Math.toRadians(-90));
-    public Pose openGatePose = new Pose(128.5, 70, Math.toRadians(-90));
+    public Pose shootPose = new Pose(87, 85, Math.toRadians(-130));
+    public Pose lastShootPose = new Pose(92, 114.5, Math.toRadians(-150));
+    public Pose preOpenGatePose = new Pose(123, 68, Math.toRadians(-90));
+    public Pose openGatePose = new Pose(128.5, 68, Math.toRadians(-90));
     public Pose controlPoint1 = new Pose(84, 62);
     public Pose controlPoint2 = new Pose(95, 67);
     public Pose controlPoint3 = new Pose(60, 42);
-    public Pose preCollectSpikeMark2Pose = new Pose(99.5, 62,0);
-    public Pose collectSpikeMark2Pose = new Pose(125, 62, 0);
-    public Pose preCollectSpikeMark1Pose = new Pose(99.5, 87, 0);
-    public Pose collectSpikeMark1Pose = new Pose(122, 87, 0);
+    public Pose preCollectSpikeMark2Pose = new Pose(99.5, 58,0);
+    public Pose collectSpikeMark2Pose = new Pose(125, 58, 0);
+    public Pose preCollectSpikeMark1Pose = new Pose(99.5, 85, 0);
+    public Pose collectSpikeMark1Pose = new Pose(122, 85, 0);
     public Pose preCollectSpikeMark3Pose = new Pose(99.5, 37, 0);
     public Pose collectSpikeMark3Pose = new Pose(122, 37, 0);
     private final ElapsedTime autoTimer = new ElapsedTime();

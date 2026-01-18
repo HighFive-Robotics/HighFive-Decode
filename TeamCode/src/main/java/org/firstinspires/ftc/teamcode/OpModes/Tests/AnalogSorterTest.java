@@ -1,13 +1,10 @@
 package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
-import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.sorterAnalogInputName;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.AnalogInput;
 
 import org.firstinspires.ftc.teamcode.Constants;
-import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Led;
+import org.firstinspires.ftc.teamcode.Core.Module.Others.Led;
 
 @TeleOp
 public class AnalogSorterTest extends LinearOpMode {

@@ -1,6 +1,5 @@
-package org.firstinspires.ftc.teamcode.Core.Module.Outtake;
+package org.firstinspires.ftc.teamcode.Core.Module.Others;
 
-import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.blockerServoName;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.ledName;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -33,6 +32,9 @@ public class Led extends HighModule {
                 break;
             case Purple:
                 setTarget(0.722);
+                break;
+            case Yellow:
+                setTarget(0.345);
                 break;
             case None:
                 setTarget(0);
