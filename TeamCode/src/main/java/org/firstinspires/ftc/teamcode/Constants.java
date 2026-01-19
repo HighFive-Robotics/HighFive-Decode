@@ -38,7 +38,7 @@ public class Constants {
 
     public enum Color {
         Blue,
-        //Yellow, gg bye bye Itd
+        Yellow,
         Red,
         Green,
         Purple,

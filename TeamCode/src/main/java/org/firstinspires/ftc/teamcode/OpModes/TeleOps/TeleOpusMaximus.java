@@ -240,13 +240,6 @@ public class TeleOpusMaximus extends LinearOpMode {
                 rumbled = false;
             }
 
-            if(robot.shooter.atTarget() && robot.isAligned()){
-                robot.led.setColor(Constants.Color.Green);
-            } else if(robot.shooter.atTarget()){
-                robot.led.setColor(Constants.Color.Purple);
-            } else {
-                robot.led.setColor(Constants.Color.Red);
-            }
             telemetry.addData("Final Auto Pose Heading" , finalAutoPose.getHeading());
             telemetry.addData("Color 1:", sorterColors[0]);
             telemetry.addData("Color 2:", sorterColors[1]);
