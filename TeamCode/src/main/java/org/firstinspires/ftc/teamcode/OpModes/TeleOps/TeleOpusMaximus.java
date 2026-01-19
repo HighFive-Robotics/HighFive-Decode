@@ -56,8 +56,8 @@ public class TeleOpusMaximus extends LinearOpMode {
 
         robot.camera.startCapture();
         waitForStart();
-        gamepad1.setLedColor(49 / 255.0, 155 / 255.0, 164 / 255.0 , 2147483647);
-        gamepad2.setLedColor(49 / 255.0, 155 / 255.0, 164 / 255.0 , 2147483647);
+        gamepad1.setLedColor(132 / 255.0, 88 / 255.0, 164 / 255.0, 2147483647);
+        gamepad2.setLedColor(132 / 255.0, 88 / 255.0, 164 / 255.0, 2147483647);
         while (opModeIsActive()) {
 
             switch(robot.intake.getCollectType()){
@@ -100,7 +100,7 @@ public class TeleOpusMaximus extends LinearOpMode {
                     }
                     if(gamepad2.right_bumper && timers.get("rightBumper2").milliseconds() >= 250){
                         intakeDriver2 = true;
-                        robot.setAction(Robot.Actions.Shoot);
+                        robot.setAction(Robot.Actions.ShootFastNormal);
                         timers.get("rightBumper2").reset();
                         timers.get("rumble").reset();
                         rumbled = true;
