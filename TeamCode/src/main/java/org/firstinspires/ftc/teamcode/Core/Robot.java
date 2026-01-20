@@ -241,7 +241,10 @@ public class Robot extends HighModule {
         if (stopShoot && (timerShoot.milliseconds() > 425 || (timerShoot.milliseconds() > 50 && shooter.getVelocityError() >= 0.6))) {
             intake.sorter.setColor(None, intake.currentSlot);
             stopShoot = false;
+            if(intake.helpingSorter){
+            //poate trb !
             intake.setPower(IntakeMotor.States.Wait);
+            }
             intake.canStop = true;
             intake.setState(Intake.States.Wait);
         }
