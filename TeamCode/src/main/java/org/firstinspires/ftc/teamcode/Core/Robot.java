@@ -238,12 +238,10 @@ public class Robot extends HighModule {
             Constants.Globals.voltage = hardwareMap.voltageSensor.iterator().next().getVoltage();
             voltageTimer.reset();
         }
-        if (stopShoot && (timerShoot.milliseconds() > 900 || (timerShoot.milliseconds() > 125 && shooter.getVelocityError() >= 0.7))) {
+        if (stopShoot && (timerShoot.milliseconds() > 425 || (timerShoot.milliseconds() > 50 && shooter.getVelocityError() >= 0.6))) {
             intake.sorter.setColor(None, intake.currentSlot);
             stopShoot = false;
-            if(!intake.helpingSorter){
-                intake.setPower(IntakeMotor.States.Wait);
-            }
+            intake.setPower(IntakeMotor.States.Wait);
             intake.canStop = true;
             intake.setState(Intake.States.Wait);
         }
@@ -275,8 +273,8 @@ public class Robot extends HighModule {
                     }
                     break;
                 case 2:
-                    if(intake.currentColor == None){
-                        shooter.blocker.setState(Close, 50);
+                    if(!stopShoot){
+                        shooter.blocker.setState(Close, 25);
                         shootingState = 3;
                     }
                     break;

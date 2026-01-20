@@ -206,6 +206,7 @@ public class HighServo {
                 break;
             case Standard:
                 targetPosition = Range.clip(position, 0, 1);
+                setInitialPosition(targetPosition,true);
                 break;
         }
         atTarget = false;
