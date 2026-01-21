@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.OpModes.TeleOps;
 
+import static org.firstinspires.ftc.teamcode.Constants.Globals.afterAuto;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.finalAutoPose;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.sorterColors;
@@ -33,6 +34,7 @@ public class TeleOpusMaximus extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         robot = new Robot(hardwareMap ,finalAutoPose, false , autoColor , telemetry,gamepad1);
+
         finalAutoPose = new Pose();
         timers.put("rightBumper1" , new ElapsedTime());
         timers.put("leftBumper1" , new ElapsedTime());
@@ -54,7 +56,8 @@ public class TeleOpusMaximus extends LinearOpMode {
         timers.get("triangle2").reset();
         timers.get("rumble").reset();
 
-        robot.camera.startCapture();
+        robot.camera.stopCapture();
+        Constants.Globals.afterAuto = false;
         waitForStart();
         gamepad1.setLedColor(132 / 255.0, 88 / 255.0, 164 / 255.0, 2147483647);
         gamepad2.setLedColor(132 / 255.0, 88 / 255.0, 164 / 255.0, 2147483647);
@@ -94,11 +97,11 @@ public class TeleOpusMaximus extends LinearOpMode {
                     }
                     break;
                 case Normal:
-                    if(gamepad1.left_bumper && timers.get("leftBumper1").milliseconds() >= 250){
+                    if(gamepad1.leftBumperWasPressed()){
                         robot.setAction(Robot.Actions.PrepareForShooting);
                         timers.get("leftBumper1").reset();
                     }
-                    if(gamepad2.right_bumper && timers.get("rightBumper2").milliseconds() >= 250){
+                    if(gamepad2.rightBumperWasPressed()){
                         intakeDriver2 = true;
                         robot.setAction(Robot.Actions.ShootFastNormal);
                         timers.get("rightBumper2").reset();
@@ -228,8 +231,12 @@ public class TeleOpusMaximus extends LinearOpMode {
             }
 
             if(gamepad1.psWasPressed()){
-                if(gamepad1.dpad_up){
-                    robot.drive.setPose(new Pose(8,8,robot.drive.getHeading()));
+                if(gamepad1.dpad_up) {
+                    if (robot.allianceColor == Constants.Color.Blue) {
+                        robot.drive.startFieldCentricDrive(gamepad1, true, 0);
+                    }
+                    robot.drive.setStartingPose(new Pose(8, 8, 0));
+                    robot.drive.setPose(new Pose(8, 8, 0));
                     robot.allianceColor = Constants.Color.Red;
                 }
                 robot.drive.resetTeleOpHeading();

@@ -128,6 +128,7 @@ public class AutoBlue extends LinearOpMode {
         robot.intake.sorter.setColor(Constants.Color.Purple,1);
         robot.intake.sorter.setColor(Constants.Color.Purple,2);
         robot.intake.sorter.setColor(Constants.Color.Purple,3);
+        Constants.Globals.afterAuto = true;
         telemetry.addLine("Ready for Action");
         telemetry.update();
         waitForStart();
@@ -137,17 +138,18 @@ public class AutoBlue extends LinearOpMode {
                 case 0:
                     robot.drive.followPath(preloadPath, true);
                     robot.shooter.setTargetVelocity(velocityPreload);
+                    robot.shooter.blocker.setState(BlockerOuttake.States.Open);
                     state++;
                     break;
                 case 1:
                     if((robot.isDone() && robot.shooter.atTarget()) || autoTimer.milliseconds() > 5000) {
-                        robot.setAction(Robot.Actions.ShootFast);
+                        robot.setAction(Robot.Actions.ShootFastNormal);
                         timer.reset();
                         state++;
                     }
                     break;
                 case 2:
-                    if(robot.isSorterEmpty() || timer.milliseconds() >= 3000){
+                    if(!robot.shootNormal || timer.milliseconds() >= 3000){
                         robot.drive.followPath(goForSpike2, true);
                         state++;
                     }

@@ -8,6 +8,7 @@ import static org.firstinspires.ftc.teamcode.Constants.Globals.BlueGoal;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.BlueGoalDistance;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.RedGoal;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.RedGoalDistance;
+import static org.firstinspires.ftc.teamcode.Constants.Globals.afterAuto;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.artifactNumber;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.greenArtifactNumber;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.purpleArtifactNumber;
@@ -38,7 +39,7 @@ import java.util.List;
 
 public class Robot extends HighModule {
 
-    ElapsedTime timerShoot = new ElapsedTime(), timerIntake = new ElapsedTime(), voltageTimer = new ElapsedTime(), intakeHelper = new ElapsedTime(), sorterTimer = new ElapsedTime(), timerNormal = new ElapsedTime();
+    ElapsedTime timerShoot = new ElapsedTime(), timerIntake = new ElapsedTime(), voltageTimer = new ElapsedTime(), sorterTimer = new ElapsedTime(), timerNormal = new ElapsedTime(), sorterTimerAuto = new ElapsedTime();
     Telemetry telemetry;
     public Actions lastAction = Actions.None;
     public Follower drive;
@@ -50,8 +51,8 @@ public class Robot extends HighModule {
     public Led led;
     boolean isAuto;
     boolean stopShoot = false, stopIntake = false;
-    public boolean startShootingSequence = false, startShootingSequenceQueue = false, shootNormal = false;
-    int shootingState = 0, shootingStateQueue = 0, stateNormal = 0, cycles = 0;
+    public boolean startShootingSequence = false, startShootingSequenceQueue = false, shootNormal = false, startShootingSequenceAuto = false;
+    int shootingState = 0, shootingStateQueue = 0, stateNormal = 0, cycles = 0, shootingStateAuto = 0;
     public Constants.Color allianceColor;
 
     public Constants.Color[] colorsQueue = {None, None, None};
@@ -61,6 +62,7 @@ public class Robot extends HighModule {
         Shoot,
         PrepareForShooting,
         ShootFast,
+        ShootFastAuto,
         ShootFastNormal,
         EmptySorter,
         StopShooting,
@@ -156,8 +158,15 @@ public class Robot extends HighModule {
                 shootingState = 0;
                 sorterTimer.reset();
                 break;
+            case ShootFastAuto:
+                startShootingSequenceAuto = true;
+                startShootingSequenceQueue = false;
+                shootingStateAuto = 0;
+                sorterTimerAuto.reset();
+                break;
             case ShootFastNormal:
                 shootNormal = true;
+                intake.canStop = false;
                 intake.setPower(IntakeMotor.States.Wait);
                 stateNormal = 0;
                 cycles = 0;
@@ -242,7 +251,6 @@ public class Robot extends HighModule {
             intake.sorter.setColor(None, intake.currentSlot);
             stopShoot = false;
             if(intake.helpingSorter){
-            //poate trb !
             intake.setPower(IntakeMotor.States.Wait);
             }
             intake.canStop = true;
@@ -256,6 +264,47 @@ public class Robot extends HighModule {
             intake.canStop = true;
             intake.setState(Intake.States.Wait);
         }
+
+        if(startShootingSequenceAuto){
+            intake.setState(Intake.States.Wait);
+            switch (shootingStateAuto){
+                case 0:
+                    if(intake.currentColor != None){
+                        if(intake.atTarget() || sorterTimerAuto.milliseconds() >= 30){
+                            shooter.blocker.setState(Open,50);
+                            shootingStateAuto = 1;
+                        }
+                    } else {
+                        shootingStateAuto = 2;
+                    }
+                    break;
+                case 1:
+                    if(shooter.blocker.atTarget() && shooter.atTarget()){
+                        setAction(Actions.Shoot);
+                        shootingStateAuto = 2;
+                    }
+                    break;
+                case 2:
+                    if(intake.currentColor == None){
+                        shooter.blocker.setState(Close, 50);
+                        shootingStateAuto = 3;
+                    }
+                    break;
+                case 3:
+                    if(shooter.blocker.atTarget()){
+                        intake.setAction(NextSlot);
+                        shootingStateAuto = 0;
+                        sorterTimerAuto.reset();
+                    }
+                    break;
+            }
+            if(artifactNumber == 0){
+                startShootingSequenceAuto = false;
+                intake.setState(Intake.States.Collect);
+            }
+        }
+
+
         if(startShootingSequence){
             intake.setState(Intake.States.Wait);
             switch (shootingState){
@@ -362,6 +411,7 @@ public class Robot extends HighModule {
                             cycles++;
                             if (cycles >= 3) {
                                 shootNormal = false;
+                                intake.canStop = true;
                             }
                         }
                         break;

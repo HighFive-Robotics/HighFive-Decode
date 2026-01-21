@@ -23,6 +23,7 @@ public class Constants {
     @Config
     public static class Globals{
         public static double voltage = 12.0;
+        public static boolean afterAuto = false;
         public static Pose finalAutoPose = new Pose(0,0,0);
         public static Color autoColor = Color.Red;
         public static Case randomizedCase = Case.None;
