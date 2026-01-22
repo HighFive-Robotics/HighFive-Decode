@@ -47,7 +47,7 @@ public class Shooter extends HighModule {
                 .setReverseMotor(true)
                 .setUseZeroPowerBehaviour(false)
                 .build();
-        blocker = new BlockerOuttake(hwMap, BlockerOuttake.ClosedPosition,true);
+        blocker = new BlockerOuttake(hwMap, BlockerOuttake.OpenPosition,true);
         tolerance = motorUp.getTolerance();
     }
 

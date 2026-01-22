@@ -38,7 +38,7 @@ public class AutoBlue extends LinearOpMode {
     public Pose preCollectSpikeMark1Pose = new Pose(42.5, 85, Math.toRadians(180));
     public Pose collectSpikeMark1Pose = new Pose(20, 85, Math.toRadians(180));
     public Pose preCollectSpikeMark3Pose = new Pose(42.5, 35, Math.toRadians(180));
-    public Pose collectSpikeMark3Pose = new Pose(20, 35, Math.toRadians(180));
+    public Pose collectSpikeMark3Pose = new Pose(16, 35, Math.toRadians(180));
 
     private final ElapsedTime autoTimer = new ElapsedTime();
     private final ElapsedTime timer = new ElapsedTime();

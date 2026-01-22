@@ -58,9 +58,11 @@ public class TeleOpusMaximus extends LinearOpMode {
 
         robot.camera.stopCapture();
         Constants.Globals.afterAuto = false;
+        robot.intake.setCollectType(Intake.CollectTypes.Normal);
+        robot.intake.setState(Intake.States.Wait);
+        gamepad1.setLedColor(49 / 255.0, 155 / 255.0, 164 / 255.0 , 2147483647);
+        gamepad2.setLedColor(49 / 255.0, 155 / 255.0, 164 / 255.0 , 2147483647);
         waitForStart();
-        gamepad1.setLedColor(132 / 255.0, 88 / 255.0, 164 / 255.0, 2147483647);
-        gamepad2.setLedColor(132 / 255.0, 88 / 255.0, 164 / 255.0, 2147483647);
         while (opModeIsActive()) {
 
             switch(robot.intake.getCollectType()){

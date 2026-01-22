@@ -38,7 +38,7 @@ public class AutoRed extends LinearOpMode {
     public Pose preCollectSpikeMark1Pose = new Pose(99.5, 85, 0);
     public Pose collectSpikeMark1Pose = new Pose(122, 85, 0);
     public Pose preCollectSpikeMark3Pose = new Pose(99.5, 37, 0);
-    public Pose collectSpikeMark3Pose = new Pose(122, 37, 0);
+    public Pose collectSpikeMark3Pose = new Pose(126, 37, 0);
     private final ElapsedTime autoTimer = new ElapsedTime();
     private final ElapsedTime timer = new ElapsedTime();
 
