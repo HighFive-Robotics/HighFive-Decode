@@ -19,8 +19,6 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighModule;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighMotor;
 
-import java.awt.font.NumericShaper;
-
 @Config
 public class Shooter extends HighModule {
     public HighMotor motorUp , motorDown;

@@ -123,10 +123,6 @@ public class AutoRed extends LinearOpMode {
                 .setReversed()
                 .build();
 
-
-        robot.intake.sorter.setColor(Constants.Color.Purple,1);
-        robot.intake.sorter.setColor(Constants.Color.Purple,2);
-        robot.intake.sorter.setColor(Constants.Color.Purple,3);
         Constants.Globals.afterAuto = true;
         telemetry.addLine("Ready for Action");
         telemetry.update();
