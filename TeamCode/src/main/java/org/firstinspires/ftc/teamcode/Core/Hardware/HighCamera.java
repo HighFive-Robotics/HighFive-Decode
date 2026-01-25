@@ -4,6 +4,8 @@ import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.cameraName;
 
 import androidx.annotation.NonNull;
 
+import com.pedropathing.ftc.PoseConverter;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -25,10 +27,11 @@ public class HighCamera{
         int getPipelineNumber(){return pipelineNumber;}
     };
     Limelight3A ll;
+    Pipelines pipeline;
     public HighCamera(@NonNull HardwareMap hardwareMap , @NonNull Pipelines pipeline){
         ll = hardwareMap.get(Limelight3A.class , cameraName);
         ll.setPollRateHz(100);
-        ll.pipelineSwitch(pipeline.getPipelineNumber());
+        setPipeline(pipeline);
     }
     public void startCapture(){
         ll.start();
@@ -38,6 +41,7 @@ public class HighCamera{
     }
     public void setPipeline(@NonNull Pipelines pipeline){
         ll.pipelineSwitch(pipeline.getPipelineNumber());
+        this.pipeline = pipeline;
     }
     public LLResult getResult(){
         LLResult result = ll.getLatestResult();
@@ -46,6 +50,7 @@ public class HighCamera{
         }else return null;
     }
     public int getAprilTagId(){
+        if(pipeline != Pipelines.AprilTagId) setPipeline(Pipelines.AprilTagId);
         LLResult result = getResult();
         if(resultIsValid(result)){
             List<LLResultTypes.FiducialResult> aprilTags = result.getFiducialResults();
@@ -64,6 +69,33 @@ public class HighCamera{
             default:
                 return Constants.Case.None;
         }
+    }
+    public Pose getAprilTagPose(){
+        if (pipeline != Pipelines.AprilTagLocation) setPipeline(Pipelines.AprilTagLocation);
+        LLResult result = getResult();
+        if(resultIsValid(result)){
+            LLResultTypes.FiducialResult fr = result.getFiducialResults().get(0);
+            double poseX = fr.getRobotPoseTargetSpace().getPosition().z * 39.37;
+            double poseY = -fr.getRobotPoseTargetSpace().getPosition().x * 39.37;
+            double poseHeading = Math.toRadians(-fr.getRobotPoseTargetSpace().getOrientation().getYaw());
+            return new Pose(poseX,poseY,poseHeading);
+        }
+        return null;
+    }
+    public Pose getBallPose() {
+        if (pipeline != Pipelines.BallDetection) setPipeline(Pipelines.BallDetection);
+        LLResult result = getResult();
+        if (resultIsValid(result)) {
+            double[] py = result.getPythonOutput();
+
+            if (py[0] == 1.0) {
+                double forwardInch = py[1];
+                double strafeInch = py[2];
+                double headingDeg = py[3];
+                return new Pose(forwardInch, strafeInch, Math.toRadians(headingDeg));
+            } 
+        }
+        return null;
     }
     public boolean motifIsValid(Constants.Case motif){
         return motif != Constants.Case.None;
