@@ -34,6 +34,7 @@ public class ShooterCalibration extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         shooter.motorUp.setTolerance(0.15);
+        shooter.setPIDCoefUp(0,0,0,0);
         waitForStart();
         while (opModeIsActive()) {
             p = Constants.ShooterConstants.kp;
@@ -43,7 +44,10 @@ public class ShooterCalibration extends LinearOpMode {
             s = Constants.ShooterConstants.ks;
             a = Constants.ShooterConstants.ka;
             shooter.setFullTargetVelocity(targetVelocity);
+            shooter.setPIDCoefDown(p,i,d,f);
+
             shooter.update();
+
             double currentVelo = shooter.motorUp.getCurrentVelocity();
             double currentPower = shooter.motorUp.getPower();
             double error = targetVelocity - currentVelo;

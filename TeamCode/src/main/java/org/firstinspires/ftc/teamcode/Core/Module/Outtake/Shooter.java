@@ -28,8 +28,8 @@ public class Shooter extends HighModule {
     public Blocker blocker;
     public double velocity, tolerance;
     public Shooter(HardwareMap hwMap){
-        motorUp = HighMotor.Builder.startBuilding()
-                .setMotor(hwMap.get(DcMotorEx.class, shooterMotorUpName))
+        motorDown = HighMotor.Builder.startBuilding()
+                .setMotor(hwMap.get(DcMotorEx.class, shooterMotorDownName))
                 .setRunMode(HighMotor.RunMode.Velocity)
                 .setReverseMotor(true)
                 .setEncoder(true , true)
@@ -40,8 +40,8 @@ public class Shooter extends HighModule {
                 .setVelocityPIDCoefficients(kp,ki,kd,kf,ks,ka,1)
                 .setUseZeroPowerBehaviour(false)
                 .build();
-        motorUp.setTolerance(0.075);
-        motorDown = HighMotor.Builder.startBuilding()
+        motorDown.setTolerance(0.075);
+        motorUp = HighMotor.Builder.startBuilding()
                 .setMotor(hwMap.get(DcMotorEx.class, shooterMotorDownName))
                 .setRunMode(HighMotor.RunMode.Velocity)
                 .setReverseMotor(true)
@@ -53,8 +53,15 @@ public class Shooter extends HighModule {
                 .setVelocityPIDCoefficients(kp,ki,kd,kf,ks,ka,1)
                 .setUseZeroPowerBehaviour(false)
                 .build();
+        motorUp.setTolerance(0.075);
         blocker = new Blocker(hwMap, Blocker.OpenPosition,true);
         tolerance = motorUp.getTolerance();
+    }
+    public void setPIDCoefDown(double kp , double kd , double ki , double kf){
+        motorDown.setVelocityPIDCoefficients(kp,ki,kd,kf);
+    }
+    public void setPIDCoefUp(double kp , double kd , double ki , double kf){
+        motorUp.setVelocityPIDCoefficients(kp,ki,kd,kf);
     }
 
     public void setFullTargetVelocity(double velocity){
