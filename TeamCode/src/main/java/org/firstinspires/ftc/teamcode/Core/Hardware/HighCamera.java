@@ -93,7 +93,7 @@ public class HighCamera{
                 double strafeInch = py[2];
                 double headingDeg = py[3];
                 return new Pose(forwardInch, strafeInch, Math.toRadians(headingDeg));
-            } 
+            }
         }
         return null;
     }
