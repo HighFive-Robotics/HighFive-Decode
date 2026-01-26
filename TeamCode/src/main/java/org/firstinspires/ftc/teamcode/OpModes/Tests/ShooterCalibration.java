@@ -42,7 +42,7 @@ public class ShooterCalibration extends LinearOpMode {
             f = Constants.ShooterConstants.kf;
             s = Constants.ShooterConstants.ks;
             a = Constants.ShooterConstants.ka;
-            shooter.setTargetVelocity(targetVelocity);
+            shooter.setFullTargetVelocity(targetVelocity);
             shooter.update();
             double currentVelo = shooter.motorUp.getCurrentVelocity();
             double currentPower = shooter.motorUp.getPower();
