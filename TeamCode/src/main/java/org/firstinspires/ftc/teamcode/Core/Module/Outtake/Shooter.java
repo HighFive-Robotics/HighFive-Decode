@@ -96,6 +96,13 @@ public class Shooter extends HighModule {
         motorUp.setTarget(veloUp);
         motorDown.setTarget(velocity);
     }
+    public void setAntiBackSpinVelocity(double velocity){
+        double veloUp = scaleWithDecay(velocity);
+        this.targetDown = velocity;
+        this.targetUp = veloUp;
+        motorUp.setTarget(veloUp);
+        motorDown.setTarget(velocity);
+    }
     public void setUpTargetVelocity(double velocity){
         this.targetUp = velocity;
         motorUp.setTarget(velocity);
@@ -114,6 +121,12 @@ public class Shooter extends HighModule {
     public boolean downAtTarget(){
         return Math.abs(targetDown-velocityDown) <= tolerance;
     }
+    public void closeBlocker(){
+        blocker.setState(Blocker.States.Close,50);
+    }
+    public void openBlocker(){
+        blocker.setState(Blocker.States.Open , 50);
+    }
     @Override
     public boolean atTarget(){
         return upAtTarget() && downAtTarget();
@@ -123,6 +136,20 @@ public class Shooter extends HighModule {
     }
     public double getVelocityErrorDown(){
         return Math.abs(targetUp - velocityDown);
+    }
+    public static double scaleWithDecay(double x) {
+        double slope = 0.20 / 1.23;
+        double hingeValue = 2.0 * slope;
+        double target = -0.1;
+        double exponent = 4 + x;
+
+        if (x <= 2.0) {
+            return x * slope;
+        }else if (x>= 4){
+            return -0.07;
+        }
+        double progress = (x - 2.0) / (7.2 - 2.0);
+        return hingeValue + (target - hingeValue) * Math.pow(progress, exponent);
     }
 //    public double getVelociyFromDistance(double distance){
 //        return Range.clip( 8.9416e-10 * distance* distance* distance* distance -7.58832e-7 * distance* distance* distance + 0.000234922 * distance * distance -0.0238624 * distance + 4.0805,3,5.35);
