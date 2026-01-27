@@ -54,17 +54,13 @@ public class Constants {
         public static String pinPointName = "odo";
         public static String webcamName = "Webcam 1";
         public static String intakeMotorName = "IM";
-        public static String intakeSensorName = "IS";
-        public static String breakBeamIntakeName = "IB";
+        public static String breakBeamIntakeNameUp = "IB";
+        public static String breakBeamIntakeNameDown = "IB";
         public static String shooterMotorUpName = "OMT";
         public static String shooterMotorDownName = "OMB";
         public static String blockerServoName = "BO";
-        public static String sorterServoName = "S";
-        public static String sorterAnalogInputName = "SAI";
-        public static String liftServoLB = "SLB";
-        public static String liftServoRB = "SRB";
-        public static String liftServoRF = "SRF";
-        public static String ledName = "L";
+        public static String ledName1 = "L1";
+        public static String ledName2 = "L2";
         public static String cameraName = "limelight";
     }
 

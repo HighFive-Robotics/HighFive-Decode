@@ -13,8 +13,6 @@ import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.ar
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.greenArtifactNumber;
 import static org.firstinspires.ftc.teamcode.Constants.Intake.SorterConstants.purpleArtifactNumber;
 import static org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake.Actions.NextSlot;
-import static org.firstinspires.ftc.teamcode.Core.Module.Outtake.BlockerOuttake.States.Close;
-import static org.firstinspires.ftc.teamcode.Core.Module.Outtake.BlockerOuttake.States.Open;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
@@ -30,9 +28,7 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighModule;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
 
-import org.firstinspires.ftc.teamcode.Core.Module.Intake.Sorter;
 import org.firstinspires.ftc.teamcode.Core.Module.Others.Led;
-import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Shooter;
 
 import java.util.Arrays;
 import java.util.List;
@@ -491,9 +487,6 @@ public class Robot extends HighModule {
             }
         }
         return false;
-    }
-    public boolean isSorterEmpty(){
-        return intake.sorter.isEmpty;
     }
 
     public double errorAngleFromDistance(double dist){

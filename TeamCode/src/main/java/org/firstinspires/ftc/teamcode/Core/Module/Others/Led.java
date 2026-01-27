@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Core.Module.Others;
 
-import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.ledName;
+import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.ledName1;
+import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.ledName2;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -12,11 +13,16 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighServo;
 
 public class Led extends HighModule {
 
-    HighServo led;
+    HighServo led1, led2;
 
     public Led(HardwareMap hw){
-        led =   HighServo.Builder.startBuilding()
-                .setServo(hw.get(Servo.class , ledName))
+        led1=   HighServo.Builder.startBuilding()
+                .setServo(hw.get(Servo.class , ledName1))
+                .setStandardRunMode()
+                .setInitPosition(0,true)
+                .build();
+        led2 =   HighServo.Builder.startBuilding()
+                .setServo(hw.get(Servo.class , ledName2))
                 .setStandardRunMode()
                 .setInitPosition(0,true)
                 .build();
@@ -44,17 +50,19 @@ public class Led extends HighModule {
 
     public void setTarget(double target) {
         this.target = target;
-        led.setPosition(target);
+        led1.setPosition(target);
+        led2.setPosition(target);
     }
 
     public void setTarget(double target, double time) {
         this.target = target;
-        led.setPosition(target, time);
+        led1.setPosition(target, time);
+        led2.setPosition(target);
     }
 
     @Override
     public boolean atTarget(){
-        return led.atTarget();
+        return led1.atTarget();
     }
 
     public double getTarget() {
@@ -63,6 +71,7 @@ public class Led extends HighModule {
 
     @Override
     public void update() {
-        led.update();
+        led1.update();
+        led2.update();
     }
 }

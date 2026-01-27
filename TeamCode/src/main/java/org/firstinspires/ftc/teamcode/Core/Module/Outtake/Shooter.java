@@ -25,7 +25,6 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.teamcode.Core.Algorithms.ActionSystem.CoreAction;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighModule;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighMotor;
 
@@ -120,12 +119,6 @@ public class Shooter extends HighModule {
     }
     public boolean downAtTarget(){
         return Math.abs(targetDown-velocityDown) <= tolerance;
-    }
-    public void closeBlocker(){
-        blocker.setState(Blocker.States.Close,50);
-    }
-    public void openBlocker(){
-        blocker.setState(Blocker.States.Open , 50);
     }
     @Override
     public boolean atTarget(){

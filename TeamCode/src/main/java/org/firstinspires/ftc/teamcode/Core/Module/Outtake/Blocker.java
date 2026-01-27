@@ -13,14 +13,14 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighServo;
 public class Blocker extends HighModule {
     public HighServo servo;
     public static double ClosedPosition = 0.58;
-    public static double OpenPosition =0.85;
+    public static double OpenPosition = 0.85;
 
     public enum States {
         Open,
         Close
     }
 
-    States state;
+    public States state;
 
     public Blocker(HardwareMap hwMap, double initPosition, boolean isAuto) {
         servo = HighServo.Builder.startBuilding()
@@ -30,8 +30,8 @@ public class Blocker extends HighModule {
                 .build();
     }
 
-    public void setState(Blocker.States state){
-        this.state = state;
+    public void setState(States state0){
+        state = state0;
         switch (state){
             case Open:
                 setTarget(OpenPosition);
@@ -42,8 +42,8 @@ public class Blocker extends HighModule {
         }
     }
 
-    public void setState(Blocker.States state, double time){
-        this.state = state;
+    public void setState(Blocker.States state0, double time){
+        state = state0;
         switch (state){
             case Open:
                 setTarget(OpenPosition, time);
