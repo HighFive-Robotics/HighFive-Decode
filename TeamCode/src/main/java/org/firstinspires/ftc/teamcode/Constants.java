@@ -82,13 +82,21 @@ public class Constants {
             public static float[] PurpleValuesHSV = {200F, 0.4F, 5F};
         }
     }
-    @Config
+
     public static class ShooterConstants {
-        public static double kp = 0.0007, kd = 5e-8, ki = 0.005, kf = 0.00022, ks = 0, ka = 0;
-        public static final double wheelDiameter = 0.096;
-        public static final double wheelDiameterBack = 0.048;
-        public static final double encoderResolution = 28;
-        public static final double encoderResolutionBack = 145.1;
+
+        @Config
+        public static class ShooterFlyWheelParams {
+            public static double kpFly = 0.00085, kdFly = 0.00006, kiFly = 0.0038, kfFly = 0.00016, ksFly = 0, kaFly = 0;
+            public static final double wheelDiameterFly = 0.096;
+            public static final double encoderResolutionFly = 28;
+        }
+        @Config
+        public static class ShooterBackWheelParams {
+            public static double kpBack = 0.0006, kdBack = 0.00002, kiBack = 0.0007, kfBack = 0.00016, ksBack = 0, kaBack = 0;
+            public static final double wheelDiameterBack = 0.048;
+            public static final double encoderResolutionBack = 145.1;
+        }
 
     }
     @Config

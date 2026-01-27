@@ -1,10 +1,15 @@
 package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
+import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.intakeMotorName;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Shooter;
@@ -12,54 +17,56 @@ import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Shooter;
 @Config
 @TeleOp(name = "Shooter Calibration", group = "Tests")
 public class ShooterCalibration extends LinearOpMode {
+    enum Mode{
+        Up,
+        Down,
+        Both,
+    }
+    public static Mode mode = Mode.Down;
+    DcMotorEx motor;
     public static double targetVelocity = 0;
-    public static double p = 0.002;
-    public static double i = 0.002;
-    public static double d = 0.00002;
-    public static double f = 0.00010;
-    public static double s = 0.00010;
-    public static double a = 0.00010;
     private Shooter shooter;
-
+    Follower drive;
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         shooter = new Shooter(hardwareMap);
-        p = Constants.ShooterConstants.kp;
-        i = Constants.ShooterConstants.ki;
-        d = Constants.ShooterConstants.kd;
-        f = Constants.ShooterConstants.kf;
-        s = Constants.ShooterConstants.ks;
-        a = Constants.ShooterConstants.ka;
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
-        shooter.motorUp.setTolerance(0.15);
-        shooter.setPIDCoefUp(0,0,0,0);
+        drive = Constants.createFollower(hardwareMap);
+        drive.startFieldCentricDrive(gamepad1, true, 0);
+        motor = hardwareMap.get(DcMotorEx.class, intakeMotorName);
+        telemetry.addLine("Init");
         waitForStart();
-        while (opModeIsActive()) {
-            p = Constants.ShooterConstants.kp;
-            i = Constants.ShooterConstants.ki;
-            d = Constants.ShooterConstants.kd;
-            f = Constants.ShooterConstants.kf;
-            s = Constants.ShooterConstants.ks;
-            a = Constants.ShooterConstants.ka;
-            shooter.setFullTargetVelocity(targetVelocity);
-            shooter.setPIDCoefDown(p,i,d,f);
+        while (opModeIsActive()){
+            switch (mode){
+                case Down:
+                    shooter.setDownTargetVelocity(targetVelocity);
+                    shooter.nanUp();
+                    shooter.updateCoefDown();
+                    shooter.update();
+                    break;
+                case Up:
+                    shooter.setUpTargetVelocity(targetVelocity);
+                    shooter.nanDown();
+                    shooter.updateCoefUp();
+                    shooter.update();
+                    break;
+                case Both:
+                    shooter.setFullTargetVelocity(targetVelocity);
+                    shooter.updateAllCoef();
+                    shooter.update();
+                    break;
+            }
+            if(gamepad1.aWasPressed()) mode = Mode.Both;
+            if(gamepad1.bWasPressed()) mode = Mode.Down;
+            if(gamepad1.xWasPressed()) mode = Mode.Up;
+            if(gamepad1.right_trigger >= 0.4){
+                motor.setPower(1);
+            }else motor.setPower(0);
 
-            shooter.update();
-
-            double currentVelo = shooter.motorUp.getCurrentVelocity();
-            double currentPower = shooter.motorUp.getPower();
-            double error = targetVelocity - currentVelo;
-            telemetry.addData("Target Velocity", targetVelocity);
-            telemetry.addData("Actual Velocity", currentVelo);
-            telemetry.addData("Error", error);
-            telemetry.addData("Velocity Error from motor", shooter.motorUp.pidfVelocity.getVelocityError());
-            telemetry.addData("Possition Error from motor", shooter.motorUp.pidfVelocity.getPositionError());
-            telemetry.addData("Motor Power", currentPower);
-            telemetry.addData("PIDF Coeffs", String.format("P:%.5f I:%.5f D:%.5f F:%.5f", p, i, d, f));
-            telemetry.addData("Is at target(Shooter Method)", shooter.atTarget());
-            telemetry.addData("Is at target(Motor Optimised Method)", shooter.motorUp.atTarget());
+            telemetry.addData("Target Velocity",targetVelocity);
+            telemetry.addData("Velocity Up",shooter.motorUp.getCurrentVelocity());
+            telemetry.addData("Velocity Down",shooter.motorDown.getCurrentVelocity());
+            telemetry.addData("Power", shooter.motorDown.getPower());
             telemetry.update();
         }
     }
