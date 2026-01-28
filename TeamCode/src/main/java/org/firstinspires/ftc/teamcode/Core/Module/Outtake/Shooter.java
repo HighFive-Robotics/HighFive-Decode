@@ -2,22 +2,22 @@ package org.firstinspires.ftc.teamcode.Core.Module.Outtake;
 
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.shooterMotorDownName;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.shooterMotorUpName;
-import static org.firstinspires.ftc.teamcode.Constants.ShooterConstants.ShooterBackWheelParams.encoderResolutionBack;
-import static org.firstinspires.ftc.teamcode.Constants.ShooterConstants.ShooterBackWheelParams.kaBack;
-import static org.firstinspires.ftc.teamcode.Constants.ShooterConstants.ShooterBackWheelParams.kdBack;
-import static org.firstinspires.ftc.teamcode.Constants.ShooterConstants.ShooterBackWheelParams.kfBack;
-import static org.firstinspires.ftc.teamcode.Constants.ShooterConstants.ShooterBackWheelParams.kiBack;
-import static org.firstinspires.ftc.teamcode.Constants.ShooterConstants.ShooterBackWheelParams.kpBack;
-import static org.firstinspires.ftc.teamcode.Constants.ShooterConstants.ShooterBackWheelParams.ksBack;
-import static org.firstinspires.ftc.teamcode.Constants.ShooterConstants.ShooterBackWheelParams.wheelDiameterBack;
-import static org.firstinspires.ftc.teamcode.Constants.ShooterConstants.ShooterFlyWheelParams.encoderResolutionFly;
-import static org.firstinspires.ftc.teamcode.Constants.ShooterConstants.ShooterFlyWheelParams.kaFly;
-import static org.firstinspires.ftc.teamcode.Constants.ShooterConstants.ShooterFlyWheelParams.kdFly;
-import static org.firstinspires.ftc.teamcode.Constants.ShooterConstants.ShooterFlyWheelParams.kfFly;
-import static org.firstinspires.ftc.teamcode.Constants.ShooterConstants.ShooterFlyWheelParams.kiFly;
-import static org.firstinspires.ftc.teamcode.Constants.ShooterConstants.ShooterFlyWheelParams.kpFly;
-import static org.firstinspires.ftc.teamcode.Constants.ShooterConstants.ShooterFlyWheelParams.ksFly;
-import static org.firstinspires.ftc.teamcode.Constants.ShooterConstants.ShooterFlyWheelParams.wheelDiameterFly;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.encoderResolutionBack;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.kaBack;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.kdBack;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.kfBack;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.kiBack;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.kpBack;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.ksBack;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.wheelDiameterBack;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterFlyWheelParams.encoderResolutionFly;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterFlyWheelParams.kaFly;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterFlyWheelParams.kdFly;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterFlyWheelParams.kfFly;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterFlyWheelParams.kiFly;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterFlyWheelParams.kpFly;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterFlyWheelParams.ksFly;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterFlyWheelParams.wheelDiameterFly;
 
 
 import com.acmerobotics.dashboard.config.Config;

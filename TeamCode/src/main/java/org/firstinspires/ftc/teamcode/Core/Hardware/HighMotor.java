@@ -302,10 +302,6 @@ public class HighMotor {
      */
     public void setUseEncoder(boolean useEncoder) {
         this.useEncoder = useEncoder;
-        if(useEncoder){
-            this.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            this.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        }
     }
 
     /**

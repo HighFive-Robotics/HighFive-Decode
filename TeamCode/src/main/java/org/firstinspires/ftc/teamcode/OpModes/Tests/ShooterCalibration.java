@@ -9,10 +9,10 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Blocker;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Shooter;
 
 @Config
@@ -28,7 +28,7 @@ public class ShooterCalibration extends LinearOpMode {
     public static Mode mode = Mode.None;
     DcMotorEx motor;
     public static double targetVelocity = 0, angle = 32 ,sV=0;
-    private Shooter shooter;
+    public Shooter shooter;
     Follower drive;
     @Override
     public void runOpMode() throws InterruptedException {
@@ -71,8 +71,8 @@ public class ShooterCalibration extends LinearOpMode {
             if(gamepad1.xWasPressed())shooter.setAntiBackSpinVelocity(3.9);
             if(gamepad1.yWasPressed())shooter.setAntiBackSpinVelocity(0);
             if(gamepad1.dpadDownWasPressed())shooter.setAntiBackSpinVelocity(4);
-            if(gamepad1.leftBumperWasPressed()) shooter.closeBlocker();
-            if(gamepad1.rightBumperWasPressed()) shooter.openBlocker();
+            if(gamepad1.leftBumperWasPressed()) shooter.blocker.setState(Blocker.States.Open);
+            if(gamepad1.rightBumperWasPressed()) shooter.blocker.setState(Blocker.States.Close);
             if(gamepad1.psWasPressed()) drive.resetTeleOpHeading();
             if(gamepad1.right_trigger >= 0.4){
                 motor.setPower(1);

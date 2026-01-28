@@ -58,6 +58,7 @@ public class Constants {
         public static String breakBeamIntakeNameDown = "IB";
         public static String shooterMotorUpName = "OMT";
         public static String shooterMotorDownName = "OMB";
+        public static String turretMotorName = "TM";
         public static String blockerServoName = "BO";
         public static String ledName1 = "L1";
         public static String ledName2 = "L2";
@@ -79,7 +80,7 @@ public class Constants {
         }
     }
 
-    public static class ShooterConstants {
+    public static class OuttakeConstants {
 
         @Config
         public static class ShooterFlyWheelParams {
@@ -92,6 +93,10 @@ public class Constants {
             public static double kpBack = 0.0006, kdBack = 0.00002, kiBack = 0.0007, kfBack = 0.00016, ksBack = 0, kaBack = 0;
             public static final double wheelDiameterBack = 0.048;
             public static final double encoderResolutionBack = 145.1;
+        }
+        @Config
+        public static class TurretParams {
+            public static double kpTurret = 0.0075, kdTurret = 0.0002, kiTurret = 0.005, kfTurret = 0.0001;
         }
 
     }

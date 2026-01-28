@@ -30,8 +30,8 @@ public class Blocker extends HighModule {
                 .build();
     }
 
-    public void setState(States state0){
-        state = state0;
+    public void setState(States state){
+        this.state = state;
         switch (state){
             case Open:
                 setTarget(OpenPosition);
@@ -42,8 +42,8 @@ public class Blocker extends HighModule {
         }
     }
 
-    public void setState(Blocker.States state0, double time){
-        state = state0;
+    public void setState(Blocker.States state, double time){
+        this.state = state;
         switch (state){
             case Open:
                 setTarget(OpenPosition, time);
