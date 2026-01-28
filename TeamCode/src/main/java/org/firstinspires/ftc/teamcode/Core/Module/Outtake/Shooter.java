@@ -27,6 +27,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighModule;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighMotor;
+import org.opencv.core.Mat;
 
 @Config
 public class Shooter extends HighModule {
@@ -96,11 +97,20 @@ public class Shooter extends HighModule {
         motorDown.setTarget(velocity);
     }
     public void setAntiBackSpinVelocity(double velocity){
-        double veloUp = scaleWithDecay(velocity);
-        this.targetDown = velocity;
-        this.targetUp = veloUp;
-        motorUp.setTarget(veloUp);
-        motorDown.setTarget(velocity);
+        if(velocity >= 3.2){
+            double veloUp = -scaleWithDecay(velocity);
+            double veloDown = velocity + Math.abs(veloUp) * 1.5;
+            this.targetDown = velocity;
+            this.targetUp = veloUp;
+            motorUp.setTarget(veloUp);
+            motorDown.setTarget(velocity);
+        }else {
+            double veloUp = scaleWithDecay(velocity);
+            this.targetDown = velocity;
+            this.targetUp = veloUp;
+            motorUp.setTarget(veloUp);
+            motorDown.setTarget(velocity);
+        }
     }
     public void setUpTargetVelocity(double velocity){
         this.targetUp = velocity;
@@ -138,8 +148,6 @@ public class Shooter extends HighModule {
 
         if (x <= 2.0) {
             return x * slope;
-        }else if (x>= 4){
-            return -0.07;
         }
         double progress = (x - 2.0) / (7.2 - 2.0);
         return hingeValue + (target - hingeValue) * Math.pow(progress, exponent);
