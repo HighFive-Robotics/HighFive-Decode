@@ -112,6 +112,20 @@ public class Shooter extends HighModule {
             motorDown.setTarget(velocity);
         }
     }
+    public void setVelocity(double velocity , double compensation){
+        double velocityUp = scaleWithDecayRate(velocity);
+        double velocityDown = velocity;
+        if(velocityUp < 0 ){
+            velocityDown += revertScale(Math.abs(velocityUp))/compensation;
+        }
+        this.targetUp = velocityUp;
+        this.targetDown = velocityDown ;
+        motorUp.setTarget(velocityUp);
+        motorDown.setTarget(velocityDown);
+    }
+    public void setVelocity(double velocity){
+        setVelocity(velocity,1);
+    }
     public void setUpTargetVelocity(double velocity){
         this.targetUp = velocity;
         motorUp.setTarget(velocity);
@@ -151,6 +165,16 @@ public class Shooter extends HighModule {
         }
         double progress = (x - 2.0) / (7.2 - 2.0);
         return hingeValue + (target - hingeValue) * Math.pow(progress, exponent);
+    }
+    public static double scaleWithDecayRate(double x){
+        if (x <= 3){
+            return 0.148889*x;
+        }else{
+            return (((((((0.0005849323 * x - 0.01907369) * x + 0.2549253) * x - 1.800606) * x + 7.238965) * x - 16.59063) * x + 19.87657) * x - 9.144974);
+        }
+    }
+    public static double revertScale(double x){
+        return x/0.138889;
     }
 //    public double getVelociyFromDistance(double distance){
 //        return Range.clip( 8.9416e-10 * distance* distance* distance* distance -7.58832e-7 * distance* distance* distance + 0.000234922 * distance * distance -0.0238624 * distance + 4.0805,3,5.35);

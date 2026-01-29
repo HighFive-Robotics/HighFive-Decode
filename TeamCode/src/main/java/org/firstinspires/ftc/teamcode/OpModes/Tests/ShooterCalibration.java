@@ -23,11 +23,12 @@ public class ShooterCalibration extends LinearOpMode {
         Down,
         Both,
         Angle,
+        Test,
         None
     }
     public static Mode mode = Mode.None;
     DcMotorEx motor;
-    public static double targetVelocity = 0, angle = 32 ,sV=0;
+    public static double targetVelocity = 0, compensation = 1 ,sV=0;
     public Shooter shooter;
     Follower drive;
     @Override
@@ -62,15 +63,18 @@ public class ShooterCalibration extends LinearOpMode {
                 case Angle:
                     shooter.setAntiBackSpinVelocity(targetVelocity);
                     shooter.updateAllCoef();
-
                     break;
-
+                case Test:
+                    shooter.setVelocity(targetVelocity,compensation);
+                    break;
+                case None:
+                    if(gamepad1.aWasPressed())shooter.setAntiBackSpinVelocity(2.5);
+                    if(gamepad1.bWasPressed())shooter.setAntiBackSpinVelocity(2.8);
+                    if(gamepad1.xWasPressed())shooter.setAntiBackSpinVelocity(3.9);
+                    if(gamepad1.yWasPressed())shooter.setAntiBackSpinVelocity(0);
+                    if(gamepad1.dpadDownWasPressed())shooter.setAntiBackSpinVelocity(4);
+                    break;
             }
-            if(gamepad1.aWasPressed())shooter.setAntiBackSpinVelocity(2.5);
-            if(gamepad1.bWasPressed())shooter.setAntiBackSpinVelocity(2.8);
-            if(gamepad1.xWasPressed())shooter.setAntiBackSpinVelocity(3.9);
-            if(gamepad1.yWasPressed())shooter.setAntiBackSpinVelocity(0);
-            if(gamepad1.dpadDownWasPressed())shooter.setAntiBackSpinVelocity(4);
             if(gamepad1.leftBumperWasPressed()) shooter.blocker.setState(Blocker.States.Open);
             if(gamepad1.rightBumperWasPressed()) shooter.blocker.setState(Blocker.States.Close);
             if(gamepad1.psWasPressed()) drive.resetTeleOpHeading();
