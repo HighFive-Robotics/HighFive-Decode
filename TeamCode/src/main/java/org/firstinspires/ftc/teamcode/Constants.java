@@ -97,6 +97,7 @@ public class Constants {
         @Config
         public static class TurretParams {
             public static double kpTurret = 0.0075, kdTurret = 0.0002, kiTurret = 0.005, kfTurret = 0.0001;
+            public static double minimumTicks = -1400, maximumTicks = 1400, ticksPerPI = 1200;
         }
 
     }
