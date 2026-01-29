@@ -1,6 +1,11 @@
 package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.intakeMotorName;
+import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.turretMotorName;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.kdTurret;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.kfTurret;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.kiTurret;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.kpTurret;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -12,12 +17,16 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.Core.Hardware.HighMotor;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Blocker;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Shooter;
 
 @Config
 @TeleOp(name = "Shooter Calibration", group = "Tests")
 public class ShooterCalibration extends LinearOpMode {
+
+    HighMotor turret;
+
     enum Mode{
         Up,
         Down,
@@ -39,6 +48,16 @@ public class ShooterCalibration extends LinearOpMode {
         drive.setStartingPose(new Pose(72,72,Math.PI));
         drive.startFieldCentricDrive(gamepad1, true, 0);
         motor = hardwareMap.get(DcMotorEx.class, intakeMotorName);
+
+        turret = HighMotor.Builder.startBuilding()
+                .setMotor(hardwareMap.get(DcMotorEx.class, turretMotorName))
+                .setRunMode(HighMotor.RunMode.PID)
+                .setReverseMotor(true)
+                .setUseZeroPowerBehaviour(false)
+                .setPIDCoefficients(kpTurret,kiTurret,kdTurret,kfTurret, HighMotor.FeedForwardType.Lift,1)
+                .setEncoder(true,false)
+                .build();
+        
         telemetry.addLine("Init");
         waitForStart();
         while (opModeIsActive()){
