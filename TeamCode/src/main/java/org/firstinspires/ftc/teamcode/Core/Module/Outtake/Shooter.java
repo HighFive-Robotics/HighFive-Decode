@@ -35,6 +35,7 @@ public class Shooter extends HighModule {
     public Blocker blocker;
     public double velocityUp, velocityDown, tolerance;
     public double targetUp, targetDown;
+
     public Shooter(HardwareMap hwMap) {
         motorDown = HighMotor.Builder.startBuilding()
                 .setMotor(hwMap.get(DcMotorEx.class, shooterMotorDownName))
@@ -90,7 +91,7 @@ public class Shooter extends HighModule {
         double velocityDown = velocity;
         if (velocityUp < 0) {
             velocityDown += revertScale(Math.abs(velocityUp)) / compensation;
-        }else {
+        } else {
             velocityDown += decayedToExtension(velocityUp);
         }
         this.targetUp = velocityUp;
@@ -142,9 +143,11 @@ public class Shooter extends HighModule {
     public static double revertScale(double x) {
         return x / 0.17988;
     }
+
     public static double decayedToExtension(double x) {
-        return x*x + (x/(0.066*Math.pow(2,x)))-6*x;
+        return x * x + (x / (0.066 * Math.pow(2, x))) - 6 * x;
     }
+
     public double getVelocityErrorUp() {
         return Math.abs(targetUp - velocityUp);
     }
@@ -160,6 +163,7 @@ public class Shooter extends HighModule {
     public boolean downAtTarget() {
         return Math.abs(targetDown - velocityDown) <= tolerance;
     }
+
     public boolean upAtTarget(double tolerance) {
         return Math.abs(targetUp - velocityUp) <= tolerance;
     }
@@ -172,9 +176,11 @@ public class Shooter extends HighModule {
     public boolean atTarget() {
         return upAtTarget() && downAtTarget();
     }
+
     public boolean atTarget(double tolerance) {
         return upAtTarget(tolerance) && downAtTarget(tolerance);
     }
+
     @Override
     public double getTarget() {
         return target;

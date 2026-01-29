@@ -30,8 +30,10 @@ public class Turret extends HighModule {
         Manual
     }
 
-    public double currentAngle, targetAngle, angleOffset = 0;
-    public double ticks, targetTicks, lastTargetTicks = 0;
+    States state = States.Automated;
+
+    public double currentAngle, targetAngle, lastTargetAngle = 0, angleOffset = 0;
+    public double ticks, targetTicks;
 
     public Turret(HardwareMap hw, Constants.Color allianceColor){
         motor = HighMotor.Builder.startBuilding()
@@ -45,7 +47,6 @@ public class Turret extends HighModule {
         motor.setTolerance(5);
         this.allianceColor = allianceColor;
     }
-
 
     /** This is the method that we will use to calculate the target angle of our turret.
      *  We use a simple formula based on the robot localization in the field, using trigonometry.
@@ -96,20 +97,20 @@ public class Turret extends HighModule {
     }
 
     /** This method sets the Target Angle to our turret, in which we calculate the Target Ticks, using the method calculateTargetTicksFromAngle().
-     *  After we calculate the Target Ticks, we make a verification that if the difference isn't bigger than 2 to not change the PID target
-     *  so we don't reset the integral sum that often and better loop time.
-     * @param targetInAngle This is the verification we make so the Target Angle that we want to set to our turret stays within the range of [-π,π].
+     *  After we calculate the Target Ticks, we make a verification that if the difference isn't bigger than 1 degree or 0.017 radians to not change the PID target
+     *  so we don't reset the integral sum that often, better loop time and for the [-11π/9,-π] and [π,11π/9] to not have bugs, when rotating to 7π/9 or to -7π/9.
+     * @param targetInRadians This is the verification we make so the Target Angle that we want to set to our turret stays within the range of [-π,π].
      */
     @Override
-    public void setTarget(double targetInAngle){
+    public void setTarget(double targetInRadians){
         targetAngle += angleOffset;
-        this.targetAngle = wrapAroundAngle(targetInAngle);
+        this.targetAngle = wrapAroundAngle(targetInRadians);
         targetTicks = calculateTargetTicksFromAngle();
-        if(Math.abs(targetTicks - lastTargetTicks) >= 2){
+        if(Math.abs(targetAngle - lastTargetAngle) >= 0.017){
             motor.setTarget(targetTicks);
-            lastTargetTicks = targetTicks;
+            lastTargetAngle = targetAngle;
         } else {
-            targetTicks = lastTargetTicks;
+            targetAngle = lastTargetAngle;
         }
     }
 
@@ -119,17 +120,17 @@ public class Turret extends HighModule {
      */
     public void setTargetTicks(double target){
         targetTicks = Range.clip(target, minimumTicks, maximumTicks); // This is a fail safe so turret doesn't break
-        if(Math.abs(targetTicks - lastTargetTicks) >= 2){
+        if(Math.abs(targetAngle - lastTargetAngle) >= 0.017){
             motor.setTarget(targetTicks);
-            lastTargetTicks = targetTicks;
+            lastTargetAngle = targetAngle;
         } else {
-            targetTicks = lastTargetTicks;
+            targetAngle = lastTargetAngle;
         }
     }
 
     /** This method sets the Target Angle in degrees to our turret, in which we calculate the Target Ticks, using the method calculateTargetTicksFromAngle().
-     *  After we calculate the Target Ticks, we make a verification that if the difference isn't bigger than 2 to not change the PID target
-     *  so we don't reset the integral sum that often and better loop time.
+     *  After we calculate the Target Ticks, we make a verification that if the difference isn't bigger than 1 degree or 0.017 radians to not change the PID target
+     *  so we don't reset the integral sum that often, better loop time and for the [-11π/9,-π] and [π,11π/9] to not have bugs, when rotating to 7π/9 or to -7π/9.
      * @param target This is the verification we make so the Target Angle that we want to set to our turret stays within the range of [-π,π].
      */
     public void setTargetDegrees(double target){
@@ -137,17 +138,72 @@ public class Turret extends HighModule {
         targetAngle += angleOffset;
         this.targetAngle = wrapAroundAngle(targetAngle);
         targetTicks = calculateTargetTicksFromAngle();
-        if(Math.abs(targetTicks - lastTargetTicks) >= 2){
+        if(Math.abs(targetAngle - lastTargetAngle) >= 0.017){
             motor.setTarget(targetTicks);
-            lastTargetTicks = targetTicks;
+            lastTargetAngle = targetAngle;
         } else {
-            targetTicks = lastTargetTicks;
+            targetAngle = lastTargetAngle;
         }
     }
 
-    /** This method resets the motor encoder and sets the last target in ticks to 0;*/
+    /** In this method we set the offset of the turret in Radians.
+     * @param offsetInRadians this is the offset of the turret in Radians that we add to the target when we set one.
+     */
+    public void setOffset(double offsetInRadians){
+        angleOffset = offsetInRadians;
+    }
+
+    /** In this method we set the offset of the turret in Degrees.
+     * @param offset this is the offset of the turret in Degrees that we add to the target when we set one.
+     */
+    public void setOffsetDegrees(double offset){
+        angleOffset = Math.toRadians(offset);
+    }
+
+    /** From this method we get the angle offset of the turret.
+     * @return This returns the angle offset
+     */
+    public double getOffset(){
+        return angleOffset;
+    }
+
+    /** From this method you will know if the turret has reached the target.
+     * @return This returns if the total error of the turret is less than 1.5 Degrees or 0.025 Radians.
+     */
+    @Override
+    public boolean atTarget(){
+        return Math.abs(targetAngle - currentAngle) >= 0.025;
+    }
+
+    @Override
+    public double getTarget(){
+        return targetAngle;
+    }
+
+    public double getTargetDegrees(){
+        return Math.toDegrees(targetAngle);
+    }
+
+    public double getCurrentAngle(){
+        return currentAngle;
+    }
+
+    public double getCurrentAngleDegrees(){
+        return Math.toDegrees(currentAngle);
+    }
+
+    public double getCurrentTicks(){
+        return ticks;
+    }
+
+    public double getTargetTicks(){
+        return targetTicks;
+    }
+
+    /** This method resets the motor encoder and sets the last target in ticks to 0.*/
     public void reset(){
-        lastTargetTicks = 0;
+        lastTargetAngle = 0;
+        angleOffset = 0;
         motor.resetMotor();
     }
 
