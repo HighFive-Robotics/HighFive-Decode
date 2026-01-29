@@ -6,28 +6,30 @@ import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretPa
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.kiTurret;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.kpTurret;
 
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighMotor;
+import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Turret;
 
 @TeleOp
 public class TestTurret extends LinearOpMode {
 
-    HighMotor motor;
+    Turret turret;
+    Follower drive;
 
     @Override
     public void runOpMode() throws InterruptedException {
 
-        motor = HighMotor.Builder.startBuilding()
-                .setMotor(hardwareMap.get(DcMotorEx.class, turretMotorName))
-                .setRunMode(HighMotor.RunMode.PID)
-                .setReverseMotor(true)
-                .setUseZeroPowerBehaviour(false)
-                .setPIDCoefficients(kpTurret,kiTurret,kdTurret,kfTurret, HighMotor.FeedForwardType.Lift,1)
-                .setEncoder(true,false)
-                .build();
+        turret = new Turret(hardwareMap, Constants.Color.Red);
+
+        drive = Constants.createFollower(hardwareMap);
+        drive.setStartingPose(new Pose(8,8, 0));
+        drive.startFieldCentricDrive(gamepad1, true, 0);
 
         waitForStart();
 
@@ -35,32 +37,50 @@ public class TestTurret extends LinearOpMode {
 
         while (opModeIsActive()){
             if(gamepad1.dpadDownWasPressed()){
-                motor.resetMotor();
+                turret.motor.resetMotor();
             }
 
             if(gamepad1.triangleWasPressed()) {
-                motor.setTarget(700);
+                turret.setTarget(turret.getTargetAngleFromDistance(drive.getPose()));
             }
 
             if(gamepad1.squareWasPressed()) {
-                motor.setTarget(-700);
+                turret.setTargetDegrees(90);
             }
 
             if(gamepad1.crossWasPressed()) {
-                motor.setTarget(300);
+                turret.setTargetDegrees(0);
             }
 
             if(gamepad1.circleWasPressed()) {
-                motor.setTarget(0);
+                turret.setTargetDegrees(-90);
             }
 
-            if(gamepad1.dpadRightWasPressed()){
-                motor.setPIDCoefficients(kpTurret,kiTurret,kdTurret,kfTurret, HighMotor.FeedForwardType.Lift, 1);
+            if(gamepad1.dpadLeftWasPressed()) {
+                turret.setTargetDegrees(Math.toDegrees(turret.targetAngle)+2);
             }
-            motor.update();
-            telemetry.addData("Ticks: ", motor.getCurrentPosition());
-            telemetry.addData("Target: ", motor.getTarget());
-            telemetry.addData("Power: ", motor.getPower());
+            if(gamepad1.dpadRightWasPressed()) {
+                turret.setTargetDegrees(Math.toDegrees(turret.targetAngle)-2);
+            }
+            if(gamepad1.dpadUpWasPressed()) {
+                turret.reset();
+            }
+
+            turret.update();
+            drive.update();
+
+            if(gamepad1.psWasPressed()){
+                drive.setStartingPose(new Pose(8,8,0));
+                drive.setPose(new Pose(8,8,0));
+            }
+            telemetry.addData("Ticks: ", turret.motor.getCurrentPosition());
+            telemetry.addData("Target: ", turret.motor.getTarget());
+            telemetry.addData("Power: ", turret.motor.getPower());
+            telemetry.addData("targetAngle: ", turret.targetAngle);
+            telemetry.addData("current angle : ", turret.currentAngle);
+            telemetry.addData("robot pose : ", drive.getPose().toString());
+            telemetry.addData("Angle from pose : ", turret.getTargetAngleFromDistance(drive.getPose()));
+            telemetry.addData("targetTicks : ", turret.targetTicks);
             telemetry.update();
         }
     }

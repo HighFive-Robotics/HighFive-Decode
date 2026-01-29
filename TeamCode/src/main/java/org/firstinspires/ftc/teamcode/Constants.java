@@ -97,7 +97,7 @@ public class Constants {
         @Config
         public static class TurretParams {
             public static double kpTurret = 0.0075, kdTurret = 0.0002, kiTurret = 0.005, kfTurret = 0.0001;
-            public static double minimumTicks = -1400, maximumTicks = 1400, ticksPerPI = 1200;
+            public static double minimumTicks = -1375, maximumTicks = 1375, ticksPerPI = 1125;
         }
 
     }
@@ -144,7 +144,7 @@ public class Constants {
             .hardwareMapName(pinPointName)
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
             .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED)
-            .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED);
+            .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD);
 
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(FConstants, hardwareMap)
