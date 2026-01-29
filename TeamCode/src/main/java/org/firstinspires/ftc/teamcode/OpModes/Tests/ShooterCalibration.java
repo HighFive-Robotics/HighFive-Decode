@@ -57,7 +57,7 @@ public class ShooterCalibration extends LinearOpMode {
                 .setPIDCoefficients(kpTurret,kiTurret,kdTurret,kfTurret, HighMotor.FeedForwardType.Lift,1)
                 .setEncoder(true,false)
                 .build();
-        
+
         telemetry.addLine("Init");
         waitForStart();
         while (opModeIsActive()){
