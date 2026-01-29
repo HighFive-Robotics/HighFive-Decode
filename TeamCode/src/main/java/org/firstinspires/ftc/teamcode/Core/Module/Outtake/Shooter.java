@@ -35,7 +35,6 @@ public class Shooter extends HighModule {
     public Blocker blocker;
     public double velocityUp, velocityDown, tolerance;
     public double targetUp, targetDown;
-
     public Shooter(HardwareMap hwMap) {
         motorDown = HighMotor.Builder.startBuilding()
                 .setMotor(hwMap.get(DcMotorEx.class, shooterMotorDownName))
@@ -49,7 +48,7 @@ public class Shooter extends HighModule {
                 .setVelocityPIDCoefficients(kpFly, kiFly, kdFly, kfFly, ksFly, kaFly, 1)
                 .setUseZeroPowerBehaviour(false)
                 .build();
-        motorDown.setTolerance(0.075);
+        motorDown.setTolerance(0.15);
 
         motorUp = HighMotor.Builder.startBuilding()
                 .setMotor(hwMap.get(DcMotorEx.class, shooterMotorUpName))
@@ -63,7 +62,7 @@ public class Shooter extends HighModule {
                 .setVelocityPIDCoefficients(kpBack, kiBack, kdBack, kfBack, ksBack, kaBack, 1)
                 .setUseZeroPowerBehaviour(false)
                 .build();
-        motorUp.setTolerance(0.075);
+        motorUp.setTolerance(0.08);
 
         blocker = new Blocker(hwMap, Blocker.OpenPosition, true);
         tolerance = motorUp.getTolerance();
@@ -91,6 +90,8 @@ public class Shooter extends HighModule {
         double velocityDown = velocity;
         if (velocityUp < 0) {
             velocityDown += revertScale(Math.abs(velocityUp)) / compensation;
+        }else {
+            velocityDown += decayedToExtension(velocityUp);
         }
         this.targetUp = velocityUp;
         this.targetDown = velocityDown;
@@ -114,7 +115,7 @@ public class Shooter extends HighModule {
 
     public void setTargetVelocity(double down, double up) {
         setUpTargetVelocity(up);
-        setUpTargetVelocity(down);
+        setDownTargetVelocity(down);
     }
 
     public static double scaleWithDecay(double x) {
@@ -132,22 +133,24 @@ public class Shooter extends HighModule {
 
     public static double scaleWithDecayRate(double x) {
         if (x <= 3) {
-            return 0.148889 * x;
+            return 0.066 * x;
         } else {
             return (((((((0.0005849323 * x - 0.01907369) * x + 0.2549253) * x - 1.800606) * x + 7.238965) * x - 16.59063) * x + 19.87657) * x - 9.144974);
         }
     }
 
     public static double revertScale(double x) {
-        return x / 0.138889;
+        return x / 0.17988;
     }
-
+    public static double decayedToExtension(double x) {
+        return x*x + (x/(0.066*Math.pow(2,x)))-6*x;
+    }
     public double getVelocityErrorUp() {
         return Math.abs(targetUp - velocityUp);
     }
 
     public double getVelocityErrorDown() {
-        return Math.abs(targetUp - velocityDown);
+        return Math.abs(targetDown - velocityDown);
     }
 
     public boolean upAtTarget() {
@@ -157,12 +160,21 @@ public class Shooter extends HighModule {
     public boolean downAtTarget() {
         return Math.abs(targetDown - velocityDown) <= tolerance;
     }
+    public boolean upAtTarget(double tolerance) {
+        return Math.abs(targetUp - velocityUp) <= tolerance;
+    }
+
+    public boolean downAtTarget(double tolerance) {
+        return Math.abs(targetDown - velocityDown) <= tolerance;
+    }
 
     @Override
     public boolean atTarget() {
         return upAtTarget() && downAtTarget();
     }
-
+    public boolean atTarget(double tolerance) {
+        return upAtTarget(tolerance) && downAtTarget(tolerance);
+    }
     @Override
     public double getTarget() {
         return target;
