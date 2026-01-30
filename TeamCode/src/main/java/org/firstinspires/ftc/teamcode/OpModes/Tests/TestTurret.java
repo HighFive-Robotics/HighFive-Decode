@@ -37,7 +37,6 @@ public class TestTurret extends LinearOpMode {
 
             if(gamepad1.triangle && time.milliseconds() >= 50) {
                 turret.setTarget(turret.getTargetAngleFromDistance(drive.getPose()));
-                time.reset();
             }
 
             if(gamepad1.squareWasPressed()) {
@@ -53,11 +52,19 @@ public class TestTurret extends LinearOpMode {
             }
 
             if(gamepad1.dpadLeftWasPressed()) {
-                turret.setOffsetDegrees(2);
+                turret.setTarget(turret.getTarget()+0.025);
             }
             if(gamepad1.dpadRightWasPressed()) {
-                turret.setOffsetDegrees(-2);
+                turret.setTarget(turret.getTarget()-0.025);
             }
+
+            if(gamepad1.leftBumperWasPressed()) {
+                turret.set
+            }
+            if(gamepad1.rightBumperWasPressed()) {
+                turret.setTarget(turret.getTarget()-0.025);
+            }
+
             if(gamepad1.optionsWasPressed()) {
                 turret.reset();
             }

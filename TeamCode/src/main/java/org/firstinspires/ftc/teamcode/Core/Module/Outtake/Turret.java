@@ -120,12 +120,8 @@ public class Turret extends HighModule {
      */
     public void setTargetTicks(double target){
         targetTicks = Range.clip(target, minimumTicks, maximumTicks); // This is a fail safe so turret doesn't break
-        if(Math.abs(targetAngle - lastTargetAngle) >= 0.017){
-            motor.setTarget(targetTicks);
-            lastTargetAngle = targetAngle;
-        } else {
-            targetAngle = lastTargetAngle;
-        }
+        motor.setTarget(targetTicks);
+        lastTargetAngle = targetAngle;
     }
 
     /** This method sets the Target Angle in degrees to our turret, in which we calculate the Target Ticks, using the method calculateTargetTicksFromAngle().
@@ -160,6 +156,20 @@ public class Turret extends HighModule {
         angleOffset = Math.toRadians(offset);
     }
 
+    /** In this method we add the offset of the turret in Radians.
+     * @param offsetInRadians this is the offset what will be added to the turret in Radians, that we add to the target when we set one.
+     */
+    public void addOffset(double offsetInRadians){
+        angleOffset += offsetInRadians;
+    }
+
+    /** In this method we add the offset of the turret in Degrees.
+     * @param offset this is the offset what will be added to the turret in Degrees, that we add to the target when we set one.
+     */
+    public void addOffsetDegrees(double offset){
+        angleOffset += Math.toRadians(offset);
+    }
+
     /** From this method we get the angle offset of the turret.
      * @return This returns the angle offset
      */
@@ -175,43 +185,75 @@ public class Turret extends HighModule {
         return Math.abs(targetAngle - currentAngle) >= 0.025;
     }
 
+    /** This method returns the target of the turret, which is in Radians.
+     * @return This returns the target, which is in the range of [-π,π].
+     */
     @Override
     public double getTarget(){
         return targetAngle;
     }
 
+    /** This method returns the target of the turret, which is in Radians.
+     * @return This returns the target, which is in the range of [-180°,180°].
+     */
     public double getTargetDegrees(){
         return Math.toDegrees(targetAngle);
     }
 
+    /** This method returns the angle of the turret, relative to the robots intake, which is in Radians.
+     * @return This returns the current angle, which is in the range of [-11π/9,11π/9].
+     */
     public double getCurrentAngle(){
         return currentAngle;
     }
 
+    /** This method returns the angle of the turret, relative to the robot heading, which is in Radians.
+     * @return This returns the current angle, which is in the range of [-π,π].
+     */
+    public double getCurrentWrappedAngle(){
+        return wrapAroundAngle(currentAngle);
+    }
+
+    /** This method returns the angle of the turret, relative to the robot intake, which is in Degrees.
+     * @return This returns the current angle, which is in the range of [-220°,220°].
+     */
     public double getCurrentAngleDegrees(){
         return Math.toDegrees(currentAngle);
     }
 
+    /** This method returns the angle of the turret, relative to the robot heading, which is in Degrees.
+     * @return This returns the current angle, which is in the range of [-180°,180°].
+     */
+    public double getCurrentAngleWrappedDegrees(){
+        return Math.toDegrees(currentAngle);
+    }
+
+    /** This method returns the current ticks of the turret, relative to the robot intake.
+     * @return This returns the current ticks, which are in the range of [-1375,1375].
+     */
     public double getCurrentTicks(){
         return ticks;
     }
 
+    /** This method returns the target ticks of the turret, relative to the robot intake.
+     * @return This returns the target ticks, which are in the range of [-1375,1375].
+     */
     public double getTargetTicks(){
         return targetTicks;
     }
 
-    /** This method resets the motor encoder and sets the last target in ticks to 0.*/
+    /** This method resets the motor encoder and sets the target to 0.*/
     public void reset(){
         lastTargetAngle = 0;
         angleOffset = 0;
         motor.resetMotor();
+        motor.setTarget(0);
     }
 
     @Override
     public void update() {
         ticks = motor.getCurrentPosition();
         currentAngle = (ticks / ticksPerPI) * Math.PI;
-        currentAngle = wrapAroundAngle(currentAngle);
         motor.update();
     }
 }
