@@ -1,14 +1,7 @@
 package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.intakeMotorName;
-import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.turretMotorName;
-import static org.firstinspires.ftc.teamcode.Constants.Globals.BlueGoalDistance;
-import static org.firstinspires.ftc.teamcode.Constants.Globals.RedGoalDistance;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
-import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.kdTurret;
-import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.kfTurret;
-import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.kiTurret;
-import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.kpTurret;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;

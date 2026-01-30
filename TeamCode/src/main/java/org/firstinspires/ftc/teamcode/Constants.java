@@ -27,7 +27,8 @@ public class Constants {
         public static Pose finalAutoPose = new Pose(0, 0, 0);
         public static Color autoColor = Color.Red;
         public static Case randomizedCase = Case.None;
-        public static Pose BlueGoal = new Pose(8, 136), BlueGoalDistance = new Pose(21, 125), RedGoal = new Pose(136, 137), RedGoalDistance = new Pose(120, 127);
+        public static Pose BlueGoalCorner = new Pose(10, 134), BlueGoalWallUp = new Pose(12, 134), BlueGoalWallLeft = new Pose(10, 132), BlueGoalDistance = new Pose(21, 125);
+        public static Pose RedGoalCorner = new Pose(134, 134), RedGoalWallUp = new Pose(132, 134), RedGoalWallRight = new Pose(134, 132), RedGoalDistance = new Pose(120, 127);
     }
 
     public enum Case {

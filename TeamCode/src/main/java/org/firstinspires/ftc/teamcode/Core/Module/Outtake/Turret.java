@@ -1,8 +1,12 @@
 package org.firstinspires.ftc.teamcode.Core.Module.Outtake;
 
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.turretMotorName;
-import static org.firstinspires.ftc.teamcode.Constants.Globals.BlueGoal;
-import static org.firstinspires.ftc.teamcode.Constants.Globals.RedGoal;
+import static org.firstinspires.ftc.teamcode.Constants.Globals.BlueGoalCorner;
+import static org.firstinspires.ftc.teamcode.Constants.Globals.BlueGoalWallLeft;
+import static org.firstinspires.ftc.teamcode.Constants.Globals.BlueGoalWallUp;
+import static org.firstinspires.ftc.teamcode.Constants.Globals.RedGoalCorner;
+import static org.firstinspires.ftc.teamcode.Constants.Globals.RedGoalWallRight;
+import static org.firstinspires.ftc.teamcode.Constants.Globals.RedGoalWallUp;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.kdTurret;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.kfTurret;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.kiTurret;
@@ -50,14 +54,47 @@ public class Turret extends HighModule {
 
     /** This is the method that we will use to calculate the target angle of our turret.
      *  We use a simple formula based on the robot localization in the field, using trigonometry.
+     *  We calculate the angle to 3 points of the goal, the corner and each wall and we see what point the shooter
+     *  can be the most perpendicular. We do this by seeing what of this 3 points have the least error to their 3 ideal angles,
+     *  this angles being 0, π/4 or π/2.
      * @param robotPose This is the pose of the robot, from which we use the x,y and heading.
      * @return this returns the target angle in Radians.
      */
     public double getTargetAngleFromDistance(Pose robotPose){
+        double angleCorner, angleWallLeft, angleWallRight, angleWallUp;
+        double errorCorner, errorWallLeft, errorWallRight, errorWallUp;
         if(allianceColor == Constants.Color.Blue){
-            return Math.atan2(BlueGoal.getY() - robotPose.getY(), BlueGoal.getX() - robotPose.getX()) - robotPose.getHeading();
+            angleCorner = Math.atan2(BlueGoalCorner.getY() - robotPose.getY(), BlueGoalCorner.getX() - robotPose.getX());
+            angleWallUp = Math.atan2(BlueGoalWallUp.getY() - robotPose.getY(), BlueGoalWallUp.getX() - robotPose.getX());
+            angleWallLeft = Math.atan2(BlueGoalWallLeft.getY() - robotPose.getY(), BlueGoalWallLeft.getX() - robotPose.getX());
+
+            errorCorner = Math.abs(-3*Math.PI/4-angleCorner);
+            errorWallUp = Math.abs(-Math.PI/2-angleWallUp);
+            errorWallLeft = Math.abs(-Math.PI - angleWallLeft);
+
+            if(errorCorner <= errorWallUp && errorCorner <= errorWallLeft){
+                return angleCorner - robotPose.getHeading();
+            } else if(errorWallUp <= errorCorner && errorWallUp <= errorWallLeft){
+                return angleWallUp - robotPose.getHeading();
+            } else {
+                return angleWallLeft - robotPose.getHeading();
+            }
         } else {
-            return Math.atan2(RedGoal.getY() - robotPose.getY(), RedGoal.getX() - robotPose.getX()) - robotPose.getHeading();
+            angleCorner = Math.atan2(RedGoalCorner.getY() - robotPose.getY(), RedGoalCorner.getX() - robotPose.getX());
+            angleWallUp = Math.atan2(RedGoalWallUp.getY() - robotPose.getY(), RedGoalWallUp.getX() - robotPose.getX());
+            angleWallRight = Math.atan2(RedGoalWallRight.getY() - robotPose.getY(), RedGoalWallRight.getX() - robotPose.getX());
+
+            errorCorner = Math.abs(Math.PI/4-angleCorner);
+            errorWallUp = Math.abs(Math.PI/2-angleWallUp);
+            errorWallRight = Math.abs(angleWallRight);//Because the formula is 0 - angleWallRight
+
+            if(errorCorner <= errorWallUp && errorCorner <= errorWallRight){
+                return angleCorner - robotPose.getHeading();
+            } else if(errorWallUp <= errorCorner && errorWallUp <= errorWallRight){
+                return angleWallUp - robotPose.getHeading();
+            } else {
+                return angleWallRight - robotPose.getHeading();
+            }
         }
     }
 
