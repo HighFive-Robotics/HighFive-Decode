@@ -85,6 +85,7 @@ public class TestTurret extends LinearOpMode {
             telemetry.addData("Target angle degrees ", turret.getTargetDegrees());
             telemetry.addData("robot pose : ", drive.getPose().toString());
             telemetry.addData("Angle from pose : ", turret.getTargetAngleFromDistance(drive.getPose()));
+            telemetry.addData("Offset angle : ", turret.getOffset());
             telemetry.update();
         }
     }

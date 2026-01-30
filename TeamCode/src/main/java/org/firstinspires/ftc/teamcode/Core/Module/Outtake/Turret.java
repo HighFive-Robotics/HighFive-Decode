@@ -140,7 +140,7 @@ public class Turret extends HighModule {
      */
     @Override
     public void setTarget(double targetInRadians){
-        targetAngle += angleOffset;
+        targetInRadians = targetInRadians + angleOffset;
         this.targetAngle = wrapAroundAngle(targetInRadians);
         targetTicks = calculateTargetTicksFromAngle();
         if(Math.abs(targetAngle - lastTargetAngle) >= 0.017){
@@ -167,9 +167,8 @@ public class Turret extends HighModule {
      * @param target This is the verification we make so the Target Angle that we want to set to our turret stays within the range of [-π,π].
      */
     public void setTargetDegrees(double target){
-        this.targetAngle = Math.toRadians(target);
-        targetAngle += angleOffset;
-        this.targetAngle = wrapAroundAngle(targetAngle);
+        target = Math.toRadians(target) + angleOffset;
+        this.targetAngle = wrapAroundAngle(target);
         targetTicks = calculateTargetTicksFromAngle();
         if(Math.abs(targetAngle - lastTargetAngle) >= 0.017){
             motor.setTarget(targetTicks);
@@ -262,7 +261,7 @@ public class Turret extends HighModule {
      * @return This returns the current angle, which is in the range of [-180°,180°].
      */
     public double getCurrentAngleWrappedDegrees(){
-        return Math.toDegrees(currentAngle);
+        return Math.toDegrees(wrapAroundAngle(currentAngle));
     }
 
     /** This method returns the current ticks of the turret, relative to the robot intake.
