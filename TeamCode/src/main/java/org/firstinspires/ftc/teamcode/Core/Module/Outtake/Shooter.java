@@ -92,7 +92,7 @@ public class Shooter extends HighModule {
         if (velocityUp < 0) {
             velocityDown += revertScale(Math.abs(velocityUp)) / compensation;
         } else {
-            velocityDown += decayedToExtension(velocityUp);
+            velocityDown += decayedToExtension(velocityUp) / compensation;
         }
         this.targetUp = velocityUp;
         this.targetDown = velocityDown;
@@ -145,7 +145,7 @@ public class Shooter extends HighModule {
     }
 
     public static double decayedToExtension(double x) {
-        return x * x + (x / (0.066 * Math.pow(2, x))) - 6 * x;
+        return x * x + (x / (0.066 * Math.pow(2, x))) - 7.6 * x;
     }
 
     public double getVelocityErrorUp() {
