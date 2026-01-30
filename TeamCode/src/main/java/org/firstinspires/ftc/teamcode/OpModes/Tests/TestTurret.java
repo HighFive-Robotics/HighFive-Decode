@@ -59,10 +59,10 @@ public class TestTurret extends LinearOpMode {
             }
 
             if(gamepad1.leftBumperWasPressed()) {
-                turret.set
+                turret.addOffsetDegrees(-2);
             }
             if(gamepad1.rightBumperWasPressed()) {
-                turret.setTarget(turret.getTarget()-0.025);
+                turret.addOffsetDegrees(+2);
             }
 
             if(gamepad1.optionsWasPressed()) {
