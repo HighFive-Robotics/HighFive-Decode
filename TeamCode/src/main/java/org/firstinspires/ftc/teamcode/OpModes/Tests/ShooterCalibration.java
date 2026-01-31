@@ -82,10 +82,10 @@ public class ShooterCalibration extends LinearOpMode {
 //            if(gamepad1.dpadRightWasPressed())turret.setTarget(turret.getTarget()+25);
 //            if(gamepad1.dpadLeftWasPressed())turret.setTarget(turret.getTarget()-25);
             if(gamepad1.dpadLeftWasPressed()) {
-                turret.addOffsetDegrees(-2);
+                turret.addOffsetDegrees(-5);
             }
             if(gamepad1.dpadRightWasPressed()) {
-                turret.addOffsetDegrees(+2);
+                turret.addOffsetDegrees(+5);
             }
             if(gamepad1.psWasPressed()) drive.resetTeleOpHeading();
             if(!shootingSeq){
@@ -99,6 +99,9 @@ public class ShooterCalibration extends LinearOpMode {
             }
             turret.setTarget(turret.getTargetAngleFromDistance(drive.getPose()));
             telemetry.addData("Target Velocity",targetVelocity);
+            telemetry.addData("Down Velocity",shooter.motorDown.getCurrentVelocity());
+            telemetry.addData("Up Velocity",shooter.motorUp.getCurrentVelocity());
+            telemetry.addData("Up ticks",shooter.motorUp.motor.getCurrentPosition());
             telemetry.addData("Distance From Goal", getDistance());
             telemetry.addData("Power", shooter.motorDown.getPower());
             telemetry.addData("Pose " , drive.getPose());

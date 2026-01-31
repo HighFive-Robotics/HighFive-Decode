@@ -35,7 +35,11 @@ public class Shooter extends HighModule {
     public Blocker blocker;
     public double velocityUp, velocityDown, tolerance;
     public double targetUp, targetDown;
-
+    public static double massBall = 0.050;
+    public static double massTopWheel = 0.030;
+    public static double couplingEfficenty = 0.8;
+    public static double alpha = 0.5;
+    public static boolean shouldUsePhysics = false;
     public Shooter(HardwareMap hwMap) {
         motorDown = HighMotor.Builder.startBuilding()
                 .setMotor(hwMap.get(DcMotorEx.class, shooterMotorDownName))
@@ -85,19 +89,44 @@ public class Shooter extends HighModule {
             motorDown.setTarget(velocity);
         }
     }
-
-    public void setVelocity(double velocity, double compensation) {
-        double velocityUp = scaleWithDecayRate(velocity);
-        double velocityDown = velocity;
-        if (velocityUp < 0) {
-            velocityDown += revertScale(Math.abs(velocityUp)) / compensation;
+    public void setVelocityPhysics(double targetLinearVelocity, double compensation) {
+        double legacyUpVelo = scaleWithDecayRate(targetLinearVelocity);
+        double legacyDownVelo = targetLinearVelocity;
+        double legacyExitEnergy = (legacyDownVelo + Math.abs(legacyUpVelo)) / 2.0;
+        double legacySpin = legacyDownVelo - Math.abs(legacyUpVelo);
+        double targetSpin = legacySpin * (1.0 - alpha);
+        double theoreticalDown = legacyExitEnergy + (targetSpin / 2.0);
+        double theoreticalUp = legacyExitEnergy - (targetSpin / 2.0);
+        double massRatio = massBall / massTopWheel;
+        double momentumFactor = 1.0 + (massRatio * couplingEfficenty);
+        double commandUp = theoreticalUp * momentumFactor;
+        double extraEnergyCost = (commandUp - theoreticalUp) / compensation;
+        double commandDown = theoreticalDown;
+        if (legacyUpVelo < 0) {
+            commandDown += revertScale(Math.abs(legacyUpVelo)) / compensation;
         } else {
-            velocityDown += decayedToExtension(velocityUp) / compensation;
+            commandDown += decayedToExtension(legacyUpVelo) / compensation;
         }
-        this.targetUp = velocityUp;
-        this.targetDown = velocityDown;
-        motorUp.setTarget(velocityUp);
-        motorDown.setTarget(velocityDown);
+        commandDown -= extraEnergyCost;
+        this.targetUp = commandUp;
+        this.targetDown = commandDown;
+        motorUp.setTarget(this.targetUp);
+        motorDown.setTarget(this.targetDown);
+    }
+    public void setVelocity(double velocity, double compensation) {
+        if(shouldUsePhysics){
+            double velocityUp = scaleWithDecayRate(velocity);
+            double velocityDown = velocity;
+            if (velocityUp < 0) {
+                velocityDown += revertScale(Math.abs(velocityUp)) / compensation;
+            } else {
+                velocityDown += decayedToExtension(velocityUp) / compensation;
+            }
+            this.targetUp = velocityUp;
+            this.targetDown = velocityDown;
+            motorUp.setTarget(velocityUp);
+            motorDown.setTarget(velocityDown);
+        }else setVelocityPhysics(velocity,compensation);
     }
 
     public void setVelocity(double velocity) {
