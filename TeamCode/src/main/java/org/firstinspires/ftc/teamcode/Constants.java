@@ -18,6 +18,8 @@ import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 public class Constants {
 
     @Config
@@ -27,8 +29,8 @@ public class Constants {
         public static Pose finalAutoPose = new Pose(0, 0, 0);
         public static Color autoColor = Color.Red;
         public static Case randomizedCase = Case.None;
-        public static Pose BlueGoalCorner = new Pose(10, 134), BlueGoalWallUp = new Pose(12, 134), BlueGoalWallLeft = new Pose(10, 132), BlueGoalDistance = new Pose(21, 125);
-        public static Pose RedGoalCorner = new Pose(134, 134), RedGoalWallUp = new Pose(132, 134), RedGoalWallRight = new Pose(134, 132), RedGoalDistance = new Pose(120, 127);
+        public static Pose BlueGoalCorner = new Pose(10, 134), BlueGoalWallUp = new Pose(12, 134), BlueGoalWallLeft = new Pose(10, 132), BlueGoalDistance = new Pose(22.5, 123);
+        public static Pose RedGoalCorner = new Pose(134, 134), RedGoalWallUp = new Pose(132, 134), RedGoalWallRight = new Pose(134, 132), RedGoalDistance = new Pose(123, 115);
     }
 
     public enum Case {
@@ -139,9 +141,9 @@ public class Constants {
             .yVelocity(63.103582);
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
-//            .distanceUnit(DistanceUnit.CM)
-            .forwardPodY(-2.8)
-            .strafePodX(-6.48)
+           //.distanceUnit(DistanceUnit.CM)
+            .forwardPodY(-2.16)//-55mm -2,16inch
+            .strafePodX(-3.35)//-85mm -3,35 inch
             .hardwareMapName(pinPointName)
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
             .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)

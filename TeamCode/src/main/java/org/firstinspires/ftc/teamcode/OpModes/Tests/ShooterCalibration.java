@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.intakeMotorName;
+import static org.firstinspires.ftc.teamcode.Constants.Globals.BlueGoalDistance;
+import static org.firstinspires.ftc.teamcode.Constants.Globals.RedGoalDistance;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -11,10 +13,8 @@ import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.Constants;
-import org.firstinspires.ftc.teamcode.Core.Hardware.HighMotor;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Blocker;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Shooter;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Turret;
@@ -22,9 +22,6 @@ import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Turret;
 @Config
 @TeleOp(name = "Shooter Calibration", group = "Tests")
 public class ShooterCalibration extends LinearOpMode {
-
-    Pose BlueGoal = new Pose(16,132);
-    Pose RedGoal = new Pose(128,132);
 
     enum Mode{
         Up,
@@ -99,6 +96,9 @@ public class ShooterCalibration extends LinearOpMode {
                 }
             }
             turret.setTarget(turret.getTargetAngleFromDistance(drive.getPose()));
+            if (gamepad1.right_stick_button) {
+                shooter.setTargetVelocity(Shooter.getDownVelocityFromDistance(getDistance()),Shooter.getUpVelocityFromDistance(getDistance()));
+            }
             telemetry.addData("Target Velocity down",velocityDown);
             telemetry.addData("Target Velocity up",velocityUp);
             telemetry.addData("Down Velocity",shooter.motorDown.getCurrentVelocity());
@@ -136,9 +136,9 @@ public class ShooterCalibration extends LinearOpMode {
     private double getDistance(){
         switch (autoColor){
             case Blue:
-                return Math.hypot(BlueGoal.getX() - drive.getPose().getX(),BlueGoal.getY() - drive.getPose().getY());
+                return 2.54 * Math.hypot(BlueGoalDistance.getX() - drive.getPose().getX(),BlueGoalDistance.getY() - drive.getPose().getY());
             case Red:
-                return Math.hypot(RedGoal.getX() - drive.getPose().getX(),RedGoal.getY()-drive.getPose().getY());
+                return 2.54 * Math.hypot(RedGoalDistance.getX() - drive.getPose().getX(),RedGoalDistance.getY() - drive.getPose().getY());
         }
         return -1;
     }
