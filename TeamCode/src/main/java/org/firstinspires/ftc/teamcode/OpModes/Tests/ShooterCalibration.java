@@ -28,8 +28,9 @@ public class ShooterCalibration extends LinearOpMode {
 
         Down,
         Test,
+        None
     }
-    public static Mode mode = Mode.Test;
+    public static Mode mode = Mode.None;
     DcMotorEx motor;
     public static double velocityUp = 0, velocityDown = 0;
     public Shooter shooter;
