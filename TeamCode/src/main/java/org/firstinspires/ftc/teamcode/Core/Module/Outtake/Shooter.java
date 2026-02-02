@@ -21,6 +21,7 @@ import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterF
 
 
 import com.acmerobotics.dashboard.config.Config;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
@@ -176,7 +177,38 @@ public class Shooter extends HighModule {
     public static double decayedToExtension(double x) {
         return x * x + (x / (0.066 * Math.pow(2, x))) - 7.6 * x;
     }
-
+    public static double getDownVelocityFromDistance(double x) {
+        double q = -1.2214742e-21;
+        double w =  2.2340637e-18;
+        double r = -1.8076462e-15;
+        double t =  8.5336681e-13;
+        double o = -2.6006502e-10;
+        double h =  5.3215045e-8;
+        double a = -0.0000073453731;
+        double b =  0.00066909674;
+        double c = -0.038158381;
+        double d =  1.2235733;
+        double f = -14.12222;
+        double out = (((((((((q * x + w) * x + r) * x + t) * x + o) * x + h) * x + a) * x + b) * x + c) * x + d) * x + f;
+        out = Range.clip(out, -7.2, 7.2);
+        return out;
+    }
+    public static double getUpVelocityFromDistance(double x) {
+        double q = -3.45907498e-23;
+        double w =  1.12139456e-19;
+        double r = -1.24832445e-16;
+        double t =  7.05167915e-14;
+        double o = -2.32198243e-11;
+        double h =  4.72528627e-9;
+        double a = -6.05676656e-7;
+        double b =  0.0000483669971;
+        double c = -0.00229899239;
+        double d =  0.058735351;
+        double f = -0.365053577;
+        double out = (((((((((q * x + w) * x + r) * x + t) * x + o) * x + h) * x + a) * x + b) * x + c) * x + d) * x + f;
+        out = Range.clip(out , -1 , 1);
+        return out;
+    }
     public double getVelocityErrorUp() {
         return Math.abs(targetUp - velocityUp);
     }

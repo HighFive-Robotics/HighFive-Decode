@@ -34,7 +34,7 @@ public class ShooterCalibration extends LinearOpMode {
     }
     public static Mode mode = Mode.Test;
     DcMotorEx motor;
-    public static double targetVelocity = 0, compensation = 1;
+    public static double velocityUp = 0, velocityDown = 0;
     public Shooter shooter;
     public Turret turret;
     public boolean shoot;
@@ -56,21 +56,22 @@ public class ShooterCalibration extends LinearOpMode {
         waitForStart();
         turret.setTarget(0);
         while (opModeIsActive()){
-            if(targetVelocity >= 3.2)tolerance = 0.25;
+
             switch (mode) {
                 case Down:
-                    shooter.setDownTargetVelocity(targetVelocity);
+                    shooter.setDownTargetVelocity(velocityDown);
                     shooter.nanUp();
                     shooter.updateCoefDown();
 
                     break;
                 case Up:
-                    shooter.setUpTargetVelocity(targetVelocity);
+                    shooter.setUpTargetVelocity(velocityUp);
                     shooter.nanDown();
                     shooter.updateCoefUp();
                     break;
                 case Test:
-                    shooter.setVelocity(targetVelocity,compensation);
+                    shooter.setDownTargetVelocity(velocityDown);
+                    shooter.setUpTargetVelocity(velocityUp);
                     break;
             }
             if(gamepad1.xWasPressed()){
@@ -98,7 +99,8 @@ public class ShooterCalibration extends LinearOpMode {
                 }
             }
             turret.setTarget(turret.getTargetAngleFromDistance(drive.getPose()));
-            telemetry.addData("Target Velocity",targetVelocity);
+            telemetry.addData("Target Velocity down",velocityDown);
+            telemetry.addData("Target Velocity up",velocityUp);
             telemetry.addData("Down Velocity",shooter.motorDown.getCurrentVelocity());
             telemetry.addData("Up Velocity",shooter.motorUp.getCurrentVelocity());
             telemetry.addData("Up ticks",shooter.motorUp.motor.getCurrentPosition());
