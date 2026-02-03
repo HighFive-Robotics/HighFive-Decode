@@ -13,6 +13,7 @@ import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Blocker;
@@ -40,6 +41,7 @@ public class ShooterCalibration extends LinearOpMode {
     public int cycles;
     Follower drive;
     boolean shootingSeq=false;
+    ElapsedTime timer;
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -49,6 +51,7 @@ public class ShooterCalibration extends LinearOpMode {
         drive.setStartingPose(new Pose(6,6,0));
         drive.startFieldCentricDrive(gamepad1, true, 0);
         motor = hardwareMap.get(DcMotorEx.class, intakeMotorName);
+        timer = new ElapsedTime();
         double tolerance;
         telemetry.addLine("Init");
         waitForStart();
@@ -72,14 +75,12 @@ public class ShooterCalibration extends LinearOpMode {
                     shooter.setUpTargetVelocity(velocityUp);
                     break;
             }
-            if(gamepad1.xWasPressed()){
+            if(gamepad1.yWasPressed()){
                 shootingSeq = true;
                 k=0;
             }
             if(gamepad1.leftBumperWasPressed()) shooter.blocker.setState(Blocker.States.Open);
             if(gamepad1.rightBumperWasPressed()) shooter.blocker.setState(Blocker.States.Close);
-//            if(gamepad1.dpadRightWasPressed())turret.setTarget(turret.getTarget()+25);
-//            if(gamepad1.dpadLeftWasPressed())turret.setTarget(turret.getTarget()-25);
             if(gamepad1.dpadLeftWasPressed()) {
                 turret.addOffsetDegrees(-5);
             }
@@ -97,35 +98,46 @@ public class ShooterCalibration extends LinearOpMode {
                 }
             }
             turret.setTarget(turret.getTargetAngleFromDistance(drive.getPose()));
-            if (gamepad1.right_stick_button) {
-                shooter.setTargetVelocity(Shooter.getDownVelocityFromDistance(getDistance()),Shooter.getUpVelocityFromDistance(getDistance()));
+            if (gamepad1.square) {
+                shooter.setTargetVelocity(getDistance());
             }
-            telemetry.addData("Target Velocity down",velocityDown);
-            telemetry.addData("Target Velocity up",velocityUp);
-            telemetry.addData("Down Velocity",shooter.motorDown.getCurrentVelocity());
-            telemetry.addData("Up Velocity",shooter.motorUp.getCurrentVelocity());
-            telemetry.addData("Up ticks",shooter.motorUp.motor.getCurrentPosition());
-            telemetry.addData("Distance From Goal", getDistance());
-            telemetry.addData("Power", shooter.motorDown.getPower());
-            telemetry.addData("Pose " , drive.getPose());
+
             if(shootingSeq){
                 switch (k){
                     case 0:
                         shooter.blocker.setState(Blocker.States.Open);
+                        cycles = 1;
+                        timer.reset();
                         k++;
+                        break;
                     case 1:
-                        if(shooter.atTarget()){
+                        if((shooter.atTarget() || timer.milliseconds() >= 200) && cycles <= 3){
                             motor.setPower(1);
                             k++;
-                        }
-                    case 2:
-                        if(shooter.getVelocityErrorDown() >= 0.25){
-                            shooter.blocker.setState(Blocker.States.Close);
-                            k = 0;
+                        }else if (cycles > 3){
+                            cycles = -1;
+                            k = -1;
                             shootingSeq = false;
                         }
+                        break;
+                    case 2:
+                        if(shooter.getVelocityErrorDown() >= 0.25){
+                            k = 1;
+                            motor.setPower(0);
+                            timer.reset();
+                            cycles++;
+                        }
+                        break;
                 }
             }
+            telemetry.addData("Down Velocity",shooter.motorDown.getCurrentVelocity());
+            telemetry.addData("Up Velocity",shooter.motorUp.getCurrentVelocity());
+            telemetry.addData("State shoot",k);
+            telemetry.addData("Bool shoot",shootingSeq);
+            telemetry.addData("error velo" , shooter.getVelocityErrorDown());
+            telemetry.addData("Distance From Goal", getDistance());
+            telemetry.addData("Power", shooter.motorDown.getPower());
+            telemetry.addData("Pose " , drive.getPose());
             turret.update();
             shooter.update();
             drive.update();

@@ -34,7 +34,7 @@ import org.opencv.core.Mat;
 public class Shooter extends HighModule {
     public HighMotor motorUp, motorDown;
     public Blocker blocker;
-    public double velocityUp, velocityDown, tolerance;
+    public double velocityUp, velocityDown, upTolerance , downTolerance;
     public double targetUp, targetDown;
     public static double massBall = 0.050;
     public static double massTopWheel = 0.030;
@@ -69,9 +69,9 @@ public class Shooter extends HighModule {
                 .setUseZeroPowerBehaviour(false)
                 .build();
         motorUp.setTolerance(0.08);
-
         blocker = new Blocker(hwMap, Blocker.OpenPosition, true);
-        tolerance = motorUp.getTolerance();
+        upTolerance = 0.05;
+        downTolerance = 0.1;
     }
 
     public void setAntiBackSpinVelocity(double velocity) {
@@ -148,7 +148,10 @@ public class Shooter extends HighModule {
         setUpTargetVelocity(up);
         setDownTargetVelocity(down);
     }
-
+    public void setTargetVelocity(double distance){
+        setUpTargetVelocity(getUpVelocityFromDistance(distance));
+        setDownTargetVelocity(getDownVelocityFromDistance(distance));
+    }
     public static double scaleWithDecay(double x) {
         double slope = 0.20 / 1.23;
         double hingeValue = 2.0 * slope;
@@ -218,11 +221,11 @@ public class Shooter extends HighModule {
     }
 
     public boolean upAtTarget() {
-        return Math.abs(targetUp - velocityUp) <= tolerance;
+        return Math.abs(targetUp - velocityUp) <= upTolerance;
     }
 
     public boolean downAtTarget() {
-        return Math.abs(targetDown - velocityDown) <= tolerance;
+        return Math.abs(targetDown - velocityDown) <= downTolerance;
     }
 
     public boolean upAtTarget(double tolerance) {
@@ -262,7 +265,10 @@ public class Shooter extends HighModule {
     public void updateCoefUp() {
         motorUp.setVelocityPIDFSA(kpBack, kiBack, kdBack, kfBack, ksBack, kaBack, 1);
     }
-
+    public void setTolerance(double upTolerance , double downTolerance){
+        this.upTolerance = upTolerance;
+        this.downTolerance = downTolerance;
+    }
     public void updateAllCoef() {
         updateCoefDown();
         updateCoefUp();
