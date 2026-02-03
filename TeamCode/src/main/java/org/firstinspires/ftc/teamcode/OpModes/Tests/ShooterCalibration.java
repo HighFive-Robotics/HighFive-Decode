@@ -62,13 +62,13 @@ public class ShooterCalibration extends LinearOpMode {
                 case Down:
                     shooter.setDownTargetVelocity(velocityDown);
                     shooter.nanUp();
-                    shooter.updateCoefDown();
+                    shooter.updateCoefficientsDown();
 
                     break;
                 case Up:
                     shooter.setUpTargetVelocity(velocityUp);
                     shooter.nanDown();
-                    shooter.updateCoefUp();
+                    shooter.updateCoefficientsUp();
                     break;
                 case Test:
                     shooter.setDownTargetVelocity(velocityDown);

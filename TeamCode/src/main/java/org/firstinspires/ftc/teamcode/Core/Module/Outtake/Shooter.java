@@ -21,26 +21,25 @@ import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterF
 
 
 import com.acmerobotics.dashboard.config.Config;
-import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighModule;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighMotor;
-import org.opencv.core.Mat;
 
 @Config
 public class Shooter extends HighModule {
     public HighMotor motorUp, motorDown;
     public Blocker blocker;
-    public double velocityUp, velocityDown, upTolerance , downTolerance , upOffset=0, downOffset=0;
+    public double velocityUp, velocityDown, upTolerance, downTolerance, upOffset = 0, downOffset = 0;
     public double targetUp, targetDown;
     public static double massBall = 0.050;
     public static double massTopWheel = 0.030;
-    public static double couplingEfficenty = 0.8;
+    public static double couplingEfficiency = 0.8;
     public static double alpha = 0.5;
     public static boolean shouldUsePhysics = false;
+
     public Shooter(HardwareMap hwMap) {
         motorDown = HighMotor.Builder.startBuilding()
                 .setMotor(hwMap.get(DcMotorEx.class, shooterMotorDownName))
@@ -75,38 +74,35 @@ public class Shooter extends HighModule {
     }
 
     public void setAntiBackSpinVelocity(double velocity) {
+        double velocityUp;
         if (velocity >= 3.2) {
-            double veloUp = -scaleWithDecay(velocity);
-            double veloDown = velocity + Math.abs(veloUp) * 1.5;
-            this.targetDown = velocity;
-            this.targetUp = veloUp;
-            motorUp.setTarget(veloUp);
-            motorDown.setTarget(velocity);
+            velocityUp = -scaleWithDecay(velocity);
+            double velocityDown = velocity + Math.abs(velocityUp) * 1.5;
         } else {
-            double veloUp = scaleWithDecay(velocity);
-            this.targetDown = velocity;
-            this.targetUp = veloUp;
-            motorUp.setTarget(veloUp);
-            motorDown.setTarget(velocity);
+            velocityUp = scaleWithDecay(velocity);
         }
+        this.targetDown = velocity;
+        this.targetUp = velocityUp;
+        motorUp.setTarget(velocityUp);
+        motorDown.setTarget(velocity);
     }
+
     public void setVelocityPhysics(double targetLinearVelocity, double compensation) {
-        double legacyUpVelo = scaleWithDecayRate(targetLinearVelocity);
-        double legacyDownVelo = targetLinearVelocity;
-        double legacyExitEnergy = (legacyDownVelo + Math.abs(legacyUpVelo)) / 2.0;
-        double legacySpin = legacyDownVelo - Math.abs(legacyUpVelo);
+        double legacyUpVelocity = scaleWithDecayRate(targetLinearVelocity);
+        double legacyExitEnergy = (targetLinearVelocity + Math.abs(legacyUpVelocity)) / 2.0;
+        double legacySpin = targetLinearVelocity - Math.abs(legacyUpVelocity);
         double targetSpin = legacySpin * (1.0 - alpha);
         double theoreticalDown = legacyExitEnergy + (targetSpin / 2.0);
         double theoreticalUp = legacyExitEnergy - (targetSpin / 2.0);
         double massRatio = massBall / massTopWheel;
-        double momentumFactor = 1.0 + (massRatio * couplingEfficenty);
+        double momentumFactor = 1.0 + (massRatio * couplingEfficiency);
         double commandUp = theoreticalUp * momentumFactor;
         double extraEnergyCost = (commandUp - theoreticalUp) / compensation;
         double commandDown = theoreticalDown;
-        if (legacyUpVelo < 0) {
-            commandDown += revertScale(Math.abs(legacyUpVelo)) / compensation;
+        if (legacyUpVelocity < 0) {
+            commandDown += revertScale(Math.abs(legacyUpVelocity)) / compensation;
         } else {
-            commandDown += decayedToExtension(legacyUpVelo) / compensation;
+            commandDown += decayedToExtension(legacyUpVelocity) / compensation;
         }
         commandDown -= extraEnergyCost;
         this.targetUp = commandUp;
@@ -114,8 +110,9 @@ public class Shooter extends HighModule {
         motorUp.setTarget(this.targetUp);
         motorDown.setTarget(this.targetDown);
     }
+
     public void setVelocity(double velocity, double compensation) {
-        if(shouldUsePhysics){
+        if (shouldUsePhysics) {
             double velocityUp = scaleWithDecayRate(velocity);
             double velocityDown = velocity;
             if (velocityUp < 0) {
@@ -127,7 +124,7 @@ public class Shooter extends HighModule {
             this.targetDown = velocityDown;
             motorUp.setTarget(velocityUp);
             motorDown.setTarget(velocityDown);
-        }else setVelocityPhysics(velocity,compensation);
+        } else setVelocityPhysics(velocity, compensation);
     }
 
     public void setVelocity(double velocity) {
@@ -148,10 +145,12 @@ public class Shooter extends HighModule {
         setUpTargetVelocity(up);
         setDownTargetVelocity(down);
     }
-    public void setTargetVelocity(double distance){
+
+    public void setTargetVelocity(double distance) {
         setUpTargetVelocity(getUpVelocityFromDistance(distance));
         setDownTargetVelocity(getDownVelocityFromDistance(distance));
     }
+
     public static double scaleWithDecay(double x) {
         double slope = 0.20 / 1.23;
         double hingeValue = 2.0 * slope;
@@ -180,38 +179,41 @@ public class Shooter extends HighModule {
     public static double decayedToExtension(double x) {
         return x * x + (x / (0.066 * Math.pow(2, x))) - 7.6 * x;
     }
+
     public static double getDownVelocityFromDistance(double x) {
         double q = -1.2214742e-21;
-        double w =  2.2340637e-18;
+        double w = 2.2340637e-18;
         double r = -1.8076462e-15;
-        double t =  8.5336681e-13;
+        double t = 8.5336681e-13;
         double o = -2.6006502e-10;
-        double h =  5.3215045e-8;
+        double h = 5.3215045e-8;
         double a = -0.0000073453731;
-        double b =  0.00066909674;
+        double b = 0.00066909674;
         double c = -0.038158381;
-        double d =  1.2235733;
+        double d = 1.2235733;
         double f = -14.12222;
         double out = (((((((((q * x + w) * x + r) * x + t) * x + o) * x + h) * x + a) * x + b) * x + c) * x + d) * x + f;
         out = Range.clip(out, -7.2, 7.2);
         return out;
     }
+
     public static double getUpVelocityFromDistance(double x) {
         double q = -3.45907498e-23;
-        double w =  1.12139456e-19;
+        double w = 1.12139456e-19;
         double r = -1.24832445e-16;
-        double t =  7.05167915e-14;
+        double t = 7.05167915e-14;
         double o = -2.32198243e-11;
-        double h =  4.72528627e-9;
+        double h = 4.72528627e-9;
         double a = -6.05676656e-7;
-        double b =  0.0000483669971;
+        double b = 0.0000483669971;
         double c = -0.00229899239;
-        double d =  0.058735351;
+        double d = 0.058735351;
         double f = -0.365053577;
         double out = (((((((((q * x + w) * x + r) * x + t) * x + o) * x + h) * x + a) * x + b) * x + c) * x + d) * x + f;
-        out = Range.clip(out , -1 , 1);
+        out = Range.clip(out, -1, 1);
         return out;
     }
+
     public double getVelocityErrorUp() {
         return Math.abs(targetUp - velocityUp);
     }
@@ -221,62 +223,71 @@ public class Shooter extends HighModule {
     }
 
     public boolean upAtTarget() {
-        return Math.abs(targetUp - velocityUp) <= (upTolerance+upOffset);
+        return Math.abs(targetUp - velocityUp) <= (upTolerance + upOffset);
     }
 
     public boolean downAtTarget() {
-        return Math.abs(targetDown - velocityDown) <= (downTolerance+downOffset);
+        return Math.abs(targetDown - velocityDown) <= (downTolerance + downOffset);
     }
 
     @Override
     public boolean atTarget() {
         return upAtTarget() && downAtTarget();
     }
-    public double getDownTolerance(){
+
+    public double getDownTolerance() {
         return downTolerance;
     }
-    public double getUpTolerance(){
+
+    public double getUpTolerance() {
         return upTolerance;
     }
-    public void setUpToleranceOffset(double offset){
+
+    public void setUpToleranceOffset(double offset) {
         this.upOffset = offset;
     }
-    public void setDownToleranceOffset(double offset){
+
+    public void setDownToleranceOffset(double offset) {
         this.downOffset = offset;
     }
-    public void addToUpToleranceOffset(double offset){
-        this.upOffset = offset;
+
+    public void addToUpToleranceOffset(double offset) {
+        this.upOffset += offset;
     }
-    public void addToDownToleranceOffset(double offset){
-        this.downOffset = offset;
+
+    public void addToDownToleranceOffset(double offset) {
+        this.downOffset += offset;
     }
+
     @Override
     public double getTarget() {
         return target;
     }
 
-    public void setPIDCoefDown(double kp, double kd, double ki, double kf) {
+    public void setPIDCoefficientsDown(double kp, double kd, double ki, double kf) {
         motorDown.setVelocityPIDCoefficients(kp, ki, kd, kf, 1);
     }
 
-    public void setPIDCoefUp(double kp, double kd, double ki, double kf) {
+    public void setPIDCoefficientsUp(double kp, double kd, double ki, double kf) {
         motorUp.setVelocityPIDCoefficients(kp, ki, kd, kf, 1);
     }
 
-    public void updateCoefDown() {
+    public void updateCoefficientsDown() {
         motorDown.setVelocityPIDFSA(kpFly, kiFly, kdFly, kfFly, ksFly, kaFly, 1);
     }
 
-    public void updateCoefUp() {
+    public void updateCoefficientsUp() {
         motorUp.setVelocityPIDFSA(kpBack, kiBack, kdBack, kfBack, ksBack, kaBack, 1);
     }
-    public void setTolerance(double upTolerance , double downTolerance){
+
+    public void setTolerance(double upTolerance, double downTolerance) {
         this.upTolerance = upTolerance;
         this.downTolerance = downTolerance;
     }
-    public void updateAllCoef() {
-        updateCoefDown();
-        updateCoefUp();
+
+    public void updateAllCoefficients() {
+        updateCoefficientsDown();
+        updateCoefficientsUp();
     }
 
     public void nanUp() {
