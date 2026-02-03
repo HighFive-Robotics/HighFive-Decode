@@ -111,7 +111,7 @@ public class ShooterCalibration extends LinearOpMode {
                         k++;
                         break;
                     case 1:
-                        if((shooter.atTarget() || timer.milliseconds() >= 200) && cycles <= 3){
+                        if((shooter.atTarget() || (cycles == 3 && timer.milliseconds() >= 200)) && cycles <= 3){
                             motor.setPower(1);
                             k++;
                         }else if (cycles > 3){
@@ -121,7 +121,7 @@ public class ShooterCalibration extends LinearOpMode {
                         }
                         break;
                     case 2:
-                        if(shooter.getVelocityErrorDown() >= 0.25){
+                        if(shooter.getVelocityErrorDown() >= 0.3 || shooter.getVelocityErrorUp() >= 0.1){
                             k = 1;
                             motor.setPower(0);
                             timer.reset();
