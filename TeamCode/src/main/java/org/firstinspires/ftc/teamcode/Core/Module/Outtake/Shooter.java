@@ -34,7 +34,7 @@ import org.opencv.core.Mat;
 public class Shooter extends HighModule {
     public HighMotor motorUp, motorDown;
     public Blocker blocker;
-    public double velocityUp, velocityDown, upTolerance , downTolerance;
+    public double velocityUp, velocityDown, upTolerance , downTolerance , upOffset=0, downOffset=0;
     public double targetUp, targetDown;
     public static double massBall = 0.050;
     public static double massTopWheel = 0.030;
@@ -221,30 +221,35 @@ public class Shooter extends HighModule {
     }
 
     public boolean upAtTarget() {
-        return Math.abs(targetUp - velocityUp) <= upTolerance;
+        return Math.abs(targetUp - velocityUp) <= (upTolerance+upOffset);
     }
 
     public boolean downAtTarget() {
-        return Math.abs(targetDown - velocityDown) <= downTolerance;
-    }
-
-    public boolean upAtTarget(double tolerance) {
-        return Math.abs(targetUp - velocityUp) <= tolerance;
-    }
-
-    public boolean downAtTarget(double tolerance) {
-        return Math.abs(targetDown - velocityDown) <= tolerance;
+        return Math.abs(targetDown - velocityDown) <= (downTolerance+downOffset);
     }
 
     @Override
     public boolean atTarget() {
         return upAtTarget() && downAtTarget();
     }
-
-    public boolean atTarget(double tolerance) {
-        return upAtTarget(tolerance) && downAtTarget(tolerance);
+    public double getDownTolerance(){
+        return downTolerance;
     }
-
+    public double getUpTolerance(){
+        return upTolerance;
+    }
+    public void setUpToleranceOffset(double offset){
+        this.upOffset = offset;
+    }
+    public void setDownToleranceOffset(double offset){
+        this.downOffset = offset;
+    }
+    public void addToUpToleranceOffset(double offset){
+        this.upOffset = offset;
+    }
+    public void addToDownToleranceOffset(double offset){
+        this.downOffset = offset;
+    }
     @Override
     public double getTarget() {
         return target;

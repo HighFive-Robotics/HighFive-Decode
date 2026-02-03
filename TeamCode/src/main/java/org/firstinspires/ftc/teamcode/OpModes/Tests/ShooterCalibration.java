@@ -107,25 +107,39 @@ public class ShooterCalibration extends LinearOpMode {
                     case 0:
                         shooter.blocker.setState(Blocker.States.Open);
                         cycles = 1;
-                        timer.reset();
                         k++;
                         break;
                     case 1:
-                        if((shooter.atTarget() || (cycles == 3 && timer.milliseconds() >= 200)) && cycles <= 3){
-                            motor.setPower(1);
-                            k++;
-                        }else if (cycles > 3){
+                        if(cycles <= 3){
+                            if(shooter.atTarget()){
+                                motor.setPower(1);
+                                timer.reset();
+                                k++;
+                                shooter.addToUpToleranceOffset(0.05);
+                                shooter.addToDownToleranceOffset(0.075);
+                            }
+                        } else {
                             cycles = -1;
                             k = -1;
+                            shooter.setDownToleranceOffset(0);
+                            shooter.setUpToleranceOffset(0);
                             shootingSeq = false;
+                            shooter.blocker.setState(Blocker.States.Close);
+                            motor.setPower(0);
                         }
                         break;
                     case 2:
-                        if(shooter.getVelocityErrorDown() >= 0.3 || shooter.getVelocityErrorUp() >= 0.1){
-                            k = 1;
+                        boolean ballFired = (shooter.getVelocityErrorDown() >= 0.4 || shooter.getVelocityErrorUp() >= 0.1) || timer.milliseconds() >= 400;
+                        boolean minPulseCheck = timer.milliseconds() > 25;
+                        if(ballFired && minPulseCheck){
                             motor.setPower(0);
-                            timer.reset();
                             cycles++;
+                            k = 1;
+                        }
+                        else if (timer.milliseconds() > 1000) {
+                            motor.setPower(0);
+                            cycles++;
+                            k = 1;
                         }
                         break;
                 }
