@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighModule;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighSensor;
 
 public class Intake extends HighModule {
+    
     public IntakeMotor intakeMotor;
     public HighSensor sensor;
     public DigitalChannel breakBeam;
