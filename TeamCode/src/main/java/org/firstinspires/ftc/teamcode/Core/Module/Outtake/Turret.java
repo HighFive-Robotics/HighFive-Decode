@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Core.Module.Outtake;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.turretMotorName;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.BlueGoalCorner;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.BlueGoalWallLeft;
@@ -12,6 +13,7 @@ import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretPa
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.kiTurret;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.kpTurret;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.maximumTicks;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.minimumErrorAngleForWalls;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.minimumTicks;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.ticksPerPI;
 
@@ -20,12 +22,14 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighModule;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighMotor;
 
 public class Turret extends HighModule {
 
+    Telemetry telemetry;
     public HighMotor motor;
     public Constants.Color allianceColor;
 
@@ -39,7 +43,7 @@ public class Turret extends HighModule {
     public double currentAngle, targetAngle, lastTargetAngle = 0, angleOffset = 0;
     public double ticks, targetTicks;
 
-    public Turret(HardwareMap hw, Constants.Color allianceColor){
+    public Turret(HardwareMap hw, Constants.Color allianceColor, Telemetry telemetry){
         motor = HighMotor.Builder.startBuilding()
                 .setMotor(hw.get(DcMotorEx.class, turretMotorName))
                 .setRunMode(HighMotor.RunMode.PID)
@@ -49,6 +53,7 @@ public class Turret extends HighModule {
                 .setEncoder(true,false)
                 .build();
         motor.setTolerance(5);
+        this.telemetry = telemetry;
         this.allianceColor = allianceColor;
     }
 
@@ -72,12 +77,15 @@ public class Turret extends HighModule {
             errorWallUp = Math.abs(-Math.PI/2-angleWallUp);
             errorWallLeft = Math.abs(-Math.PI - angleWallLeft);
 
-            if(errorCorner <= errorWallUp && errorCorner <= errorWallLeft){
-                return angleCorner - robotPose.getHeading();
-            } else if(errorWallUp <= errorCorner && errorWallUp <= errorWallLeft){
+            if(angleWallLeft <= minimumErrorAngleForWalls && angleWallLeft <= errorCorner){
+                telemetry.addLine("Wall Right");
+                return angleWallLeft - robotPose.getHeading();
+            } else if(errorWallUp <= minimumErrorAngleForWalls && angleWallUp <= errorCorner){
+                telemetry.addLine("Wall Up");
                 return angleWallUp - robotPose.getHeading();
             } else {
-                return angleWallLeft - robotPose.getHeading();
+                telemetry.addLine("Corner");
+                return angleCorner - robotPose.getHeading();
             }
         } else {
             angleCorner = Math.atan2(RedGoalCorner.getY() - robotPose.getY(), RedGoalCorner.getX() - robotPose.getX());
@@ -88,12 +96,15 @@ public class Turret extends HighModule {
             errorWallUp = Math.abs(Math.PI/2-angleWallUp);
             errorWallRight = Math.abs(angleWallRight);//Because the formula is 0 - angleWallRight
 
-            if(errorCorner <= errorWallUp && errorCorner <= errorWallRight){
-                return angleCorner - robotPose.getHeading();
-            } else if(errorWallUp <= errorCorner && errorWallUp <= errorWallRight){
+            if(errorWallRight <= minimumErrorAngleForWalls && errorWallRight <= errorCorner){
+                telemetry.addLine("Wall Right");
+                return angleWallRight - robotPose.getHeading();
+            } else if(errorWallUp <= minimumErrorAngleForWalls && angleWallUp <= errorCorner){
+                telemetry.addLine("Wall Up");
                 return angleWallUp - robotPose.getHeading();
             } else {
-                return angleWallRight - robotPose.getHeading();
+                telemetry.addLine("Corner");
+                return angleCorner - robotPose.getHeading();
             }
         }
     }
@@ -113,18 +124,18 @@ public class Turret extends HighModule {
     }
 
     /** This method calculates the ticks target from the target angle that we want, making sure that our turret does not rotate past 11π/9 in both directions.
-     *  This formula transform the angle which the turret rotates of [-11π/9,11π/9] in ticks from [-1375,1375].
+     *  This formula transform the angle which the turret rotates of [-7π/6,7π/6] in ticks from [-1.313,1.313].
      *  The Target Angle that we want to set to our turret is within the range of [-π,π], verification made before the method is used.
      */
     public double calculateTargetTicksFromAngle(){
         double ticks;
         ticks = targetAngle / Math.PI * ticksPerPI;
-        if (targetAngle >= 7 * Math.PI / 9){
+        if (targetAngle >= 5 * Math.PI / 6){
             if(Math.abs(targetAngle - currentAngle) >= Math.PI){
                 ticks = (targetAngle / Math.PI - 1) * ticksPerPI - ticksPerPI;
             }
         }
-        if (targetAngle <= - 7 * Math.PI / 9){
+        if (targetAngle <= - 5 * Math.PI / 6){
             if(Math.abs(targetAngle - currentAngle) >= Math.PI) {
                 ticks = (1 + targetAngle / Math.PI) * ticksPerPI + ticksPerPI;
             }
@@ -135,7 +146,7 @@ public class Turret extends HighModule {
 
     /** This method sets the Target Angle to our turret, in which we calculate the Target Ticks, using the method calculateTargetTicksFromAngle().
      *  After we calculate the Target Ticks, we make a verification that if the difference isn't bigger than 1 degree or 0.017 radians to not change the PID target
-     *  so we don't reset the integral sum that often, better loop time and for the [-11π/9,-π] and [π,11π/9] to not have bugs, when rotating to 7π/9 or to -7π/9.
+     *  so we don't reset the integral sum that often, better loop time and for the [-7π/6,-π] and [π,7π/6] to not have bugs, when rotating to 5π/6 or to -5π/6.
      * @param targetInRadians This is the verification we make so the Target Angle that we want to set to our turret stays within the range of [-π,π].
      */
     @Override
@@ -163,7 +174,7 @@ public class Turret extends HighModule {
 
     /** This method sets the Target Angle in degrees to our turret, in which we calculate the Target Ticks, using the method calculateTargetTicksFromAngle().
      *  After we calculate the Target Ticks, we make a verification that if the difference isn't bigger than 1 degree or 0.017 radians to not change the PID target
-     *  so we don't reset the integral sum that often, better loop time and for the [-11π/9,-π] and [π,11π/9] to not have bugs, when rotating to 7π/9 or to -7π/9.
+     *  so we don't reset the integral sum that often, better loop time and for the [-7π/6,-π] and [π,7π/6] to not have bugs, when rotating to 5π/6 or to -5π/6.
      * @param target This is the verification we make so the Target Angle that we want to set to our turret stays within the range of [-π,π].
      */
     public void setTargetDegrees(double target){
@@ -237,7 +248,7 @@ public class Turret extends HighModule {
     }
 
     /** This method returns the angle of the turret, relative to the robots intake, which is in Radians.
-     * @return This returns the current angle, which is in the range of [-11π/9,11π/9].
+     * @return This returns the current angle, which is in the range of [-7π/6,7π/6].
      */
     public double getCurrentAngle(){
         return currentAngle;
@@ -251,7 +262,7 @@ public class Turret extends HighModule {
     }
 
     /** This method returns the angle of the turret, relative to the robot intake, which is in Degrees.
-     * @return This returns the current angle, which is in the range of [-220°,220°].
+     * @return This returns the current angle, which is in the range of [-210°,210°].
      */
     public double getCurrentAngleDegrees(){
         return Math.toDegrees(currentAngle);
@@ -265,14 +276,14 @@ public class Turret extends HighModule {
     }
 
     /** This method returns the current ticks of the turret, relative to the robot intake.
-     * @return This returns the current ticks, which are in the range of [-1375,1375].
+     * @return This returns the current ticks, which are in the range of [-1313,1313].
      */
     public double getCurrentTicks(){
         return ticks;
     }
 
     /** This method returns the target ticks of the turret, relative to the robot intake.
-     * @return This returns the target ticks, which are in the range of [-1375,1375].
+     * @return This returns the target ticks, which are in the range of [-1313,1313].
      */
     public double getTargetTicks(){
         return targetTicks;

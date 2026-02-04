@@ -32,7 +32,7 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighMotor;
 public class Shooter extends HighModule {
     public HighMotor motorUp, motorDown;
     public Blocker blocker;
-    public double velocityUp, velocityDown, upTolerance, downTolerance, upOffset = 0, downOffset = 0;
+    public double velocityUp, velocityDown, upTolerance, downTolerance, upOffset = 0.05, downOffset = 0.1;
     public double targetUp, targetDown;
     public static double massBall = 0.050;
     public static double massTopWheel = 0.030;
@@ -77,7 +77,6 @@ public class Shooter extends HighModule {
         double velocityUp;
         if (velocity >= 3.2) {
             velocityUp = -scaleWithDecay(velocity);
-            double velocityDown = velocity + Math.abs(velocityUp) * 1.5;
         } else {
             velocityUp = scaleWithDecay(velocity);
         }

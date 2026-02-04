@@ -47,7 +47,7 @@ public class ShooterCalibration extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         shooter = new Shooter(hardwareMap);
         drive = Constants.createFollower(hardwareMap);
-        turret = new Turret(hardwareMap, Constants.Color.Red);
+        turret = new Turret(hardwareMap, Constants.Color.Red, telemetry);
         drive.setStartingPose(new Pose(6,6,0));
         drive.startFieldCentricDrive(gamepad1, true, 0);
         motor = hardwareMap.get(DcMotorEx.class, intakeMotorName);

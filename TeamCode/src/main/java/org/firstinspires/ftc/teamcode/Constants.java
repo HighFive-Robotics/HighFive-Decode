@@ -30,7 +30,7 @@ public class Constants {
         public static Color autoColor = Color.Red;
         public static Case randomizedCase = Case.None;
         public static Pose BlueGoalCorner = new Pose(10, 134), BlueGoalWallUp = new Pose(12, 134), BlueGoalWallLeft = new Pose(10, 132), BlueGoalDistance = new Pose(22.5, 123);
-        public static Pose RedGoalCorner = new Pose(134, 134), RedGoalWallUp = new Pose(132, 134), RedGoalWallRight = new Pose(134, 132), RedGoalDistance = new Pose(126, 122);
+        public static Pose RedGoalCorner = new Pose(134, 134), RedGoalWallUp = new Pose(132, 134), RedGoalWallRight = new Pose(134, 132), RedGoalDistance = new Pose(121, 121);
     }
 
     public enum Case {
@@ -100,7 +100,7 @@ public class Constants {
         @Config
         public static class TurretParams {
             public static double kpTurret = 0.0075, kdTurret = 0.0002, kiTurret = 0.005, kfTurret = 0.0001;
-            public static double minimumTicks = -1375, maximumTicks = 1375, ticksPerPI = 1125;
+            public static double minimumTicks = -1313, maximumTicks = 1313, ticksPerPI = 1125, minimumErrorAngleForWalls = Math.PI / 10;
         }
 
     }
@@ -142,7 +142,7 @@ public class Constants {
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
            //.distanceUnit(DistanceUnit.CM)
-            .forwardPodY(-2.16)//-55mm -2,16inch
+            .forwardPodY(2.16)//-55mm -2,16inch
             .strafePodX(-3.35)//-85mm -3,35 inch
             .hardwareMapName(pinPointName)
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)

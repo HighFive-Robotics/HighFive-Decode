@@ -18,7 +18,7 @@ public class TestTurret extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        turret = new Turret(hardwareMap, Constants.Color.Red);
+        turret = new Turret(hardwareMap, Constants.Color.Red, telemetry);
 
         drive = Constants.createFollower(hardwareMap);
         drive.setStartingPose(new Pose(8,8, 0));
