@@ -180,35 +180,35 @@ public class Shooter extends HighModule {
     }
 
     public static double getDownVelocityFromDistance(double x) {
-        double q = -1.2214742e-21;
-        double w = 2.2340637e-18;
-        double r = -1.8076462e-15;
-        double t = 8.5336681e-13;
-        double o = -2.6006502e-10;
-        double h = 5.3215045e-8;
-        double a = -0.0000073453731;
-        double b = 0.00066909674;
-        double c = -0.038158381;
-        double d = 1.2235733;
-        double f = -14.12222;
-        double out = (((((((((q * x + w) * x + r) * x + t) * x + o) * x + h) * x + a) * x + b) * x + c) * x + d) * x + f;
+        double a = 9.4918428E-23;
+        double b = -1.2357392E-19;
+        double c = 2.6235422E-17;
+        double d = 4.0235121E-14;
+        double f = -3.3316395E-11;
+        double g = 1.1832639E-8;
+        double h = -0.0000023618685;
+        double j = 0.00027990222;
+        double k = -0.019383058;
+        double l = 0.72053699;
+        double m = -8.4572775;
+        double out = m + x * (l + x * (k + x * (j + x * (h + x * (g + x * (f + x * (d + x * (c + x * (b + x * a)))))))));
         out = Range.clip(out, -7.2, 7.2);
         return out;
     }
 
     public static double getUpVelocityFromDistance(double x) {
-        double q = -3.45907498e-23;
-        double w = 1.12139456e-19;
-        double r = -1.24832445e-16;
-        double t = 7.05167915e-14;
-        double o = -2.32198243e-11;
-        double h = 4.72528627e-9;
-        double a = -6.05676656e-7;
-        double b = 0.0000483669971;
-        double c = -0.00229899239;
-        double d = 0.058735351;
-        double f = -0.365053577;
-        double out = (((((((((q * x + w) * x + r) * x + t) * x + o) * x + h) * x + a) * x + b) * x + c) * x + d) * x + f;
+        double a = -7.7848356E-24;
+        double b =  8.4146821E-21;
+        double c =  2.4909286E-18;
+        double d = -8.0146899E-15;
+        double f =  5.1807831E-12;
+        double g = -1.6932642E-9;
+        double h =  3.1933696E-7;
+        double j = -0.000035728628;
+        double k =  0.0023123818;
+        double l = -0.078720616;
+        double m =  1.3238504;
+        double out = m + x * (l + x * (k + x * (j + x * (h + x * (g + x * (f + x * (d + x * (c + x * (b + x * a)))))))));
         out = Range.clip(out, -1, 1);
         return out;
     }
