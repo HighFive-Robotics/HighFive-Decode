@@ -263,6 +263,13 @@ public class Shooter extends HighModule {
         return target;
     }
 
+    public double getTargetDown() {
+        return targetDown;
+    }
+    public double getTargetUp() {
+        return targetUp;
+    }
+
     public void setPIDCoefficientsDown(double kp, double kd, double ki, double kf) {
         motorDown.setVelocityPIDCoefficients(kp, ki, kd, kf, 1);
     }

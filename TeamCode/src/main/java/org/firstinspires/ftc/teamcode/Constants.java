@@ -18,8 +18,6 @@ import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-
 public class Constants {
 
     @Config
@@ -30,7 +28,7 @@ public class Constants {
         public static Color autoColor = Color.Red;
         public static Case randomizedCase = Case.None;
         public static Pose BlueGoalCorner = new Pose(10, 134), BlueGoalWallUp = new Pose(12, 134), BlueGoalWallLeft = new Pose(10, 132), BlueGoalDistance = new Pose(22.5, 123);
-        public static Pose RedGoalCorner = new Pose(134, 134), RedGoalWallUp = new Pose(132, 134), RedGoalWallRight = new Pose(134, 132), RedGoalDistance = new Pose(121, 121);
+        public static Pose RedGoalCorner = new Pose(132, 132), RedGoalWallUp = new Pose(130, 132), RedGoalWallRight = new Pose(132, 130), RedGoalDistance = new Pose(121, 121);
     }
 
     public enum Case {
@@ -87,7 +85,7 @@ public class Constants {
 
         @Config
         public static class ShooterFlyWheelParams {
-            public static double kpFly = 0.00085, kdFly = 0.00006, kiFly = 0.0038, kfFly = 0.00016, ksFly = 0, kaFly = 0;
+            public static double kpFly = 0.004, kdFly = 0.0001, kiFly = 0.0035, kfFly = 0.00016, ksFly = 0, kaFly = 0;
             public static final double wheelDiameterFly = 0.096;
             public static final double encoderResolutionFly = 28;
         }

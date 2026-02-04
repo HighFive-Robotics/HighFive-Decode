@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.Core.Module.Outtake;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.turretMotorName;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.BlueGoalCorner;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.BlueGoalWallLeft;
@@ -78,13 +77,10 @@ public class Turret extends HighModule {
             errorWallLeft = Math.abs(-Math.PI - angleWallLeft);
 
             if(angleWallLeft <= minimumErrorAngleForWalls && angleWallLeft <= errorCorner){
-                telemetry.addLine("Wall Right");
                 return angleWallLeft - robotPose.getHeading();
             } else if(errorWallUp <= minimumErrorAngleForWalls && angleWallUp <= errorCorner){
-                telemetry.addLine("Wall Up");
                 return angleWallUp - robotPose.getHeading();
             } else {
-                telemetry.addLine("Corner");
                 return angleCorner - robotPose.getHeading();
             }
         } else {
@@ -97,13 +93,10 @@ public class Turret extends HighModule {
             errorWallRight = Math.abs(angleWallRight);//Because the formula is 0 - angleWallRight
 
             if(errorWallRight <= minimumErrorAngleForWalls && errorWallRight <= errorCorner){
-                telemetry.addLine("Wall Right");
                 return angleWallRight - robotPose.getHeading();
             } else if(errorWallUp <= minimumErrorAngleForWalls && angleWallUp <= errorCorner){
-                telemetry.addLine("Wall Up");
                 return angleWallUp - robotPose.getHeading();
             } else {
-                telemetry.addLine("Corner");
                 return angleCorner - robotPose.getHeading();
             }
         }

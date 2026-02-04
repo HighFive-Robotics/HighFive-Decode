@@ -88,6 +88,7 @@ public class ShooterCalibration extends LinearOpMode {
                 turret.addOffsetDegrees(+5);
             }
             if(gamepad1.psWasPressed()) drive.resetTeleOpHeading();
+            if(gamepad1.psWasPressed()) drive.resetTeleOpHeading();
             if(!shootingSeq){
                 if(gamepad1.right_trigger >= 0.4){
                     motor.setPower(1);
@@ -100,6 +101,9 @@ public class ShooterCalibration extends LinearOpMode {
             turret.setTarget(turret.getTargetAngleFromDistance(drive.getPose()));
             if (gamepad1.square) {
                 shooter.setTargetVelocity(getDistance());
+            }
+            if (gamepad1.circle) {
+                shooter.updateAllCoefficients();
             }
 
             if(shootingSeq){
@@ -116,7 +120,7 @@ public class ShooterCalibration extends LinearOpMode {
                                 timer.reset();
                                 k++;
                                 shooter.addToUpToleranceOffset(0.025);
-                                shooter.addToDownToleranceOffset(0.06);
+                                shooter.addToDownToleranceOffset(0.035);
                             }
                         } else {
                             cycles = -1;
@@ -148,7 +152,9 @@ public class ShooterCalibration extends LinearOpMode {
                 shooter.motorDown.motor.setPower(0.5);
             }
             telemetry.addData("Down Velocity",shooter.motorDown.getCurrentVelocity());
+            telemetry.addData("Down Target",shooter.getTargetDown());
             telemetry.addData("Up Velocity",shooter.motorUp.getCurrentVelocity());
+            telemetry.addData("Up Target",shooter.getTargetUp());
             telemetry.addData("State shoot",k);
             telemetry.addData("Bool shoot",shootingSeq);
             telemetry.addData("error velo" , shooter.getVelocityErrorDown());
