@@ -115,8 +115,8 @@ public class ShooterCalibration extends LinearOpMode {
                                 motor.setPower(1);
                                 timer.reset();
                                 k++;
-                                shooter.addToUpToleranceOffset(0.05);
-                                shooter.addToDownToleranceOffset(0.075);
+                                shooter.addToUpToleranceOffset(0.025);
+                                shooter.addToDownToleranceOffset(0.06);
                             }
                         } else {
                             cycles = -1;
@@ -129,7 +129,7 @@ public class ShooterCalibration extends LinearOpMode {
                         }
                         break;
                     case 2:
-                        boolean ballFired = (shooter.getVelocityErrorDown() >= 0.4 || shooter.getVelocityErrorUp() >= 0.1) || timer.milliseconds() >= 400;
+                        boolean ballFired = (shooter.getVelocityErrorDown() >= 0.35 || shooter.getVelocityErrorUp() >= 0.1) || timer.milliseconds() >= 450;
                         boolean minPulseCheck = timer.milliseconds() > 25;
                         if(ballFired && minPulseCheck){
                             motor.setPower(0);
@@ -143,6 +143,9 @@ public class ShooterCalibration extends LinearOpMode {
                         }
                         break;
                 }
+            }
+            if(gamepad1.optionsWasPressed()){
+                shooter.motorDown.motor.setPower(0.5);
             }
             telemetry.addData("Down Velocity",shooter.motorDown.getCurrentVelocity());
             telemetry.addData("Up Velocity",shooter.motorUp.getCurrentVelocity());
