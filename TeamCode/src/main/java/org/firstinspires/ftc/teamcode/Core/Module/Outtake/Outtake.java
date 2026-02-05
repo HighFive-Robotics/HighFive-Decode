@@ -21,15 +21,21 @@ public class Outtake extends HighModule {
     public Shooter shooter;
     public Turret turret;
     public Blocker blocker;
+    public DigitalChannel breakBeamOuttake;
+    private final Telemetry telemetry;
+
     public Pose robotPose;
-    private DigitalChannel breakBeamOuttake;
+    final ElapsedTime timer = new ElapsedTime();
     private double distanceToGoal;
-    private Telemetry telemetry;
+    public boolean hasShot = false;
+
+
     public Outtake(HardwareMap hardwareMap , Constants.Color color , Telemetry telemetry){
         shooter = new Shooter(hardwareMap);
         turret = new Turret(hardwareMap , color , telemetry);
-        blocker = new Blocker(hardwareMap, Blocker.OpenPosition, true);
+        blocker = new Blocker(hardwareMap, Blocker.ClosedPosition, true);
         breakBeamOuttake = hardwareMap.get(DigitalChannel.class, breakBeamOuttakeName);
+        breakBeamOuttake.setMode(DigitalChannel.Mode.INPUT);
         this.telemetry = telemetry;
     }
 
@@ -84,6 +90,17 @@ public class Outtake extends HighModule {
         shooter.update();
         turret.update();
         blocker.update();
+
+        if(breakBeamOuttake.getState()){
+            timer.reset();
+            hasShot = true;
+        }
+
+        if(hasShot){
+            if(timer.milliseconds() >= 100){
+                hasShot = false;
+            }
+        }
     }
     public void update(Pose robotPose) {
         this.robotPose = robotPose;

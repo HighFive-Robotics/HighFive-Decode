@@ -27,7 +27,7 @@ public class Constants {
         public static Pose finalAutoPose = new Pose(0, 0, 0);
         public static Color autoColor = Color.Red;
         public static Case randomizedCase = Case.None;
-        public static Pose BlueGoalCorner = new Pose(10, 134), BlueGoalWallUp = new Pose(12, 134), BlueGoalWallLeft = new Pose(10, 132), BlueGoalDistance = new Pose(22.5, 123);
+        public static Pose BlueGoalCorner = new Pose(4.5, 139.5), BlueGoalWallUp = new Pose(14, 132), BlueGoalWallLeft = new Pose(12, 130), BlueGoalDistance = new Pose(18.5, 123.5);
         public static Pose RedGoalCorner = new Pose(139.5, 139.5), RedGoalWallUp = new Pose(130, 132), RedGoalWallRight = new Pose(132, 130), RedGoalDistance = new Pose(121, 121);
     }
 
@@ -113,15 +113,15 @@ public class Constants {
 
     public static FollowerConstants FConstants = new FollowerConstants()
             .holdPointHeadingScaling(1)
-            .mass(15.5)
-            .forwardZeroPowerAcceleration(-36.6917641)
-            .lateralZeroPowerAcceleration(-62.2850712)
+            .mass(13.7)
+            .forwardZeroPowerAcceleration(-30.7325319)
+            .lateralZeroPowerAcceleration(-74.2480333)
             .useSecondaryTranslationalPIDF(false)
             .useSecondaryHeadingPIDF(false)
             .useSecondaryDrivePIDF(true)
             .translationalPIDFCoefficients(new PIDFCoefficients(0.125, 0, 0.0175, 0))
             .headingPIDFCoefficients(new PIDFCoefficients(2, 0, 0.15, 0))
-            .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(3, 0, 0.05, 0))
+            .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(2.5, 0, 0.07, 0))
             .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.1, 0, 0.001, 0.6, 0.01))
             .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(0.01, 0, 0.0001, 0.6, 0.01))
             .centripetalScaling(0.0004);
@@ -136,8 +136,8 @@ public class Constants {
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .xVelocity(80.185892)
-            .yVelocity(63.103582);
+            .xVelocity(78.989683)
+            .yVelocity(61.149199);
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
            //.distanceUnit(DistanceUnit.CM)

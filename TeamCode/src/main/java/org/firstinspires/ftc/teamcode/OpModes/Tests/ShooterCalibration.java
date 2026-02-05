@@ -30,11 +30,11 @@ public class ShooterCalibration extends LinearOpMode {
 
     enum Mode{
         Up,
-
         Down,
         Test,
         None
     }
+
     HighCamera camera;
     public Outtake outtake;
     public static Mode mode = Mode.None;
@@ -102,6 +102,7 @@ public class ShooterCalibration extends LinearOpMode {
             if (gamepad1.optionsWasPressed()) {
                 shouldUseCamera = !shouldUseCamera;
             }
+
             if (shootingSeq) {
                 switch (k) {
                     case 0:

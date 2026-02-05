@@ -16,7 +16,7 @@ public class Intake extends HighModule {
 
     ElapsedTime timer = new ElapsedTime();
 
-    public boolean isFull = false, isPartial = false;
+    public boolean isFull = false, isPartial = false, canStop = true;
 
     public Intake(HardwareMap hwMap) {
         intakeMotor = new IntakeMotor(hwMap);
@@ -26,7 +26,7 @@ public class Intake extends HighModule {
         breakBeamDown.setMode(DigitalChannel.Mode.INPUT);
     }
 
-    public void setPowerState(IntakeMotor.States state){
+    public void setPower(IntakeMotor.States state){
         intakeMotor.setState(state);
     }
 
