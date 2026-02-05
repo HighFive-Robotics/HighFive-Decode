@@ -150,8 +150,6 @@ public class Turret extends HighModule {
         if(Math.abs(targetAngle - lastTargetAngle) >= 0.017){
             motor.setTarget(targetTicks);
             lastTargetAngle = targetAngle;
-        } else {
-            targetAngle = lastTargetAngle;
         }
     }
 
@@ -177,8 +175,6 @@ public class Turret extends HighModule {
         if(Math.abs(targetAngle - lastTargetAngle) >= 0.017){
             motor.setTarget(targetTicks);
             lastTargetAngle = targetAngle;
-        } else {
-            targetAngle = lastTargetAngle;
         }
     }
 
@@ -218,11 +214,11 @@ public class Turret extends HighModule {
     }
 
     /** From this method you will know if the turret has reached the target.
-     * @return This returns if the total error of the turret is less than 1.5 Degrees or 0.025 Radians.
+     * @return This returns if the total error of the turret is less than 3 Degrees or 0.050 Radians.
      */
     @Override
     public boolean atTarget(){
-        return Math.abs(targetAngle - currentAngle) >= 0.025;
+        return Math.abs(targetAngle - wrapAroundAngle(currentAngle)) <= 0.050;
     }
 
     /** This method returns the target of the turret, which is in Radians.

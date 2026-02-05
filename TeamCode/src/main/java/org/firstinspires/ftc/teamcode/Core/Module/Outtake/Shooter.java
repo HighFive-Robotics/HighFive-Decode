@@ -31,7 +31,6 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighMotor;
 @Config
 public class Shooter extends HighModule {
     public HighMotor motorUp, motorDown;
-    public Blocker blocker;
     public double velocityUp, velocityDown, upTolerance, downTolerance, upOffset = 0.05, downOffset = 0.1;
     public double targetUp, targetDown;
     public static double massBall = 0.050;
@@ -68,7 +67,6 @@ public class Shooter extends HighModule {
                 .setUseZeroPowerBehaviour(false)
                 .build();
         motorUp.setTolerance(0.08);
-        blocker = new Blocker(hwMap, Blocker.OpenPosition, true);
         upTolerance = 0.05;
         downTolerance = 0.1;
     }
@@ -175,42 +173,16 @@ public class Shooter extends HighModule {
         return x / 0.17988;
     }
 
-    public static double decayedToExtension(double x) {
+    public double decayedToExtension(double x) {
         return x * x + (x / (0.066 * Math.pow(2, x))) - 7.6 * x;
     }
 
     public static double getDownVelocityFromDistance(double x) {
-        double a = 9.4918428E-23;
-        double b = -1.2357392E-19;
-        double c = 2.6235422E-17;
-        double d = 4.0235121E-14;
-        double f = -3.3316395E-11;
-        double g = 1.1832639E-8;
-        double h = -0.0000023618685;
-        double j = 0.00027990222;
-        double k = -0.019383058;
-        double l = 0.72053699;
-        double m = -8.4572775;
-        double out = m + x * (l + x * (k + x * (j + x * (h + x * (g + x * (f + x * (d + x * (c + x * (b + x * a)))))))));
-        out = Range.clip(out, -7.2, 7.2);
-        return out;
+        return TrajectoryRegression.calculateDown(x);
     }
 
     public static double getUpVelocityFromDistance(double x) {
-        double a = -7.7848356E-24;
-        double b =  8.4146821E-21;
-        double c =  2.4909286E-18;
-        double d = -8.0146899E-15;
-        double f =  5.1807831E-12;
-        double g = -1.6932642E-9;
-        double h =  3.1933696E-7;
-        double j = -0.000035728628;
-        double k =  0.0023123818;
-        double l = -0.078720616;
-        double m =  1.3238504;
-        double out = m + x * (l + x * (k + x * (j + x * (h + x * (g + x * (f + x * (d + x * (c + x * (b + x * a)))))))));
-        out = Range.clip(out, -1, 1);
-        return out;
+        return TrajectoryRegression.calculateUp(x);
     }
 
     public double getVelocityErrorUp() {
@@ -310,6 +282,5 @@ public class Shooter extends HighModule {
         velocityDown = motorDown.getCurrentVelocity();
         motorUp.update();
         motorDown.update();
-        blocker.update();
     }
 }

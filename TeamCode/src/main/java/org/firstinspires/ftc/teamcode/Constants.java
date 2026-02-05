@@ -28,7 +28,7 @@ public class Constants {
         public static Color autoColor = Color.Red;
         public static Case randomizedCase = Case.None;
         public static Pose BlueGoalCorner = new Pose(10, 134), BlueGoalWallUp = new Pose(12, 134), BlueGoalWallLeft = new Pose(10, 132), BlueGoalDistance = new Pose(22.5, 123);
-        public static Pose RedGoalCorner = new Pose(132, 132), RedGoalWallUp = new Pose(130, 132), RedGoalWallRight = new Pose(132, 130), RedGoalDistance = new Pose(121, 121);
+        public static Pose RedGoalCorner = new Pose(139.5, 139.5), RedGoalWallUp = new Pose(130, 132), RedGoalWallRight = new Pose(132, 130), RedGoalDistance = new Pose(121, 121);
     }
 
     public enum Case {
@@ -55,8 +55,9 @@ public class Constants {
         public static String pinPointName = "odo";
         public static String webcamName = "Webcam 1";
         public static String intakeMotorName = "IM";
-        public static String breakBeamIntakeNameUp = "IB";
-        public static String breakBeamIntakeNameDown = "IB";
+        public static String breakBeamIntakeNameUp = "IBU";
+        public static String breakBeamIntakeNameDown = "IBD";
+        public static String breakBeamOuttakeName = "OB";
         public static String shooterMotorUpName = "OMT";
         public static String shooterMotorDownName = "OMB";
         public static String turretMotorName = "TM";

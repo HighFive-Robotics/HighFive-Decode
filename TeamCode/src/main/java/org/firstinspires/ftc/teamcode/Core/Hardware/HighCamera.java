@@ -11,6 +11,7 @@ import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.Constants;
 
 import java.util.List;
@@ -82,6 +83,48 @@ public class HighCamera{
         }
         return null;
     }
+    public Pose getAprilTagPose(double heading){
+        if (pipeline != Pipelines.AprilTagLocation) setPipeline(Pipelines.AprilTagLocation);
+        ll.updateRobotOrientation(heading);
+        LLResult result = getResult();
+        if(resultIsValid(result)){
+            LLResultTypes.FiducialResult fr = result.getFiducialResults().get(0);
+            double poseX = -fr.getRobotPoseTargetSpace().getPosition().x * 39.37;
+            double poseY = fr.getRobotPoseTargetSpace().getPosition().z * 39.37;
+            double poseHeading = Math.toRadians(-fr.getRobotPoseTargetSpace().getOrientation().getYaw());
+            return new Pose(poseX,poseY,poseHeading);
+        }
+        return null;
+    }
+    public Pose getMegaTagFieldPose() {
+        LLResult result = getResult();
+        if (result != null) {
+            Pose3D mt1 = result.getBotpose();
+            if (mt1 != null) {
+                return new Pose(
+                        mt1.getPosition().x * 39.37,
+                        mt1.getPosition().y * 39.37,
+                        Math.toRadians(mt1.getOrientation().getYaw())
+                );
+            }
+        }
+        return null;
+    }
+    public Pose getMegaTagFieldPose(double heading) {
+        ll.updateRobotOrientation(heading);
+        LLResult result = getResult();
+        if (result != null) {
+            Pose3D mt1 = result.getBotpose();
+            if (mt1 != null) {
+                return new Pose(
+                        mt1.getPosition().x * 39.37,
+                        mt1.getPosition().y * 39.37,
+                        Math.toRadians(mt1.getOrientation().getYaw())
+                );
+            }
+        }
+        return null;
+    }
     public Pose getBallPose() {
         if (pipeline != Pipelines.BallDetection) setPipeline(Pipelines.BallDetection);
         LLResult result = getResult();
@@ -101,6 +144,6 @@ public class HighCamera{
         return motif != Constants.Case.None;
     }
     public boolean resultIsValid(LLResult result){
-        return result != null;
+        return result != null && result.isValid();
     }
 }
