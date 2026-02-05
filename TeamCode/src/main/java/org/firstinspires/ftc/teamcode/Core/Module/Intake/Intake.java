@@ -37,7 +37,10 @@ public class Intake extends HighModule {
     @Override
     public void update() {
         intakeMotor.update();
-        isFull = breakBeamUp.getState() && breakBeamDown.getState();
-        isFull = breakBeamUp.getState();
+        if(timer.milliseconds() >= 150){
+            isFull = breakBeamUp.getState() && breakBeamDown.getState();
+            isPartial = breakBeamUp.getState();
+            timer.reset();
+        }
     }
 }
