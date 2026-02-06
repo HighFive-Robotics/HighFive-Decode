@@ -168,7 +168,7 @@ public class AutoBlue extends LinearOpMode {
                     state++;
                     break;
                 case 1:
-                    if((robot.isDone() && robot.outtake.atTarget()) || autoTimer.milliseconds() > 5000) {
+                    if(robot.isDone() || autoTimer.milliseconds() > 5000) {
                         robot.setAction(Robot.Actions.Shoot);
                         timer.reset();
                         state = 100;
@@ -309,7 +309,7 @@ public class AutoBlue extends LinearOpMode {
                     }
                     break;
                 case 19:
-                    if (timer.milliseconds() >= 750) {
+                    if (timer.milliseconds() >= 750 || robot.intake.isFull) {
                         robot.outtake.turret.setTargetDegrees(-85);
                         robot.drive.followPath(goShootLast);
                         state++;
