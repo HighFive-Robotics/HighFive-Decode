@@ -22,23 +22,23 @@ public class AutoBlue extends LinearOpMode {
     public Robot robot;
     public int state = 0;
 
-    public Pose startPose = new Pose(15, 119, Math.toRadians(-40));
+    public Pose startPose = new Pose(17, 111.5, Math.toRadians(0));
     public Pose shootPose = new Pose(55, 85, Math.toRadians(-40));
     public Pose lastShootPose = new Pose(50, 112.5, Math.toRadians(-25));
     public Pose preOpenGatePose = new Pose(20, 68, Math.toRadians(-90));
     public Pose openGatePose = new Pose(12, 68, Math.toRadians(-90));
     public Pose controlPoint1 = new Pose(60, 60);
     public Pose controlPoint2 = new Pose(45, 65);
-    public Pose controlPoint3 = new Pose(60, 40);
+    public Pose controlPoint3 = new Pose(62, 45);
     public Pose controlPoint4 = new Pose(12, 58);
-    public Pose preCollectSpikeMark2Pose = new Pose(42.5, 60, Math.toRadians(180));
-    public Pose collectSpikeMark2Pose = new Pose(17, 60, Math.toRadians(180));
-    public Pose preCollectSpikeMark1Pose = new Pose(42.5, 82, Math.toRadians(180));
-    public Pose collectSpikeMark1Pose = new Pose(20, 82, Math.toRadians(180));
-    public Pose preCollectSpikeMark3Pose = new Pose(42.5, 37, Math.toRadians(180));
-    public Pose collectSpikeMark3Pose = new Pose(16, 37, Math.toRadians(180));
-    public Pose collectLoadingZone1 = new Pose(9, 12, Math.toRadians(180));
-    public Pose preCollectLoadingZone1 = new Pose(9, 22, Math.toRadians(180));
+    public Pose preCollectSpikeMark2Pose = new Pose(42.5, 58, Math.toRadians(180));
+    public Pose collectSpikeMark2Pose = new Pose(17, 58, Math.toRadians(180));
+    public Pose preCollectSpikeMark1Pose = new Pose(42.5, 78, Math.toRadians(180));
+    public Pose collectSpikeMark1Pose = new Pose(20, 78, Math.toRadians(180));
+    public Pose preCollectSpikeMark3Pose = new Pose(42.5, 34, Math.toRadians(180));
+    public Pose collectSpikeMark3Pose = new Pose(16, 34, Math.toRadians(180));
+    public Pose collectLoadingZone1 = new Pose(12, 12, Math.toRadians(180));
+    public Pose preCollectLoadingZone1 = new Pose(12, 22, Math.toRadians(180));
 
     private final ElapsedTime autoTimer = new ElapsedTime();
     private final ElapsedTime timer = new ElapsedTime();
@@ -46,6 +46,7 @@ public class AutoBlue extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         robot = new Robot(hardwareMap, startPose, true, Constants.Color.Blue, telemetry, gamepad1);
+        robot.outtake.turret.reset();
         autoColor = Constants.Color.Blue;
         robot.drive.resetTeleOpHeading();
         robot.camera.startCapture();
@@ -162,7 +163,8 @@ public class AutoBlue extends LinearOpMode {
             switch (state) {
                 case 0:
                     robot.drive.followPath(preloadPath, true);
-                    robot.outtake.turret.setTargetDegrees(180);
+                    robot.intake.setPower(IntakeMotor.States.Collect);
+                    robot.outtake.turret.setTargetDegrees(167);
                     state++;
                     break;
                 case 1:
@@ -185,6 +187,12 @@ public class AutoBlue extends LinearOpMode {
                         robot.outtake.closeBlocker();
                         robot.outtake.setShootingVelocity(130);
                         robot.outtake.turret.setTargetDegrees(-45);
+                        robot.drive.followPath(goForSpike1, true);
+                        state = 3;
+                    }
+                    break;
+                case 3:
+                    if(robot.drive.atParametricEnd()){
                         robot.drive.followPath(collectSpike1, true);
                         state = 5;
                     }
@@ -206,7 +214,7 @@ public class AutoBlue extends LinearOpMode {
                 case 7:
                     if (!robot.shootingSequence || timer.milliseconds() >= 5000) {
                         robot.drive.followPath(goForSpike2, true);
-                        robot.outtake.turret.setTargetDegrees(180);
+                        robot.outtake.turret.setTargetDegrees(173);
                         state = 700;
                     }
                     break;
@@ -249,7 +257,7 @@ public class AutoBlue extends LinearOpMode {
                     break;
                 case 12:
                 if (!robot.shootingSequence || timer.milliseconds() >= 5000) {
-                    robot.outtake.turret.setTargetDegrees(-95);
+                    robot.outtake.turret.setTargetDegrees(-100);
                     robot.intake.setPower(IntakeMotor.States.Collect);
                     robot.drive.followPath(goForSpike3, true);
                     state++;
@@ -258,12 +266,14 @@ public class AutoBlue extends LinearOpMode {
                 case 13:
                     if (robot.drive.atParametricEnd()) {
                         robot.intake.setPower(IntakeMotor.States.Collect);
+                        robot.drive.setMaxPower(0.8);
                         robot.drive.followPath(collectSpike3, true);
                         state++;
                     }
                     break;
                 case 14:
                     if (robot.isDone()) {
+                        robot.drive.setMaxPower(1);
                         robot.drive.followPath(goShootSpike3, true);
                         state = 15;
                     }
@@ -300,7 +310,7 @@ public class AutoBlue extends LinearOpMode {
                     break;
                 case 19:
                     if (timer.milliseconds() >= 750) {
-                        robot.outtake.turret.setTargetDegrees(-80);
+                        robot.outtake.turret.setTargetDegrees(-85);
                         robot.drive.followPath(goShootLast);
                         state++;
                     }
