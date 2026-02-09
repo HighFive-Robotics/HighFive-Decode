@@ -153,7 +153,7 @@ public class Robot extends HighModule {
                     }
                     break;
                 case 2:
-                    boolean ballFired = (outtake.checkErrorTolerance(0.35,1)) || timerShoot.milliseconds() >= 275;
+                    boolean ballFired = outtake.checkErrorTolerance(0.35,0.1) || timerShoot.milliseconds() >= 275;
                     boolean minPulseCheck = timerShoot.milliseconds() > 25;
                     if(ballFired && minPulseCheck) {
                         intake.setPower(IntakeMotor.States.Wait);
