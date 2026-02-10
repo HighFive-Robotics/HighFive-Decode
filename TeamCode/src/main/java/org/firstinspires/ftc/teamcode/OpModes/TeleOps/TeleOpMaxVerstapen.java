@@ -19,6 +19,7 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
     Robot robot;
 
     boolean rumbled = false;
+    boolean dynamicUpdate = false;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -78,6 +79,14 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
                 robot.drive.resetTeleOpHeading();
             }
 
+            if(gamepad1.optionsWasPressed()){
+                dynamicUpdate = !dynamicUpdate;
+            }
+
+            if(dynamicUpdate){
+                robot.outtake.setShootingVelocityOffset(-2);
+            }
+            
             telemetry.update();
             robot.update();
         }

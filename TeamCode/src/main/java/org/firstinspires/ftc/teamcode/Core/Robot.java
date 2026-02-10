@@ -129,16 +129,16 @@ public class Robot extends HighModule {
                 case 0:
                     outtake.openBlocker();
                     cycles = 1;
+                    timerShoot.reset();
                     shootingState++;
                     break;
                 case 1:
                     if (cycles <= 3 || holdingSequence) {
-                        if (outtake.atTarget()) {
+                        if (outtake.atTarget() || (cycles == 1 && timerShoot.milliseconds()>=400)) {
                             intake.setPower(IntakeMotor.States.Collect);
-                            timerShoot.reset();
-                            shootingState++;
+                            timerShoot.reset();                            shootingState++;
                             if(cycles <= 3){
-                                outtake.increaseToleranceOffset(0.035,0.025);
+                                outtake.increaseToleranceOffset(0.05,0.025);
                             }
                         }
                     } else {
@@ -153,7 +153,7 @@ public class Robot extends HighModule {
                     }
                     break;
                 case 2:
-                    boolean ballFired = outtake.checkErrorTolerance(0.35,0.1) || timerShoot.milliseconds() >= 275;
+                    boolean ballFired = outtake.hasShot || outtake.checkErrorTolerance(0.35,0.1) || timerShoot.milliseconds() >= 275;
                     boolean minPulseCheck = timerShoot.milliseconds() > 25;
                     if(ballFired && minPulseCheck) {
                         intake.setPower(IntakeMotor.States.Wait);
