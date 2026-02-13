@@ -25,7 +25,7 @@ public class Outtake extends HighModule {
     private final Telemetry telemetry;
 
     public Pose robotPose;
-    final ElapsedTime timer = new ElapsedTime();
+    public final ElapsedTime timer = new ElapsedTime();
     private double distanceToGoal;
     public boolean hasShot = false;
 
@@ -91,14 +91,15 @@ public class Outtake extends HighModule {
         turret.update();
         blocker.update();
 
-        if(breakBeamOuttake.getState()){
+        if(breakBeamOuttake.getState() && timer.milliseconds() >= 30){
             timer.reset();
             hasShot = true;
         }
 
         if(hasShot){
-            if(timer.milliseconds() >= 100){
+            if(timer.milliseconds() >= 30){
                 hasShot = false;
+                timer.reset();
             }
         }
     }
@@ -112,9 +113,7 @@ public class Outtake extends HighModule {
                  distanceToGoal = 2.54 * Math.hypot(RedGoalDistance.getX() - robotPose.getX(),RedGoalDistance.getY() - robotPose.getY());
                  break;
         }
-        shooter.update();
-        turret.update();
-        blocker.update();
+        update();
     }
     public void debug(){
         telemetry.addData("Down Velocity", shooter.motorDown.getCurrentVelocity());
