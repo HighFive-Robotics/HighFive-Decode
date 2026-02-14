@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Core.Module.Outtake;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.shooterMotorDownName;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.shooterMotorUpName;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.encoderResolutionBack;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.kC;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.kaBack;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.kdBack;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.kfBack;
@@ -23,7 +24,6 @@ import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterF
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighModule;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighMotor;
@@ -33,20 +33,16 @@ public class Shooter extends HighModule {
     public HighMotor motorUp, motorDown;
     public double velocityUp, velocityDown, upTolerance, downTolerance, upOffset = 0.05, downOffset = 0.1;
     public double targetUp, targetDown;
-    public static double massBall = 0.050;
-    public static double massTopWheel = 0.030;
-    public static double couplingEfficiency = 0.8;
-    public static double alpha = 0.5;
-    public static boolean shouldUsePhysics = false;
+    private boolean shouldCompensate = false;
 
     public Shooter(HardwareMap hwMap) {
+        target = 0;
         motorDown = HighMotor.Builder.startBuilding()
                 .setMotor(hwMap.get(DcMotorEx.class, shooterMotorDownName))
                 .setRunMode(HighMotor.RunMode.Velocity)
                 .setReverseMotor(false)
                 .setEncoder(true, false)
                 .setEncoderResolution(encoderResolutionFly)
-                .setMotorRPM(HighMotor.MotorRPM.RPM6000)
                 .setWheelDiameter(wheelDiameterFly)
                 .useVoltageComensationForVelocity(true)
                 .setVelocityPIDCoefficients(kpFly, kiFly, kdFly, kfFly, ksFly, kaFly, 1)
@@ -59,8 +55,7 @@ public class Shooter extends HighModule {
                 .setRunMode(HighMotor.RunMode.Velocity)
                 .setReverseMotor(false)
                 .setEncoder(true, false)
-                .setEncoderResolution(encoderResolutionBack)
-                .setMotorRPM(HighMotor.MotorRPM.RPM6000)
+                .setEncoderResolution(encoderResolutionBack/2)
                 .setWheelDiameter(wheelDiameterBack)
                 .useVoltageComensationForVelocity(true)
                 .setVelocityPIDCoefficients(kpBack, kiBack, kdBack, kfBack, ksBack, kaBack, 1)
@@ -71,62 +66,7 @@ public class Shooter extends HighModule {
         downTolerance = 0.1;
     }
 
-    public void setAntiBackSpinVelocity(double velocity) {
-        double velocityUp;
-        if (velocity >= 3.2) {
-            velocityUp = -scaleWithDecay(velocity);
-        } else {
-            velocityUp = scaleWithDecay(velocity);
-        }
-        this.targetDown = velocity;
-        this.targetUp = velocityUp;
-        motorUp.setTarget(velocityUp);
-        motorDown.setTarget(velocity);
-    }
 
-    public void setVelocityPhysics(double targetLinearVelocity, double compensation) {
-        double legacyUpVelocity = scaleWithDecayRate(targetLinearVelocity);
-        double legacyExitEnergy = (targetLinearVelocity + Math.abs(legacyUpVelocity)) / 2.0;
-        double legacySpin = targetLinearVelocity - Math.abs(legacyUpVelocity);
-        double targetSpin = legacySpin * (1.0 - alpha);
-        double theoreticalDown = legacyExitEnergy + (targetSpin / 2.0);
-        double theoreticalUp = legacyExitEnergy - (targetSpin / 2.0);
-        double massRatio = massBall / massTopWheel;
-        double momentumFactor = 1.0 + (massRatio * couplingEfficiency);
-        double commandUp = theoreticalUp * momentumFactor;
-        double extraEnergyCost = (commandUp - theoreticalUp) / compensation;
-        double commandDown = theoreticalDown;
-        if (legacyUpVelocity < 0) {
-            commandDown += revertScale(Math.abs(legacyUpVelocity)) / compensation;
-        } else {
-            commandDown += decayedToExtension(legacyUpVelocity) / compensation;
-        }
-        commandDown -= extraEnergyCost;
-        this.targetUp = commandUp;
-        this.targetDown = commandDown;
-        motorUp.setTarget(this.targetUp);
-        motorDown.setTarget(this.targetDown);
-    }
-
-    public void setVelocity(double velocity, double compensation) {
-        if (shouldUsePhysics) {
-            double velocityUp = scaleWithDecayRate(velocity);
-            double velocityDown = velocity;
-            if (velocityUp < 0) {
-                velocityDown += revertScale(Math.abs(velocityUp)) / compensation;
-            } else {
-                velocityDown += decayedToExtension(velocityUp) / compensation;
-            }
-            this.targetUp = velocityUp;
-            this.targetDown = velocityDown;
-            motorUp.setTarget(velocityUp);
-            motorDown.setTarget(velocityDown);
-        } else setVelocityPhysics(velocity, compensation);
-    }
-
-    public void setVelocity(double velocity) {
-        setVelocity(velocity, 1);
-    }
 
     public void setUpTargetVelocity(double velocity) {
         this.targetUp = velocity;
@@ -144,39 +84,20 @@ public class Shooter extends HighModule {
     }
 
     public void setTargetVelocity(double distance) {
-        setUpTargetVelocity(getUpVelocityFromDistance(distance));
-        setDownTargetVelocity(getDownVelocityFromDistance(distance));
+        double raw = TrajectoryRegression.calculateDown(distance);
+        setTargetVelocity(raw,raw);
+        target = raw;
     }
-
-    public static double scaleWithDecay(double x) {
-        double slope = 0.20 / 1.23;
-        double hingeValue = 2.0 * slope;
-        double target = -0.1;
-        double exponent = 4 + x;
-
-        if (x <= 2.0) {
-            return x * slope;
-        }
-        double progress = (x - 2.0) / (7.2 - 2.0);
-        return hingeValue + (target - hingeValue) * Math.pow(progress, exponent);
+    public void setTargetVelocityCompensation(double distance) {
+        shouldCompensate = true;
+        setTargetVelocity(distance);
     }
+    public void setManualVelocity(double velocity){
+        setTargetVelocity(velocity,velocity);
+        shouldCompensate = true;
+        target = velocity;
 
-    public static double scaleWithDecayRate(double x) {
-        if (x <= 3) {
-            return 0.066 * x;
-        } else {
-            return (((((((0.0005849323 * x - 0.01907369) * x + 0.2549253) * x - 1.800606) * x + 7.238965) * x - 16.59063) * x + 19.87657) * x - 9.144974);
-        }
     }
-
-    public static double revertScale(double x) {
-        return x / 0.17988;
-    }
-
-    public double decayedToExtension(double x) {
-        return x * x + (x / (0.066 * Math.pow(2, x))) - 7.6 * x;
-    }
-
     public static double getDownVelocityFromDistance(double x) {
         return TrajectoryRegression.calculateDown(x);
     }
@@ -280,6 +201,10 @@ public class Shooter extends HighModule {
     public void update() {
         velocityUp = motorUp.getCurrentVelocity();
         velocityDown = motorDown.getCurrentVelocity();
+        if(shouldCompensate && target != 0){
+            targetUp += getVelocityErrorDown() * kC;
+            setUpTargetVelocity(targetUp);
+        }
         motorUp.update();
         motorDown.update();
     }

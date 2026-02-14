@@ -42,6 +42,13 @@ public class Outtake extends HighModule {
     public void setShootingVelocity(double dist){
            shooter.setTargetVelocity(dist);
     }
+    public void setShootingVelocityCompensation(double dist){
+           shooter.setTargetVelocityCompensation(dist);
+    }
+    public void setShootingVelocity(double up , double down){
+           shooter.setDownTargetVelocity(down);
+           shooter.setUpTargetVelocity(up);
+    }
     public void setShootingVelocity(){
         setShootingVelocity(distanceToGoal);
     }
@@ -120,6 +127,7 @@ public class Outtake extends HighModule {
         telemetry.addData("Down Target", shooter.getTargetDown());
         telemetry.addData("Up Velocity", shooter.motorUp.getCurrentVelocity());
         telemetry.addData("Up Target", shooter.getTargetUp());
+        telemetry.addData("General Target" , shooter.target);
         telemetry.addData("Down error velocity", shooter.getVelocityErrorDown());
         telemetry.addData("Ticks: ", turret.getCurrentTicks());
         telemetry.addData("Target Ticks: ", turret.getTargetTicks());

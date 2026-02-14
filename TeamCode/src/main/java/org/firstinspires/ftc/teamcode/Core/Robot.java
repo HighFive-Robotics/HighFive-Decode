@@ -138,7 +138,7 @@ public class Robot extends HighModule {
                             intake.setPower(IntakeMotor.States.Collect);
                             timerShoot.reset();                            shootingState++;
                             if(cycles <= 3){
-                                outtake.increaseToleranceOffset(0.05,0.025);
+                                outtake.increaseToleranceOffset(0.07,0.03);
                             }
                         }
                     } else {
@@ -153,7 +153,7 @@ public class Robot extends HighModule {
                     }
                     break;
                 case 2:
-                    boolean ballFired = outtake.hasShot || outtake.checkErrorTolerance(0.35,0.1) || timerShoot.milliseconds() >= 275;
+                    boolean ballFired = outtake.hasShot ||  timerShoot.milliseconds() >= 275 || outtake.checkErrorTolerance(0.7,0.2);
                     boolean minPulseCheck = timerShoot.milliseconds() > 25;
                     if(ballFired && minPulseCheck) {
                         intake.setPower(IntakeMotor.States.Wait);

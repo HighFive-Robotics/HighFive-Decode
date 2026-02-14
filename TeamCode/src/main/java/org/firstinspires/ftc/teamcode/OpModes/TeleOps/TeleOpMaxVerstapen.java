@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 @TeleOp
@@ -21,8 +22,8 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
     Robot robot;
 
     int i = 0;
-    double []velocityDown = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-
+//    double []velocityDown = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    ArrayList<Double> velocityDown = new ArrayList<>();
     boolean rumbled = false;
     boolean dynamicUpdate = false;
 
@@ -93,12 +94,12 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
             }
 
             if(robot.outtake.hasShot){
-                velocityDown[i] = robot.outtake.shooter.velocityDown;
+                velocityDown.add(robot.outtake.shooter.velocityDown);
                 robot.outtake.hasShot = false;
                 i++;
             }
 
-            telemetry.addData("Velocity Down:", Arrays.toString(velocityDown));
+            telemetry.addData("Velocity Down:", velocityDown.toString());
             telemetry.addData("Shoot :", robot.outtake.hasShot);
             telemetry.update();
             robot.update();

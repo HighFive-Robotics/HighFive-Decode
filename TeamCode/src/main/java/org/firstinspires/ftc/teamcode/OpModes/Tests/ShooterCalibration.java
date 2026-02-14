@@ -45,7 +45,7 @@ public class ShooterCalibration extends LinearOpMode {
     public int cycles;
     Follower drive;
     boolean shootingSeq=false , holdingSeq = false;
-    public static boolean shouldUseCamera = false;
+    public static boolean dacia = true;
     ElapsedTime timer;
     @Override
     public void runOpMode() throws InterruptedException {
@@ -100,7 +100,7 @@ public class ShooterCalibration extends LinearOpMode {
                 outtake.shooter.updateAllCoefficients();
             }
             if (gamepad1.optionsWasPressed()) {
-                shouldUseCamera = !shouldUseCamera;
+                dacia = !dacia;
             }
 
             if (shootingSeq) {
@@ -143,6 +143,9 @@ public class ShooterCalibration extends LinearOpMode {
                         }
                         break;
                 }
+            }
+            if(dacia){
+                outtake.shooter.setManualVelocity(velocityDown);
             }
             outtake.update(drive.getPose());
             outtake.alignTurret();
