@@ -24,15 +24,15 @@ public class Blocker extends HighModule {
 
     public Blocker(HardwareMap hwMap, double initPosition, boolean isAuto) {
         servo = HighServo.Builder.startBuilding()
-                .setServo(hwMap.get(Servo.class , blockerServoName))
+                .setServo(hwMap.get(Servo.class, blockerServoName))
                 .setStandardRunMode()
-                .setInitPosition(initPosition,isAuto)
+                .setInitPosition(initPosition, isAuto)
                 .build();
     }
 
-    public void setState(States state){
+    public void setState(States state) {
         this.state = state;
-        switch (state){
+        switch (state) {
             case Open:
                 setTarget(OpenPosition);
                 break;
@@ -42,9 +42,9 @@ public class Blocker extends HighModule {
         }
     }
 
-    public void setState(Blocker.States state, double time){
+    public void setState(Blocker.States state, double time) {
         this.state = state;
-        switch (state){
+        switch (state) {
             case Open:
                 setTarget(OpenPosition, time);
                 break;
@@ -65,7 +65,7 @@ public class Blocker extends HighModule {
     }
 
     @Override
-    public boolean atTarget(){
+    public boolean atTarget() {
         return servo.atTarget();
     }
 

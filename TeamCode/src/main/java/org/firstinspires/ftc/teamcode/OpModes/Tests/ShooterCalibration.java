@@ -147,6 +147,9 @@ public class ShooterCalibration extends LinearOpMode {
             if(dacia){
                 outtake.shooter.setManualVelocity(velocityDown);
             }
+            if(mode == Mode.Up){
+                outtake.shooter.setUpTargetVelocity(velocityUp);
+            }
             outtake.update(drive.getPose());
             outtake.alignTurret();
             outtake.debug();

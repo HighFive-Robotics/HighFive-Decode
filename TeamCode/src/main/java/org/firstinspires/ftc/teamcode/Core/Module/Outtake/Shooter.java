@@ -55,7 +55,7 @@ public class Shooter extends HighModule {
                 .setRunMode(HighMotor.RunMode.Velocity)
                 .setReverseMotor(false)
                 .setEncoder(true, false)
-                .setEncoderResolution(encoderResolutionBack/2)
+                .setEncoderResolution(encoderResolutionBack / 2)
                 .setWheelDiameter(wheelDiameterBack)
                 .useVoltageComensationForVelocity(true)
                 .setVelocityPIDCoefficients(kpBack, kiBack, kdBack, kfBack, ksBack, kaBack, 1)
@@ -65,7 +65,6 @@ public class Shooter extends HighModule {
         upTolerance = 0.05;
         downTolerance = 0.1;
     }
-
 
 
     public void setUpTargetVelocity(double velocity) {
@@ -85,19 +84,22 @@ public class Shooter extends HighModule {
 
     public void setTargetVelocity(double distance) {
         double raw = TrajectoryRegression.calculateDown(distance);
-        setTargetVelocity(raw,raw);
+        setTargetVelocity(raw, raw);
         target = raw;
     }
+
     public void setTargetVelocityCompensation(double distance) {
         shouldCompensate = true;
         setTargetVelocity(distance);
     }
-    public void setManualVelocity(double velocity){
-        setTargetVelocity(velocity,velocity);
+
+    public void setManualVelocity(double velocity) {
+        setTargetVelocity(velocity, velocity);
         shouldCompensate = true;
         target = velocity;
 
     }
+
     public static double getDownVelocityFromDistance(double x) {
         return TrajectoryRegression.calculateDown(x);
     }
@@ -159,6 +161,7 @@ public class Shooter extends HighModule {
     public double getTargetDown() {
         return targetDown;
     }
+
     public double getTargetUp() {
         return targetUp;
     }
@@ -201,7 +204,7 @@ public class Shooter extends HighModule {
     public void update() {
         velocityUp = motorUp.getCurrentVelocity();
         velocityDown = motorDown.getCurrentVelocity();
-        if(shouldCompensate && target != 0){
+        if (shouldCompensate && target != 0) {
             targetUp += getVelocityErrorDown() * kC;
             setUpTargetVelocity(targetUp);
         }

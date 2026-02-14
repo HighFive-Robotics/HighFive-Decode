@@ -91,7 +91,7 @@ public class Constants {
         }
         @Config
         public static class ShooterBackWheelParams {
-            public static double kpBack = 0.0006, kdBack = 0.00002, kiBack = 0.0007, kfBack = 0.00016, ksBack = 0, kaBack = 0;
+            public static double kpBack = 0.00093, kdBack = 0.00002, kiBack = 0.0009, kfBack = 0.00008, ksBack = 0, kaBack = 0;
             public static final double wheelDiameterBack = 0.048;
             public static final double encoderResolutionBack = 28;
             public static double kC = 1;
@@ -141,7 +141,7 @@ public class Constants {
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
            //.distanceUnit(DistanceUnit.CM)
-            .forwardPodY(2.16)//-55mm -2,16inch
+            .forwardPodY(2.16)//-55mm 2,16inch
             .strafePodX(-3.35)//-85mm -3,35 inch
             .hardwareMapName(pinPointName)
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
