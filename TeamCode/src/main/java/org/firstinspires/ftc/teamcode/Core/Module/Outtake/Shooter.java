@@ -31,7 +31,7 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighMotor;
 @Config
 public class Shooter extends HighModule {
     public HighMotor motorUp, motorDown;
-    public double velocityUp, velocityDown, upTolerance, downTolerance, upOffset = 0.05, downOffset = 0.1;
+    public double velocityUp, velocityDown, upTolerance, downTolerance, toleranceCompensation = 0.2, upOffset = 0, downOffset = 0;
     public double targetUp, targetDown;
     private boolean shouldCompensate = false;
 
@@ -116,6 +116,10 @@ public class Shooter extends HighModule {
         return Math.abs(targetDown - velocityDown);
     }
 
+    public double getVelocityErrorCompensation() {
+        return 2 * target - (velocityUp + velocityDown);
+    }
+
     public boolean upAtTarget() {
         return Math.abs(targetUp - velocityUp) <= (upTolerance + upOffset);
     }
@@ -127,6 +131,18 @@ public class Shooter extends HighModule {
     @Override
     public boolean atTarget() {
         return upAtTarget() && downAtTarget();
+    }
+
+    public boolean atTargetCompensated() {
+        return Math.abs(2 * target - (velocityUp + velocityDown)) <= toleranceCompensation;
+    }
+
+    public void setToleranceCompensationOffset(double offset) {
+        this.toleranceCompensation = offset;
+    }
+
+    public void addToleranceCompensationOffset(double offset) {
+        this.toleranceCompensation += offset;
     }
 
     public double getDownTolerance() {
@@ -198,6 +214,14 @@ public class Shooter extends HighModule {
 
     public void nanDown() {
         motorDown.setVelocityPIDFSA(0, 0, 0, 0, 0, 0, 1);
+    }
+
+    public void enableCompensation(){
+        shouldCompensate = true;
+    }
+
+    public void disableCompensation(){
+        shouldCompensate = false;
     }
 
     @Override

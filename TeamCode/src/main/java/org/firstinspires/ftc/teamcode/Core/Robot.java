@@ -128,32 +128,36 @@ public class Robot extends HighModule {
             switch (shootingState) {
                 case 0:
                     outtake.openBlocker();
+                    outtake.shooter.enableCompensation();
+                    shootingState++;
                     cycles = 1;
                     timerShoot.reset();
-                    shootingState++;
                     break;
                 case 1:
                     if (cycles <= 3 || holdingSequence) {
-                        if (outtake.atTarget() || (cycles == 1 && timerShoot.milliseconds()>=400)) {
+                        if (outtake.atTarget()) {
                             intake.setPower(IntakeMotor.States.Collect);
-                            timerShoot.reset();                            shootingState++;
                             if(cycles <= 3){
-                                outtake.increaseToleranceOffset(0.07,0.03);
+                                outtake.shooter.addToleranceCompensationOffset(0.25);
                             }
+                            shootingState++;
+                            timerShoot.reset();
                         }
                     } else {
-                        cycles = -1;
                         state = States.Collect;
+                        intake.setPower(IntakeMotor.States.Wait);
+                        outtake.shooter.setUpTargetVelocity(outtake.shooter.getTargetDown());
+                        outtake.setToleranceCompensationOffset(0.2);
+                        outtake.shooter.disableCompensation();
+                        outtake.closeBlocker();
+                        shootingSequence = false;
                         intake.canStop = true;
                         shootingState = -1;
-                        outtake.closeBlocker();
-                        outtake.setToleranceOffset(0,0);
-                        shootingSequence = false;
-                        intake.setPower(IntakeMotor.States.Wait);
+                        cycles = -1;
                     }
                     break;
                 case 2:
-                    boolean ballFired = outtake.hasShot ||  timerShoot.milliseconds() >= 275 || outtake.checkErrorTolerance(0.7,0.2);
+                    boolean ballFired = outtake.hasShot ||  timerShoot.milliseconds() >= 300 || outtake.checkErrorToleranceDown(0.3);
                     boolean minPulseCheck = timerShoot.milliseconds() > 25;
                     if(ballFired && minPulseCheck) {
                         intake.setPower(IntakeMotor.States.Wait);

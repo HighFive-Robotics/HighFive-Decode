@@ -85,7 +85,7 @@ public class Outtake extends HighModule {
     }
 
     public boolean atTarget() {
-        return shooter.atTarget() && turret.atTarget();
+        return shooter.atTargetCompensated() && turret.atTarget();
     }
 
     public void increaseToleranceOffset(double down, double up) {
@@ -98,6 +98,11 @@ public class Outtake extends HighModule {
         shooter.addToUpToleranceOffset(-up);
     }
 
+
+    public void setToleranceCompensationOffset(double offset) {
+        shooter.setToleranceCompensationOffset(offset);
+    }
+
     public void setToleranceOffset(double down, double up) {
         shooter.setDownToleranceOffset(down);
         shooter.setUpToleranceOffset(up);
@@ -106,6 +111,15 @@ public class Outtake extends HighModule {
     public boolean checkErrorTolerance(double down, double up) {
         return shooter.getVelocityErrorDown() >= down || shooter.getVelocityErrorUp() >= up;
     }
+
+    public boolean checkErrorToleranceDown(double error) {
+        return shooter.getVelocityErrorDown() >= error;
+    }
+
+    public boolean checkErrorToleranceCompensation(double error) {
+        return Math.abs(shooter.getVelocityErrorCompensation()) <= error;
+    }
+
 
     @Override
     public void update() {
