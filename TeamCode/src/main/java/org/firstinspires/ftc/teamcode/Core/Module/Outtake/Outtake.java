@@ -154,6 +154,7 @@ public class Outtake extends HighModule {
     }
 
     public void debug() {
+        telemetry.addData("Distance ", distanceToGoal);
         telemetry.addData("Down Velocity", shooter.motorDown.getCurrentVelocity());
         telemetry.addData("Down Target", shooter.getTargetDown());
         telemetry.addData("Up Velocity", shooter.motorUp.getCurrentVelocity());

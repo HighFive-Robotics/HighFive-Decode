@@ -1,10 +1,6 @@
 package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
-import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.breakBeamOuttakeName;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.intakeMotorName;
-import static org.firstinspires.ftc.teamcode.Constants.Globals.BlueGoalDistance;
-import static org.firstinspires.ftc.teamcode.Constants.Globals.RedGoalDistance;
-import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -14,15 +10,11 @@ import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighCamera;
-import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Blocker;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Outtake;
-import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Shooter;
-import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Turret;
 
 @Config
 @TeleOp(name = "Shooter Calibration", group = "Tests")
@@ -41,12 +33,12 @@ public class ShooterCalibration extends LinearOpMode {
     DcMotorEx motor;
     public static double velocityUp = 0, velocityDown = 0;
     public boolean shoot;
-    public int k;
+    public int shootingState;
     public int cycles;
     Follower drive;
-    boolean shootingSeq=false , holdingSeq = false;
+    boolean shootingSequence=false , holdingSequence = false;
     public static boolean dacia = true;
-    ElapsedTime timer;
+    ElapsedTime timerShoot;
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -58,18 +50,18 @@ public class ShooterCalibration extends LinearOpMode {
         motor = hardwareMap.get(DcMotorEx.class, intakeMotorName);
         outtake = new Outtake(hardwareMap , Constants.Color.Red , telemetry);
         outtake.turret.reset();
-        timer = new ElapsedTime();
+        timerShoot = new ElapsedTime();
         double tolerance;
         telemetry.addLine("Init");
         waitForStart();
         while (opModeIsActive()) {
             if (gamepad1.yWasPressed()) {
-                shootingSeq = true;
-                holdingSeq = true;
-                k = 0;
+                shootingSequence = true;
+                holdingSequence = true;
+                shootingState = 0;
             }
             if(gamepad1.yWasReleased()){
-                holdingSeq = false;
+                holdingSequence = false;
             }
             if (gamepad1.leftBumperWasPressed()) outtake.openBlocker();
             if (gamepad1.rightBumperWasPressed()) outtake.closeBlocker();
@@ -81,7 +73,7 @@ public class ShooterCalibration extends LinearOpMode {
             }
             if (gamepad1.psWasPressed()) drive.resetTeleOpHeading();
             if (gamepad1.psWasPressed()) drive.resetTeleOpHeading();
-            if (!shootingSeq) {
+            if (!shootingSequence) {
                 if (gamepad1.right_trigger >= 0.4) {
                     motor.setPower(1);
                 } else if (gamepad1.left_trigger >= 0.4) {
@@ -103,43 +95,50 @@ public class ShooterCalibration extends LinearOpMode {
                 dacia = !dacia;
             }
 
-            if (shootingSeq) {
-                switch (k) {
+            if (shootingSequence) {
+                switch (shootingState) {
                     case 0:
                         outtake.openBlocker();
+                        outtake.shooter.enableCompensation();
+                        shootingState++;
                         cycles = 1;
-                        k++;
+                        timerShoot.reset();
                         break;
                     case 1:
-                        if (cycles <= 3 || holdingSeq) {
+                        if (cycles <= 3 || holdingSequence) {
                             if (outtake.atTarget()) {
                                 motor.setPower(1);
-                                timer.reset();
-                                k++;
                                 if(cycles <= 3){
-                                    outtake.increaseToleranceOffset(0.035,0.025);
+                                    outtake.shooter.addToleranceCompensationOffset(0.4);
                                 }
+                                shootingState++;
+                                timerShoot.reset();
                             }
                         } else {
-                            cycles = -1;
-                            k = -1;
-                            outtake.closeBlocker();
-                            outtake.setToleranceOffset(0,0);
-                            shootingSeq = false;
                             motor.setPower(0);
+                            outtake.shooter.setUpTargetVelocity(outtake.shooter.getTargetDown());
+                            outtake.setToleranceCompensationOffset(0.2);
+                            outtake.shooter.disableCompensation();
+                            outtake.closeBlocker();
+                            shootingSequence = false;
+                            shootingState = -1;
+                            cycles = -1;
                         }
                         break;
                     case 2:
-                        boolean ballFired = (outtake.checkErrorTolerance(0.35,1)) || timer.milliseconds() >= 275;
-                        boolean minPulseCheck = timer.milliseconds() > 25;
-                        if (ballFired && minPulseCheck) {
-                            motor.setPower(0);
+                        boolean ballFired = outtake.hasShot || timerShoot.milliseconds() >= 275 || outtake.checkErrorToleranceDown(0.5);
+                        if(ballFired) {
+                            if(!outtake.atTarget()){
+                                motor.setPower(0);
+                            }
                             cycles++;
-                            k = 1;
-                        } else if (timer.milliseconds() > 1000) {
-                            motor.setPower(0);
+                            shootingState = 1;
+                        } else if (timerShoot.milliseconds() > 1000) {
+                            if(!outtake.atTarget()){
+                                motor.setPower(0);
+                            }
                             cycles++;
-                            k = 1;
+                            shootingState = 1;
                         }
                         break;
                 }
@@ -153,7 +152,7 @@ public class ShooterCalibration extends LinearOpMode {
             outtake.update(drive.getPose());
             outtake.alignTurret();
             outtake.debug();
-            telemetry.addData("holding" , holdingSeq);
+            telemetry.addData("holding" , holdingSequence);
             telemetry.addData("Robot Pose" , drive.getPose());
             drive.update();
             telemetry.update();
