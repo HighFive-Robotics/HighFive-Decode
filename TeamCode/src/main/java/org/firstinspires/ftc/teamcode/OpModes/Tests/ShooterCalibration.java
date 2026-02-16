@@ -109,7 +109,7 @@ public class ShooterCalibration extends LinearOpMode {
                             if (outtake.atTarget()) {
                                 motor.setPower(1);
                                 if(cycles <= 3){
-                                    outtake.shooter.addToleranceCompensationOffset(0.4);
+                                    outtake.addErrorToleranceScaled();
                                 }
                                 shootingState++;
                                 timerShoot.reset();
@@ -117,7 +117,7 @@ public class ShooterCalibration extends LinearOpMode {
                         } else {
                             motor.setPower(0);
                             outtake.shooter.setUpTargetVelocity(outtake.shooter.getTargetDown());
-                            outtake.setToleranceCompensationOffset(0.2);
+                            outtake.resetErrorTolerance();
                             outtake.shooter.disableCompensation();
                             outtake.closeBlocker();
                             shootingSequence = false;

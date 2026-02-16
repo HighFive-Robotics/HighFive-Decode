@@ -10,6 +10,7 @@ import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Constants;
@@ -119,7 +120,13 @@ public class Outtake extends HighModule {
     public boolean checkErrorToleranceCompensation(double error) {
         return Math.abs(shooter.getVelocityErrorCompensation()) <= error;
     }
-
+    public void addErrorToleranceScaled(){
+        double offset = Range.scale(distanceToGoal , 40  , 420 , 0.5 , 0.12 );
+        shooter.addToleranceCompensationOffset(offset);
+    }
+    public void resetErrorTolerance(){
+        shooter.setToleranceCompensationOffset(0);
+    }
 
     @Override
     public void update() {

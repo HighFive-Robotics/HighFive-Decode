@@ -31,7 +31,7 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighMotor;
 @Config
 public class Shooter extends HighModule {
     public HighMotor motorUp, motorDown;
-    public double velocityUp, velocityDown, upTolerance, downTolerance, toleranceCompensation = 0.2, upOffset = 0, downOffset = 0;
+    public double velocityUp, velocityDown, upTolerance, downTolerance, toleranceCompensation = 0.2, upOffset = 0, downOffset = 0 , compOffset = 0;
     public double targetUp, targetDown;
     private boolean shouldCompensate = false;
 
@@ -134,15 +134,15 @@ public class Shooter extends HighModule {
     }
 
     public boolean atTargetCompensated() {
-        return Math.abs(2 * target - (velocityUp + velocityDown)) <= toleranceCompensation;
+        return Math.abs( (targetUp+targetDown) - (velocityUp + velocityDown)) <= (toleranceCompensation+compOffset);
     }
 
     public void setToleranceCompensationOffset(double offset) {
-        this.toleranceCompensation = offset;
+        this.compOffset = offset;
     }
 
     public void addToleranceCompensationOffset(double offset) {
-        this.toleranceCompensation += offset;
+        this.compOffset += offset;
     }
 
     public double getDownTolerance() {
