@@ -55,6 +55,9 @@ public class Outtake extends HighModule {
     public void setShootingVelocity() {
         setShootingVelocity(distanceToGoal);
     }
+    public void setShootingVelocityCompensation() {
+        setShootingVelocityCompensation(distanceToGoal);
+    }
 
     public void setShootingVelocityOffset(double offset) {
         setShootingVelocity(distanceToGoal + offset);
@@ -84,8 +87,10 @@ public class Outtake extends HighModule {
     public void offsetTurretToLeft(double angle) {
         turret.addOffsetDegrees(angle);
     }
-
-    public boolean atTarget() {
+    public boolean atTarget(){
+        return shooter.atTarget() && turret.atTarget();
+    }
+    public boolean atTargetCompensated() {
         return shooter.atTargetCompensated() && turret.atTarget();
     }
 
@@ -126,6 +131,7 @@ public class Outtake extends HighModule {
     }
     public void resetErrorTolerance(){
         shooter.setToleranceCompensationOffset(0);
+        setToleranceOffset(0,0);
     }
 
     @Override

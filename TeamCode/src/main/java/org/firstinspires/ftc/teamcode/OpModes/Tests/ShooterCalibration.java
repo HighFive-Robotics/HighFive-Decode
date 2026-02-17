@@ -37,7 +37,7 @@ public class ShooterCalibration extends LinearOpMode {
     public int cycles;
     Follower drive;
     boolean shootingSequence=false , holdingSequence = false;
-    public static boolean dacia = true;
+    public static boolean dacia = false;
     ElapsedTime timerShoot;
     @Override
     public void runOpMode() throws InterruptedException {
@@ -83,7 +83,7 @@ public class ShooterCalibration extends LinearOpMode {
                 }
             }
             if (gamepad1.square) {
-                outtake.setShootingVelocity();
+                outtake.setShootingVelocityCompensation();
             }
             if(gamepad1.dpad_up){
                 outtake.setShootingVelocityOffset(-2);
@@ -106,10 +106,12 @@ public class ShooterCalibration extends LinearOpMode {
                         break;
                     case 1:
                         if (cycles <= 3 || holdingSequence) {
-                            if (outtake.atTarget()) {
+                            if (outtake.atTargetCompensated()) {
+                                //outtake.atTarget()
                                 motor.setPower(1);
                                 if(cycles <= 3){
                                     outtake.shooter.addToleranceCompensationOffset(0.25);
+                                    //outtake.increaseToleranceOffset(0.25,0.25);
                                 }
                                 shootingState++;
                                 timerShoot.reset();
@@ -149,9 +151,9 @@ public class ShooterCalibration extends LinearOpMode {
             if(mode == Mode.Up){
                 outtake.shooter.setUpTargetVelocity(velocityUp);
                 outtake.shooter.setDownTargetVelocity(velocityDown);
-                if(!shootingSequence){
-                    outtake.shooter.disableCompensation();
-                }
+            }
+            if(!shootingSequence){
+                outtake.shooter.disableCompensation();
             }
             outtake.update(drive.getPose());
             outtake.alignTurret();
