@@ -83,9 +83,9 @@ public class Shooter extends HighModule {
     }
 
     public void setTargetVelocity(double distance) {
-        double raw = TrajectoryRegression.calculateDown(distance);
-        setTargetVelocity(raw, raw);
-        target = raw;
+        double rawDown = TrajectoryRegression.calculateDown(distance);
+        double rawUp = TrajectoryRegression.calculateDown(distance);
+        setTargetVelocity(rawDown, rawUp);
     }
 
     public void setTargetVelocityCompensation(double distance) {

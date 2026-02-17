@@ -1,45 +1,26 @@
 package org.firstinspires.ftc.teamcode.Core.Module.Outtake;
 
 public class TrajectoryRegression {
-
-    private static final double downA = 5.02502747733E-33;
-    private static final double downB = -2.32053461186E-29;
-    private static final double downC = 4.49913375867E-26;
-    private static final double downD = -5.00288776291E-23;
-    private static final double downF = 3.61655927294E-20;
-    private static final double downG = -1.81220201039E-17;
-    private static final double downH = 6.52226974479E-15;
-    private static final double downI = -1.71876400232E-12;
-    private static final double downJ = 3.34372682813E-10;
-    private static final double downK = -4.80011885576E-8;
-    private static final double downL = 0.00000504119816252;
-    private static final double downM = -0.000380358115941;
-    private static final double downN = 0.0199702203189;
-    private static final double downO = -0.689788406172;
-    private static final double downP = 14.0482217018;
-    private static final double downQ = -125.004841328;
-    private static final double upA = -9.201304940118E-33;
-    private static final double upB = 3.128330393841E-29;
-    private static final double upC = -4.843882638944E-26;
-    private static final double upD = 4.520129398433E-23;
-    private static final double upF = -2.835116647496E-20;
-    private static final double upG = 1.26219620553E-17;
-    private static final double upH = -4.10643755153E-15;
-    private static final double upI = 9.904339960864E-13;
-    private static final double upJ = -1.778240917699E-10;
-    private static final double upK = 2.366205747903E-8;
-    private static final double upL = -0.000002303780517619;
-    private static final double upM = 0.0001604044564653;
-    private static final double upN = -0.007694804578658;
-    private static final double upO = 0.2390664657819;
-    private static final double upP = -4.289508500321;
-    private static final double upQ = 33.74292059678;
+    private static final double[] setDown = { 5.585132074254942e-44d, -1.8854211950640406e-40d, 2.76357876873917e-37d, -2.2331584780330814e-34d, 9.929354353720153e-32d, -1.4218042767276446e-29d, -9.33921966927388e-27d, 5.6673409746638655e-24d, -6.694512503125435e-22d, -6.307976793543907e-19d, 4.138191227101554e-16d, -1.377922309122005e-13d, 3.083478442897163e-11d, -4.987453499607144e-09d, 5.972757436948574e-07d, -5.308481273211793e-05d, 0.003456176852011372d, -0.15995491948004198d, 4.973306918846195d, -92.91049791982536d, 788.3955933796611d };
+    private static final double[] setUp = { 2.8018400255984564e-43d, -9.658060884555398e-40d, 1.4481089580651512e-36d, -1.2009709592796482e-33d, 5.529266962009386e-31d, -8.788316348823414e-29d, -4.950715613240139e-26d, 3.257356494755319e-23d, -4.49559006503232e-21d, -3.455513265040487e-18d, 2.4273468038614162e-15d, -8.390366829099213e-13d, 1.9384776067249482e-10d, -3.231735313480256e-08d, 3.986272950949883e-06d, -0.0003647281021423681d, 0.024428963800861684d, -1.161993917056958d, 37.08854502115891d, -710.4486750798309d, 6159.061360380956d };
+    private static final double[] setCompensation = { -3.5127417661534687e-44d, 1.3580125979749688e-40d, -2.2795911223215077e-37d, 2.124578513772447e-34d, -1.1230048707673122e-31d, 2.4444104920168872e-29d, 8.138959473140624e-27d, -7.391629489184381e-24d, 1.5047175288692427e-21d, 6.580332631293134e-19d, -5.882637273633581e-16d, 2.257339680038597e-13d, -5.6331168288528924e-11d, 1.0011285579621469e-08d, -1.3045014264015657e-06d, 0.0001251404345726291d, -0.008728027628494579d, 0.42953610180043555d, -14.097752663821158d, 276.064167711849d, -2431.0335052932d };
+    private static double calculatePolinom(double[] coeffs, double x) {
+        double result = 0.0;
+        for (double c : coeffs) {
+            result = result * x + c;
+        }
+        return result;
+    }
 
     public static double calculateDown(double x) {
-        return downQ + x * (downP + x * (downO + x * (downN + x * (downM + x * (downL + x * (downK + x * (downJ + x * (downI + x * (downH + x * (downG + x * (downF + x * (downD + x * (downC + x * (downB + x * downA))))))))))))));
+        return calculatePolinom(setDown, x);
     }
 
     public static double calculateUp(double x) {
-        return upQ + x * (upP + x * (upO + x * (upN + x * (upM + x * (upL + x * (upK + x * (upJ + x * (upI + x * (upH + x * (upG + x * (upF + x * (upD + x * (upC + x * (upB + x * upA))))))))))))));
+        return calculatePolinom(setUp, x);
+    }
+
+    public static double calculateKC(double x) {
+        return calculatePolinom(setCompensation, x);
     }
 }
