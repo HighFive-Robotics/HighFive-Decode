@@ -33,7 +33,7 @@ public class Shooter extends HighModule {
     public HighMotor motorUp, motorDown;
     public double velocityUp, velocityDown, upTolerance, downTolerance, toleranceCompensation = 0.2, upOffset = 0, downOffset = 0 , compOffset = 0;
     public double targetUp, targetDown;
-    private boolean shouldCompensate = false;
+    public boolean shouldCompensate = false;
 
     public Shooter(HardwareMap hwMap) {
         target = 0;
@@ -228,7 +228,7 @@ public class Shooter extends HighModule {
     public void update() {
         velocityUp = motorUp.getCurrentVelocity();
         velocityDown = motorDown.getCurrentVelocity();
-        if (shouldCompensate && target != 0) {
+        if (shouldCompensate) {
             targetUp += getVelocityErrorDown() * kC;
             setUpTargetVelocity(targetUp);
         }

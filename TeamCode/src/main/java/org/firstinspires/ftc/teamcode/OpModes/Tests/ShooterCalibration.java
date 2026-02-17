@@ -109,7 +109,7 @@ public class ShooterCalibration extends LinearOpMode {
                             if (outtake.atTarget()) {
                                 motor.setPower(1);
                                 if(cycles <= 3){
-                                    outtake.addErrorToleranceScaled();
+                                    outtake.shooter.addToleranceCompensationOffset(0.25);
                                 }
                                 shootingState++;
                                 timerShoot.reset();
@@ -126,7 +126,7 @@ public class ShooterCalibration extends LinearOpMode {
                         }
                         break;
                     case 2:
-                        boolean ballFired = outtake.hasShot || timerShoot.milliseconds() >= 275 || outtake.checkErrorToleranceDown(0.5);
+                        boolean ballFired = outtake.hasShot || timerShoot.milliseconds() >= 275 || outtake.checkErrorToleranceDown(0.25);
                         if(ballFired) {
                             if(!outtake.atTarget()){
                                 motor.setPower(0);
@@ -143,17 +143,22 @@ public class ShooterCalibration extends LinearOpMode {
                         break;
                 }
             }
-            if(dacia){
+            if(dacia && mode == Mode.None){
                 outtake.shooter.setManualVelocity(velocityDown);
             }
             if(mode == Mode.Up){
                 outtake.shooter.setUpTargetVelocity(velocityUp);
+                outtake.shooter.setDownTargetVelocity(velocityDown);
+                if(!shootingSequence){
+                    outtake.shooter.disableCompensation();
+                }
             }
             outtake.update(drive.getPose());
             outtake.alignTurret();
             outtake.debug();
             telemetry.addData("holding" , holdingSequence);
             telemetry.addData("Robot Pose" , drive.getPose());
+            telemetry.addData("shouldCompensate " , outtake.shooter.shouldCompensate);
             drive.update();
             telemetry.update();
         }

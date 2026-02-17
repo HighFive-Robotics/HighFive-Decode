@@ -144,27 +144,28 @@ public class Robot extends HighModule {
                             timerShoot.reset();
                         }
                     } else {
-                        state = States.Collect;
                         intake.setPower(IntakeMotor.States.Wait);
                         outtake.shooter.setUpTargetVelocity(outtake.shooter.getTargetDown());
-                        outtake.setToleranceCompensationOffset(0.2);
+                        outtake.resetErrorTolerance();
                         outtake.shooter.disableCompensation();
                         outtake.closeBlocker();
                         shootingSequence = false;
-                        intake.canStop = true;
                         shootingState = -1;
                         cycles = -1;
                     }
                     break;
                 case 2:
-                    boolean ballFired = outtake.hasShot ||  timerShoot.milliseconds() >= 300 || outtake.checkErrorToleranceDown(0.3);
-                    boolean minPulseCheck = timerShoot.milliseconds() > 25;
-                    if(ballFired && minPulseCheck) {
-                        intake.setPower(IntakeMotor.States.Wait);
+                    boolean ballFired = outtake.hasShot || timerShoot.milliseconds() >= 275 || outtake.checkErrorToleranceDown(0.25);
+                    if(ballFired) {
+                        if(!outtake.atTarget()){
+                            intake.setPower(IntakeMotor.States.Wait);
+                        }
                         cycles++;
                         shootingState = 1;
                     } else if (timerShoot.milliseconds() > 1000) {
-                        intake.setPower(IntakeMotor.States.Wait);
+                        if(!outtake.atTarget()){
+                            intake.setPower(IntakeMotor.States.Wait);
+                        }
                         cycles++;
                         shootingState = 1;
                     }
