@@ -97,7 +97,9 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
                 robot.outtake.hasShot = false;
                 i++;
             }
-
+            if(gamepad2.psWasPressed()){
+                robot.resetWithCamera();
+            }
             robot.outtake.debug();
             telemetry.addData("Velocity Down:", velocityDown.toString());
             telemetry.addData("Shoot :", robot.outtake.hasShot);

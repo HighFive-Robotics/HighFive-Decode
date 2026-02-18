@@ -89,7 +89,6 @@ public class Outtake extends HighModule {
     public void offsetTurretToLeft(double angle) {
         turret.addOffsetDegrees(angle);
     }
-
     @Override
     public boolean atTarget(){
         return shooter.atTarget() && turret.atTarget();

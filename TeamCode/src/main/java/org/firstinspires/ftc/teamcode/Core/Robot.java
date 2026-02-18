@@ -44,6 +44,7 @@ public class Robot extends HighModule {
 
     boolean isAuto;
     public boolean shootingSequence = false , holdingSequence = false, shouldAlignTurret = true;
+    private Pose cameraPose = new Pose(0,0,0);
     int shootingState = 0;
 
     public int cycles = 0;
@@ -99,7 +100,12 @@ public class Robot extends HighModule {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
     }
+    public void resetWithCamera(){
+        drive.setStartingPose(new Pose(6, 6, 0));
+        cameraPose = camera.getAprilTagPose(outtake.turret.getCurrentAngleWrappedDegrees());
+        drive.setPose(cameraPose);
 
+    }
     public void setAction(Actions action) {
         lastAction = action;
         switch (action) {
@@ -116,7 +122,6 @@ public class Robot extends HighModule {
     public boolean isDone() {
         return !drive.isBusy();
     }
-
     @Override
     public void update() {
         if (voltageTimer.milliseconds() >= 500) {
@@ -177,7 +182,6 @@ public class Robot extends HighModule {
                     break;
             }
         }
-
         intake.update();
         drive.update();
         outtake.update(drive.getPose());
@@ -186,6 +190,7 @@ public class Robot extends HighModule {
         }
         led.update();
         telemetry.addData("atTargetCompensated", outtake.shooter.atTargetCompensated());
+        telemetry.addData("Camera pose " , cameraPose);
         telemetry.addData("atTarget", outtake.shooter.atTarget());
         if(state == States.Collect){
             if(intake.isFull){

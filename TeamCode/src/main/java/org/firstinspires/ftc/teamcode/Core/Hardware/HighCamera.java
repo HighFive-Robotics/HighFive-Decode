@@ -10,6 +10,7 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.Constants;
@@ -101,30 +102,34 @@ public class HighCamera{
         if (result != null) {
             Pose3D mt1 = result.getBotpose();
             if (mt1 != null) {
-                return new Pose(
-                        mt1.getPosition().x * 39.37,
-                        mt1.getPosition().y * 39.37,
-                        Math.toRadians(mt1.getOrientation().getYaw())
-                );
+                // Convert meters to inches and shift the center (0,0) to the corner (0,0) by adding 72
+                double xInches = (mt1.getPosition().x * 39.3701) + 72.0;
+                double yInches = (mt1.getPosition().y * 39.3701) + 72.0;
+                double headingRadians = Math.toRadians(mt1.getOrientation().getYaw());
+
+                return new Pose(xInches, yInches, headingRadians);
             }
         }
         return null;
     }
+
     public Pose getMegaTagFieldPose(double heading) {
         ll.updateRobotOrientation(heading);
         LLResult result = getResult();
         if (result != null) {
             Pose3D mt1 = result.getBotpose();
             if (mt1 != null) {
-                return new Pose(
-                        mt1.getPosition().x * 39.37,
-                        mt1.getPosition().y * 39.37,
-                        Math.toRadians(mt1.getOrientation().getYaw())
-                );
+                // Convert meters to inches and shift the center (0,0) to the corner (0,0) by adding 72
+                double xInches = (mt1.getPosition().x * 39.3701) + 72.0;
+                double yInches = (mt1.getPosition().y * 39.3701) + 72.0;
+                double headingRadians = Math.toRadians(mt1.getOrientation().getYaw());
+
+                return new Pose(xInches, yInches, headingRadians);
             }
         }
         return null;
     }
+
     public Pose getBallPose() {
         if (pipeline != Pipelines.BallDetection) setPipeline(Pipelines.BallDetection);
         LLResult result = getResult();
