@@ -99,8 +99,8 @@ public class Constants {
         @Config
         public static class TurretParams {
             public static double kpTurret = 0.026, kdTurret = 0.0012, kiTurret = 0.026, kfTurret = 0.0001;
-            public static double minimumTicks = -518.67;
-            public static double maximumTicks = 518.67;
+            public static double kp2Turret = 0.026, kd2Turret = 0.0012, ki2Turret = 0.026, thresholdSmallPID = 35;
+            public static double minimumTicks = -502, maximumTicks = 502;
             public static double ticksPerPI = 430.0;
             public static double minimumErrorAngleForWalls = Math.PI / 10;
         }

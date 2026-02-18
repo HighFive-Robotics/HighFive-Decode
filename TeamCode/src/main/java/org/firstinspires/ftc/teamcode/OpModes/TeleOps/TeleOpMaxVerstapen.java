@@ -22,7 +22,6 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
     Robot robot;
 
     int i = 0;
-//    double []velocityDown = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     ArrayList<Double> velocityDown = new ArrayList<>();
     boolean rumbled = false;
     boolean dynamicUpdate = false;

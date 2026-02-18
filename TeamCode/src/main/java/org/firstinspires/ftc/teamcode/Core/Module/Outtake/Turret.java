@@ -7,13 +7,17 @@ import static org.firstinspires.ftc.teamcode.Constants.Globals.BlueGoalWallUp;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.RedGoalCorner;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.RedGoalWallRight;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.RedGoalWallUp;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.kd2Turret;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.kdTurret;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.kfTurret;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.ki2Turret;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.kiTurret;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.kp2Turret;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.kpTurret;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.maximumTicks;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.minimumErrorAngleForWalls;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.minimumTicks;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.thresholdSmallPID;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.TurretParams.ticksPerPI;
 
 import com.pedropathing.geometry.Pose;
@@ -31,6 +35,7 @@ public class Turret extends HighModule {
     Telemetry telemetry;
     public HighMotor motor;
     public Constants.Color allianceColor;
+    public boolean smallPid = true;
 
     public enum States{
         Automated,
@@ -48,7 +53,7 @@ public class Turret extends HighModule {
                 .setRunMode(HighMotor.RunMode.PID)
                 .setReverseMotor(true)
                 .setUseZeroPowerBehaviour(false)
-                .setPIDCoefficients(kpTurret,kiTurret,kdTurret,kfTurret, HighMotor.FeedForwardType.Lift,1)
+                .setPIDCoefficients(kp2Turret, ki2Turret, kd2Turret, kfTurret, HighMotor.FeedForwardType.Lift,1)
                 .setEncoder(true,false)
                 .build();
         motor.setTolerance(5);
@@ -290,6 +295,15 @@ public class Turret extends HighModule {
     public void update() {
         ticks = motor.getCurrentPosition();
         currentAngle = (ticks / ticksPerPI) * Math.PI;
+        if(Math.abs(targetTicks - ticks) <= thresholdSmallPID){
+            if(!smallPid){
+                motor.setPIDCoefficients(kp2Turret,ki2Turret,kd2Turret,kfTurret, HighMotor.FeedForwardType.Lift,1);
+                smallPid = true;
+            }
+        } else if (smallPid){
+            motor.setPIDCoefficients(kpTurret,kiTurret,kdTurret,kfTurret, HighMotor.FeedForwardType.Lift,1);
+            smallPid = false;
+        }
         motor.update();
     }
 }
