@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.breakBeamOutt
 import static org.firstinspires.ftc.teamcode.Constants.Globals.BlueGoalDistance;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.RedGoalDistance;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.kC;
 
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -43,6 +44,10 @@ public class Outtake extends HighModule {
         shooter.setTargetVelocity(dist);
     }
 
+    public void setShootingVelocity() {
+        shooter.setTargetVelocity(distanceToGoal);
+    }
+
     public void setShootingVelocityCompensation(double dist) {
         shooter.setTargetVelocityCompensation(dist);
     }
@@ -52,9 +57,6 @@ public class Outtake extends HighModule {
         shooter.setUpTargetVelocity(up);
     }
 
-    public void setShootingVelocity() {
-        setShootingVelocity(distanceToGoal);
-    }
     public void setShootingVelocityCompensation() {
         setShootingVelocityCompensation(distanceToGoal);
     }
@@ -87,6 +89,8 @@ public class Outtake extends HighModule {
     public void offsetTurretToLeft(double angle) {
         turret.addOffsetDegrees(angle);
     }
+
+    @Override
     public boolean atTarget(){
         return shooter.atTarget() && turret.atTarget();
     }
@@ -120,6 +124,10 @@ public class Outtake extends HighModule {
 
     public boolean checkErrorToleranceDown(double error) {
         return shooter.getVelocityErrorDown() >= error;
+    }
+
+    public boolean checkErrorToleranceUp(double error) {
+        return shooter.getVelocityErrorUp() >= error;
     }
 
     public boolean checkErrorToleranceCompensation(double error) {
@@ -168,6 +176,7 @@ public class Outtake extends HighModule {
 
     public void debug() {
         telemetry.addData("Distance ", distanceToGoal);
+        telemetry.addData("Kc ", kC);
         telemetry.addData("Down Velocity", shooter.motorDown.getCurrentVelocity());
         telemetry.addData("Down Target", shooter.getTargetDown());
         telemetry.addData("Up Velocity", shooter.motorUp.getCurrentVelocity());

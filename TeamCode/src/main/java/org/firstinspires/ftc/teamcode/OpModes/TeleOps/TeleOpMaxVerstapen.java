@@ -44,7 +44,7 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
             }
 
             if(gamepad2.left_bumper){
-                robot.outtake.setShootingVelocityOffset(-2);
+                robot.outtake.setShootingVelocity();
             }
 
             if (gamepad2.left_trigger >= 0.6){
@@ -99,6 +99,7 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
                 i++;
             }
 
+            robot.outtake.debug();
             telemetry.addData("Velocity Down:", velocityDown.toString());
             telemetry.addData("Shoot :", robot.outtake.hasShot);
             telemetry.update();

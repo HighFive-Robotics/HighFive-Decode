@@ -129,13 +129,14 @@ public class Robot extends HighModule {
                 case 0:
                     outtake.openBlocker();
                     outtake.shooter.enableCompensation();
+                    intake.canStop = false;
                     shootingState++;
                     cycles = 1;
                     timerShoot.reset();
                     break;
                 case 1:
                     if (cycles <= 3 || holdingSequence) {
-                        if (outtake.atTarget()) {
+                        if (outtake.atTargetCompensated()) {
                             intake.setPower(IntakeMotor.States.Collect);
                             if(cycles <= 3){
                                 outtake.shooter.addToleranceCompensationOffset(0.25);
@@ -149,6 +150,7 @@ public class Robot extends HighModule {
                         outtake.resetErrorTolerance();
                         outtake.shooter.disableCompensation();
                         outtake.closeBlocker();
+                        intake.canStop = true;
                         shootingSequence = false;
                         shootingState = -1;
                         cycles = -1;
@@ -157,13 +159,13 @@ public class Robot extends HighModule {
                 case 2:
                     boolean ballFired = outtake.hasShot || timerShoot.milliseconds() >= 275 || outtake.checkErrorToleranceDown(0.25);
                     if(ballFired) {
-                        if(!outtake.atTarget()){
+                        if(!outtake.atTargetCompensated()){
                             intake.setPower(IntakeMotor.States.Wait);
                         }
                         cycles++;
                         shootingState = 1;
                     } else if (timerShoot.milliseconds() > 1000) {
-                        if(!outtake.atTarget()){
+                        if(!outtake.atTargetCompensated()){
                             intake.setPower(IntakeMotor.States.Wait);
                         }
                         cycles++;

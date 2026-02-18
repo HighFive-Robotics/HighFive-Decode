@@ -29,7 +29,7 @@ public class ShooterCalibration extends LinearOpMode {
 
     HighCamera camera;
     public Outtake outtake;
-    public static Mode mode = Mode.None;
+    public static Mode mode = Mode.Down;
     DcMotorEx motor;
     public static double velocityUp = 0, velocityDown = 0;
     public boolean shoot;
@@ -83,7 +83,7 @@ public class ShooterCalibration extends LinearOpMode {
                 }
             }
             if (gamepad1.square) {
-                outtake.setShootingVelocityCompensation();
+                outtake.setShootingVelocity();
             }
             if(gamepad1.dpad_up){
                 outtake.setShootingVelocityOffset(-2);
@@ -107,11 +107,9 @@ public class ShooterCalibration extends LinearOpMode {
                     case 1:
                         if (cycles <= 3 || holdingSequence) {
                             if (outtake.atTargetCompensated()) {
-                                //outtake.atTarget()
                                 motor.setPower(1);
                                 if(cycles <= 3){
                                     outtake.shooter.addToleranceCompensationOffset(0.25);
-                                    //outtake.increaseToleranceOffset(0.25,0.25);
                                 }
                                 shootingState++;
                                 timerShoot.reset();
@@ -130,13 +128,13 @@ public class ShooterCalibration extends LinearOpMode {
                     case 2:
                         boolean ballFired = outtake.hasShot || timerShoot.milliseconds() >= 275 || outtake.checkErrorToleranceDown(0.25);
                         if(ballFired) {
-                            if(!outtake.atTarget()){
+                            if(!outtake.atTargetCompensated()){
                                 motor.setPower(0);
                             }
                             cycles++;
                             shootingState = 1;
                         } else if (timerShoot.milliseconds() > 1000) {
-                            if(!outtake.atTarget()){
+                            if(!outtake.atTargetCompensated()){
                                 motor.setPower(0);
                             }
                             cycles++;
