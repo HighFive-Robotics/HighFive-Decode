@@ -70,8 +70,6 @@ public class TestTurret extends LinearOpMode {
             }
 
             turret.update();
-            drive.update();
-
             if(gamepad1.psWasPressed()){
                 drive.setStartingPose(new Pose(6,6,0));
                 drive.setPose(new Pose(6,6,0));

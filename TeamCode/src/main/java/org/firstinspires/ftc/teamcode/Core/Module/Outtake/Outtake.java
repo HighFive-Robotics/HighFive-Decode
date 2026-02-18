@@ -134,14 +134,16 @@ public class Outtake extends HighModule {
         return Math.abs(shooter.getVelocityErrorCompensation()) <= error;
     }
     public void addErrorToleranceScaled(){
-        double offset = Range.scale(distanceToGoal , 40  , 420 , 0.5 , 0.12 );
+        double offset = Range.scale(distanceToGoal , 40  , 420 , 0.6 , 0.18 );
         shooter.addToleranceCompensationOffset(offset);
     }
     public void resetErrorTolerance(){
         shooter.setToleranceCompensationOffset(0);
         setToleranceOffset(0,0);
     }
-
+    public double getDistanceToGoalTime(){
+        return distanceToGoal<=240?275:375;
+    }
     @Override
     public void update() {
         shooter.update();
@@ -175,6 +177,9 @@ public class Outtake extends HighModule {
     }
 
     public void debug() {
+        telemetry.addData("Shooter Down Tollerence + Offset" , shooter.getDownOffset());
+        telemetry.addData("Shooter Up Tollerence + Offset" , shooter.getUpOffset());
+        telemetry.addData("Shooter Compensation Tolerance + Offset" , shooter.getToleranceCompensation());
         telemetry.addData("Distance ", distanceToGoal);
         telemetry.addData("Kc ", kC);
         telemetry.addData("Down Velocity", shooter.motorDown.getCurrentVelocity());

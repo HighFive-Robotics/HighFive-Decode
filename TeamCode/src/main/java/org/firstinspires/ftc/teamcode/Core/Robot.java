@@ -127,19 +127,21 @@ public class Robot extends HighModule {
         if (shootingSequence) {
             switch (shootingState) {
                 case 0:
-                    outtake.openBlocker();
-                    outtake.shooter.enableCompensation();
-                    intake.canStop = false;
-                    shootingState++;
-                    cycles = 1;
-                    timerShoot.reset();
+                    if (outtake.atTarget()) {
+                        outtake.openBlocker();
+                        outtake.shooter.enableCompensation();
+                        intake.canStop = false;
+                        shootingState++;
+                        cycles = 1;
+                        timerShoot.reset();
+                    }
                     break;
                 case 1:
                     if (cycles <= 3 || holdingSequence) {
                         if (outtake.atTargetCompensated()) {
                             intake.setPower(IntakeMotor.States.Collect);
                             if(cycles <= 3){
-                                outtake.shooter.addToleranceCompensationOffset(0.25);
+                                outtake.addErrorToleranceScaled();
                             }
                             shootingState++;
                             timerShoot.reset();
@@ -157,7 +159,8 @@ public class Robot extends HighModule {
                     }
                     break;
                 case 2:
-                    boolean ballFired = outtake.hasShot || timerShoot.milliseconds() >= 275 || outtake.checkErrorToleranceDown(0.25);
+                    boolean shootingPulse  = timerShoot.milliseconds() >= 25;
+                    boolean ballFired =  ( outtake.hasShot || timerShoot.milliseconds() >= 275 || outtake.shooter.jerk >= 0.3 ) && shootingPulse;
                     if(ballFired) {
                         if(!outtake.atTargetCompensated()){
                             intake.setPower(IntakeMotor.States.Wait);
@@ -182,12 +185,8 @@ public class Robot extends HighModule {
             outtake.alignTurret();
         }
         led.update();
-
-        telemetry.addData("isPartial", intake.isPartial);
-        telemetry.addData("isFull", intake.isFull);
-        telemetry.addData("BB1", intake.breakBeamUp.getState());
-        telemetry.addData("BB2", intake.breakBeamDown.getState());
-
+        telemetry.addData("atTargetCompensated", outtake.shooter.atTargetCompensated());
+        telemetry.addData("atTarget", outtake.shooter.atTarget());
         if(state == States.Collect){
             if(intake.isFull){
                 led.setColor(Green);
