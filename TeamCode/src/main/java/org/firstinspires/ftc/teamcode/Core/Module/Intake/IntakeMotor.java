@@ -32,6 +32,7 @@ public class IntakeMotor extends HighModule {
                 .setMotor(hwMap.get(DcMotorEx.class, intakeMotorName))
                 .setRunMode(HighMotor.RunMode.Standard)
                 .setReverseMotor(false)
+                .setUseZeroPowerBehaviour(true)
                 .build();
     }
 
