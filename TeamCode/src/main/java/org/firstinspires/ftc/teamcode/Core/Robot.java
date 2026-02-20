@@ -117,6 +117,8 @@ public class Robot extends HighModule {
                 intake.canStop = false;
                 shootingState = 0;
                 outtake.shooter.disableCompensation();
+                outtake.isShooting = true;
+                timerShoot.reset();
                 break;
             case StopShoot:
                 shootingSequence = false;
@@ -162,6 +164,7 @@ public class Robot extends HighModule {
                         outtake.shooter.setUpTargetVelocity(outtake.shooter.getTargetDown());
                         outtake.resetErrorTolerance();
                         outtake.shooter.disableCompensation();
+                        outtake.isShooting = false;
                         outtake.closeBlocker();
                         intake.canStop = true;
                         shootingSequence = false;

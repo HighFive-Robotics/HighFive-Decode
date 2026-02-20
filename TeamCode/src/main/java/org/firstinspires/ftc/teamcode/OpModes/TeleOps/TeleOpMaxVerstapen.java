@@ -110,5 +110,6 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
             telemetry.update();
             robot.update();
         }
+        robot.outtake.stopBreakBeamThread();
     }
 }

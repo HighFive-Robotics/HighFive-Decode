@@ -33,9 +33,9 @@ public class Shooter extends HighModule {
     public HighMotor motorUp, motorDown;
     public double velocityUp, velocityDown, upTolerance, downTolerance, toleranceCompensation = 0.2, upOffset = 0, downOffset = 0, compOffset = 0;
     public double targetUp, targetUpCompensated, targetDown;
-    public boolean shouldCompensate = false;
+    public boolean shouldCompensate = false , wasAtTarget = false;
     private double lastVelocityDown, lastVelocityUp;
-    public double jerk = 0;
+    public double jerk = 0 ;
 
     public Shooter(HardwareMap hwMap) {
         target = 0;
@@ -150,7 +150,17 @@ public class Shooter extends HighModule {
     public boolean atTargetCompensated() {
         return Math.abs((getTargetUp() + targetDown) - (velocityUp + velocityDown)) <= (toleranceCompensation + compOffset);
     }
-
+    public boolean detectShoot() {
+        if (atTarget()) {
+            wasAtTarget = true;
+            return false;
+        }
+        if (wasAtTarget && (jerk >= 0.45)) {
+            wasAtTarget = false;
+            return true;
+        }
+        return false;
+    }
     public void setToleranceCompensationOffset(double offset) {
         this.compOffset = offset;
     }

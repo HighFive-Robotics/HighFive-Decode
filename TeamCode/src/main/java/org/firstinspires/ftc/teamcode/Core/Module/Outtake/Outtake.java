@@ -28,7 +28,11 @@ public class Outtake extends HighModule {
     public Pose robotPose;
     public final ElapsedTime timer = new ElapsedTime();
     private double distanceToGoal;
-    public boolean hasShot = false;
+    public volatile boolean hasShot = false;
+    private Thread breakBeamThread;
+    private volatile boolean isRunning = true;
+    public boolean isShooting = false;
+
 
 
     public Outtake(HardwareMap hardwareMap, Constants.Color color, Telemetry telemetry) {
@@ -38,6 +42,40 @@ public class Outtake extends HighModule {
         breakBeamOuttake = hardwareMap.get(DigitalChannel.class, breakBeamOuttakeName);
         breakBeamOuttake.setMode(DigitalChannel.Mode.INPUT);
         this.telemetry = telemetry;
+        startBreakBeamThread();
+    }
+
+    public void startBreakBeamThread() {
+        breakBeamThread = new Thread(() -> {
+            boolean lastState = false;
+            while (isRunning && isShooting) {
+                boolean currentState = breakBeamOuttake.getState();
+                if (!hasShot && currentState) {
+                    timer.reset();
+                    hasShot = true;
+                }
+                if (hasShot) {
+                    if (timer.milliseconds() >= 30) {
+                        hasShot = false;
+                    }
+                }
+                lastState = currentState;
+                try {
+                    Thread.sleep(2);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        });
+
+        breakBeamThread.setPriority(Thread.MAX_PRIORITY);
+        breakBeamThread.start();
+    }
+    public void stopBreakBeamThread() {
+        isRunning = false;
+        if (breakBeamThread != null) {
+            breakBeamThread.interrupt();
+        }
     }
 
     public void setShootingVelocity(double dist) {
@@ -148,16 +186,16 @@ public class Outtake extends HighModule {
         shooter.update();
         turret.update();
         blocker.update();
-        if (hasShot) {
-            if (timer.milliseconds() >= 30 || !breakBeamOuttake.getState()) {
-                hasShot = false;
-            }
-        }
-
-        if (!hasShot && breakBeamOuttake.getState()) {
-            timer.reset();
-            hasShot = true;
-        }
+//        if (hasShot) {
+//            if (timer.milliseconds() >= 30 || !breakBeamOuttake.getState()) {
+//                hasShot = false;
+//            }
+//        }
+//
+//        if (!hasShot && breakBeamOuttake.getState()) {
+//            timer.reset();
+//            hasShot = true;
+//        }
     }
 
     public void update(Pose robotPose) {
