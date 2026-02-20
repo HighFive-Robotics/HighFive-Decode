@@ -56,6 +56,7 @@ public class Robot extends HighModule {
 
     public enum Actions {
         Shoot,
+        StopShoot,
         None
     }
 
@@ -114,6 +115,11 @@ public class Robot extends HighModule {
                 intake.canStop = false;
                 shootingState = 0;
                 break;
+            case StopShoot:
+                shootingSequence = false;
+                intake.canStop = true;
+                shootingState = 0;
+                break;
             case None:
                 break;
         }
@@ -165,7 +171,7 @@ public class Robot extends HighModule {
                     break;
                 case 2:
                     boolean shootingPulse  = timerShoot.milliseconds() >= 25;
-                    boolean ballFired =  ( outtake.hasShot || timerShoot.milliseconds() >= 275 || outtake.shooter.jerk >= 0.3 ) && shootingPulse;
+                    boolean ballFired = (outtake.hasShot || timerShoot.milliseconds() >= 400 || outtake.shooter.jerk >= 0.3) && shootingPulse;
                     if(ballFired) {
                         if(!outtake.atTargetCompensated()){
                             intake.setPower(IntakeMotor.States.Wait);

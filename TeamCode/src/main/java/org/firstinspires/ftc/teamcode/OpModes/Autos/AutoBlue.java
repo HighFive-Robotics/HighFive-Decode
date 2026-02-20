@@ -23,6 +23,7 @@ public class AutoBlue extends LinearOpMode {
     public int state = 0;
 
     public Pose startPose = new Pose(17, 111.5, Math.toRadians(0));
+
     public Pose shootPose = new Pose(55, 85, Math.toRadians(-40));
     public Pose lastShootPose = new Pose(50, 112.5, Math.toRadians(-25));
     public Pose preOpenGatePose = new Pose(20, 68, Math.toRadians(-90));
@@ -37,8 +38,8 @@ public class AutoBlue extends LinearOpMode {
     public Pose collectSpikeMark1Pose = new Pose(20, 78, Math.toRadians(180));
     public Pose preCollectSpikeMark3Pose = new Pose(42.5, 34, Math.toRadians(180));
     public Pose collectSpikeMark3Pose = new Pose(16, 34, Math.toRadians(180));
-    public Pose collectLoadingZone1 = new Pose(12, 12, Math.toRadians(180));
-    public Pose preCollectLoadingZone1 = new Pose(12, 22, Math.toRadians(180));
+    public Pose collectLoadingZone1 = new Pose(10, 12, Math.toRadians(180));
+    public Pose preCollectLoadingZone1 = new Pose(10, 22, Math.toRadians(180));
 
     private final ElapsedTime autoTimer = new ElapsedTime();
     private final ElapsedTime timer = new ElapsedTime();
@@ -168,7 +169,7 @@ public class AutoBlue extends LinearOpMode {
                     state++;
                     break;
                 case 1:
-                    if(robot.isDone() || autoTimer.milliseconds() > 5000) {
+                    if((robot.isDone()) || autoTimer.milliseconds() > 5000) {
                         robot.setAction(Robot.Actions.Shoot);
                         timer.reset();
                         state = 100;
@@ -256,13 +257,13 @@ public class AutoBlue extends LinearOpMode {
                     }
                     break;
                 case 12:
-                if (!robot.shootingSequence || timer.milliseconds() >= 5000) {
-                    robot.outtake.turret.setTargetDegrees(-100);
-                    robot.intake.setPower(IntakeMotor.States.Collect);
-                    robot.drive.followPath(goForSpike3, true);
-                    state++;
-                }
-                break;
+                    if (!robot.shootingSequence || timer.milliseconds() >= 5000) {
+                        robot.outtake.turret.setTargetDegrees(-100);
+                        robot.intake.setPower(IntakeMotor.States.Collect);
+                        robot.drive.followPath(goForSpike3, true);
+                        state++;
+                    }
+                    break;
                 case 13:
                     if (robot.drive.atParametricEnd()) {
                         robot.intake.setPower(IntakeMotor.States.Collect);

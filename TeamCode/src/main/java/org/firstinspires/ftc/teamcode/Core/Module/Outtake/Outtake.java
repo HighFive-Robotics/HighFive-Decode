@@ -133,7 +133,7 @@ public class Outtake extends HighModule {
         return Math.abs(shooter.getVelocityErrorCompensation()) <= error;
     }
     public void addErrorToleranceScaled(){
-        double offset = Range.scale(distanceToGoal , 40  , 420 , 0.6 , 0.18 );
+        double offset = Range.scale(distanceToGoal , 40  , 420 , 0.6 , 0.18);
         shooter.addToleranceCompensationOffset(offset);
     }
     public void resetErrorTolerance(){

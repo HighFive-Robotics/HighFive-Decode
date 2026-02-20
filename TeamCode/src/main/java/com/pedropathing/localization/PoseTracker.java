@@ -16,7 +16,7 @@ import com.pedropathing.math.Vector;
  */
 public class PoseTracker {
 
-    private final Localizer localizer;
+    public final Localizer localizer;
 
     private Pose startingPose = new Pose(0,0,0);
 

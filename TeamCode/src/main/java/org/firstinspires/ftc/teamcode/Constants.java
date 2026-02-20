@@ -98,11 +98,11 @@ public class Constants {
         }
         @Config
         public static class TurretParams {
-            public static double kpTurret = 0.026, kdTurret = 0.0012, kiTurret = 0.026, kfTurret = 0.0001;
-            public static double kp2Turret = 0.026, kd2Turret = 0.0012, ki2Turret = 0.026, thresholdSmallPID = 35;
+            public static double kpTurret = 0.026, kdTurret = 0.0025, kiTurret = 0.026, kfTurret = 0.0001;
+            public static double kp2Turret = 0.03, kd2Turret = 0.002, ki2Turret = 0.035, thresholdSmallPID = 35;
             public static double minimumTicks = -502, maximumTicks = 502;
             public static double ticksPerPI = 430.0;
-            public static double minimumErrorAngleForWalls = Math.PI / 10;
+            public static double minimumErrorAngleForWalls = Math.PI / 15;
         }
 
     }
@@ -144,8 +144,8 @@ public class Constants {
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
            //.distanceUnit(DistanceUnit.CM)
-            .forwardPodY(2.16)//-55mm 2,16inch
-            .strafePodX(-3.35)//-85mm -3,35 inch
+            .forwardPodY(2.25)//55mm 2,16inch
+            .strafePodX(-3.5)//-85mm -3,35 inch
             .hardwareMapName(pinPointName)
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
             .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)

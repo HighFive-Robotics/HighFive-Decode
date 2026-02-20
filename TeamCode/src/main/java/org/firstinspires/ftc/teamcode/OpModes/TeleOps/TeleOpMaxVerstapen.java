@@ -7,6 +7,7 @@ import static org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor.Stat
 import static org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor.States.Wait;
 
 import com.pedropathing.geometry.Pose;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -16,7 +17,7 @@ import org.firstinspires.ftc.teamcode.Core.Robot;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-@TeleOp
+@TeleOp(name = "😎TeleOp😎")
 public class TeleOpMaxVerstapen extends LinearOpMode {
 
     Robot robot;
@@ -28,7 +29,7 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        robot = new Robot(hardwareMap ,finalAutoPose, false , autoColor , telemetry,gamepad1);
+        robot = new Robot(hardwareMap ,finalAutoPose, false , autoColor, telemetry, gamepad1);
         finalAutoPose = new Pose();
 
         Constants.Globals.afterAuto = false;
@@ -53,11 +54,19 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
                 robot.outtake.closeBlocker();
             }
 
-            if (gamepad2.dpadLeftWasPressed()) {
+            if (gamepad2.dpad_left) {
                 robot.outtake.offsetTurretToLeft(2.5);
             }
-            if (gamepad1.dpadRightWasPressed()) {
+            if (gamepad2.dpad_right) {
                 robot.outtake.offsetTurretToRight(2.5);
+            }
+            if (gamepad2.dpadUpWasPressed()) {
+                robot.outtake.turret.setTarget(0);
+                robot.outtake.turret.setOffset(0);
+                robot.shouldAlignTurret = false;
+            }
+            if (gamepad2.dpadDownWasPressed()) {
+                robot.shouldAlignTurret = true;
             }
 
             if(gamepad1.left_trigger >= 0.8){
@@ -92,11 +101,6 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
                 robot.outtake.setShootingVelocityOffset(-2);
             }
 
-            if(robot.outtake.hasShot){
-                velocityDown.add(robot.outtake.shooter.velocityDown);
-                robot.outtake.hasShot = false;
-                i++;
-            }
             if(gamepad2.psWasPressed()){
                 robot.resetWithCamera();
             }

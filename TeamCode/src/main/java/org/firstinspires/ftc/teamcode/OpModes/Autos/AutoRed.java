@@ -31,16 +31,16 @@ public class AutoRed extends LinearOpMode {
     public Pose openGatePose = new Pose(128.5, 68, Math.toRadians(-90));
     public Pose controlPoint1 = new Pose(84, 62);
     public Pose controlPoint2 = new Pose(95, 67);
-    public Pose controlPoint3 = new Pose(60, 42);
+    public Pose controlPoint3 = new Pose(80, 40);
     public Pose controlPoint4 = new Pose(130, 58);
     public Pose preCollectSpikeMark2Pose = new Pose(99.5, 58,0);
     public Pose collectSpikeMark2Pose = new Pose(125, 58, 0);
-    public Pose preCollectSpikeMark1Pose = new Pose(99.5, 85, 0);
-    public Pose collectSpikeMark1Pose = new Pose(122, 85, 0);
-    public Pose preCollectSpikeMark3Pose = new Pose(99.5, 37, 0);
-    public Pose collectSpikeMark3Pose = new Pose(126, 37, 0);
-    public Pose collectLoadingZone1 = new Pose(130, 12, Math.toRadians(-90));
-    public Pose preCollectLoadingZone1 = new Pose(130, 22, Math.toRadians(-90));
+    public Pose preCollectSpikeMark1Pose = new Pose(99.5, 82, 0);
+    public Pose collectSpikeMark1Pose = new Pose(122, 82, 0);
+    public Pose preCollectSpikeMark3Pose = new Pose(99.5, 34, 0);
+    public Pose collectSpikeMark3Pose = new Pose(126, 34, 0);
+    public Pose collectLoadingZone1 = new Pose(134, 10, Math.toRadians(-90));
+    public Pose preCollectLoadingZone1 = new Pose(134, 20, Math.toRadians(-90));
 
     private final ElapsedTime autoTimer = new ElapsedTime();
     private final ElapsedTime timer = new ElapsedTime();
@@ -104,7 +104,7 @@ public class AutoRed extends LinearOpMode {
 
         PathChain goForShoot1 = robot.drive.pathBuilder()
                 .addPath(new BezierLine(collectSpikeMark1Pose, shootPose))
-                .setLinearHeadingInterpolation(collectSpikeMark1Pose.getHeading(), Math.toRadians(180))
+                .setLinearHeadingInterpolation(collectSpikeMark1Pose.getHeading(), Math.toRadians(0))
                 .build();
 
         PathChain goForSpike3 = robot.drive.pathBuilder()
@@ -167,11 +167,11 @@ public class AutoRed extends LinearOpMode {
                 case 0:
                     robot.drive.followPath(preloadPath, true);
                     robot.intake.setPower(IntakeMotor.States.Collect);
-                    robot.outtake.turret.setTargetDegrees(-167);
+                    robot.outtake.turret.setTargetDegrees(170);
                     state++;
                     break;
                 case 1:
-                    if(robot.isDone() || autoTimer.milliseconds() > 5000) {
+                    if((robot.isDone() && robot.outtake.atTarget())  || autoTimer.milliseconds() > 5000) {
                         robot.setAction(Robot.Actions.Shoot);
                         timer.reset();
                         state = 100;
@@ -217,7 +217,7 @@ public class AutoRed extends LinearOpMode {
                 case 7:
                     if (!robot.shootingSequence || timer.milliseconds() >= 5000) {
                         robot.drive.followPath(goForSpike2, true);
-                        robot.outtake.turret.setTargetDegrees(-173);
+                        robot.outtake.turret.setTargetDegrees(173);
                         state = 700;
                     }
                     break;
@@ -260,7 +260,7 @@ public class AutoRed extends LinearOpMode {
                     break;
                 case 12:
                     if (!robot.shootingSequence || timer.milliseconds() >= 5000) {
-                        robot.outtake.turret.setTargetDegrees(100);
+                        robot.outtake.turret.setTargetDegrees(90);
                         robot.intake.setPower(IntakeMotor.States.Collect);
                         robot.drive.followPath(goForSpike3, true);
                         state++;
@@ -313,7 +313,7 @@ public class AutoRed extends LinearOpMode {
                     break;
                 case 19:
                     if (timer.milliseconds() >= 750 || robot.intake.isFull) {
-                        robot.outtake.turret.setTargetDegrees(85);
+                        robot.outtake.turret.setTargetDegrees(80);
                         robot.drive.followPath(goShootLast);
                         state++;
                     }
