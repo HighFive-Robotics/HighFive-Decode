@@ -329,5 +329,6 @@ public class AutoBlue extends LinearOpMode {
             telemetry.addData("State: ", state);
             telemetry.update();
         }
+        robot.outtake.stopBreakBeamThread();
     }
 }

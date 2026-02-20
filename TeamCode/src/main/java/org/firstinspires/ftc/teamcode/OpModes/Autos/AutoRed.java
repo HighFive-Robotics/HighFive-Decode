@@ -331,5 +331,6 @@ public class AutoRed extends LinearOpMode {
             telemetry.addData("State: ", state);
             telemetry.update();
         }
+        robot.outtake.stopBreakBeamThread();
     }
 }

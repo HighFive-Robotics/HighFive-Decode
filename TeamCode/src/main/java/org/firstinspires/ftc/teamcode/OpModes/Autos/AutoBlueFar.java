@@ -176,5 +176,6 @@ public class AutoBlueFar extends LinearOpMode {
             telemetry.addData("State: ", state);
             telemetry.update();
         }
+        robot.outtake.stopBreakBeamThread();
     }
 }

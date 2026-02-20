@@ -180,5 +180,6 @@ public class AutoRedFar extends LinearOpMode {
             telemetry.addData("State: ", state);
             telemetry.update();
         }
+        robot.outtake.stopBreakBeamThread();
     }
 }
