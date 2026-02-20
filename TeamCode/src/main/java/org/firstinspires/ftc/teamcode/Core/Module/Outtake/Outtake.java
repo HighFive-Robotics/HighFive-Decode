@@ -148,17 +148,15 @@ public class Outtake extends HighModule {
         shooter.update();
         turret.update();
         blocker.update();
-
-        if (breakBeamOuttake.getState() && timer.milliseconds() >= 30) {
-            timer.reset();
-            hasShot = true;
+        if (hasShot) {
+            if (timer.milliseconds() >= 30 || !breakBeamOuttake.getState()) {
+                hasShot = false;
+            }
         }
 
-        if (hasShot) {
-            if (timer.milliseconds() >= 30) {
-                hasShot = false;
-                timer.reset();
-            }
+        if (!hasShot && breakBeamOuttake.getState()) {
+            timer.reset();
+            hasShot = true;
         }
     }
 

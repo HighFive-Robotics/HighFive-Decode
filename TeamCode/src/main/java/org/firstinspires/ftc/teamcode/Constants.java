@@ -18,6 +18,8 @@ import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 public class Constants {
 
     @Config
@@ -27,8 +29,8 @@ public class Constants {
         public static Pose finalAutoPose = new Pose(0, 0, 0);
         public static Color autoColor = Color.Red;
         public static Case randomizedCase = Case.None;
-        public static Pose BlueGoalCorner = new Pose(4.5, 139.5), BlueGoalWallUp = new Pose(14, 132), BlueGoalWallLeft = new Pose(12, 130), BlueGoalDistance = new Pose(18.5, 123.5);
-        public static Pose RedGoalCorner = new Pose(139.5, 139.5), RedGoalWallUp = new Pose(130, 132), RedGoalWallRight = new Pose(132, 130), RedGoalDistance = new Pose(121, 121);
+        public static Pose BlueGoalCorner = new Pose(8, 136), BlueGoalWallUp = new Pose(10, 136), BlueGoalWallLeft = new Pose(10, 134), BlueGoalDistance = new Pose(18.5, 123.5);
+        public static Pose RedGoalCorner = new Pose(136, 136), RedGoalWallUp = new Pose(134, 136), RedGoalWallRight = new Pose(136, 134), RedGoalDistance = new Pose(121, 121);
     }
 
     public enum Case {
@@ -99,7 +101,7 @@ public class Constants {
         @Config
         public static class TurretParams {
             public static double kpTurret = 0.026, kdTurret = 0.0025, kiTurret = 0.026, kfTurret = 0.0001;
-            public static double kp2Turret = 0.03, kd2Turret = 0.002, ki2Turret = 0.035, thresholdSmallPID = 35;
+            public static double kp2Turret = 0.035, kd2Turret = 0.0025, ki2Turret = 0.035, thresholdSmallPID = 35;
             public static double minimumTicks = -502, maximumTicks = 502;
             public static double ticksPerPI = 430.0;
             public static double minimumErrorAngleForWalls = Math.PI / 15;
@@ -143,9 +145,9 @@ public class Constants {
             .yVelocity(61.149199);
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
-           //.distanceUnit(DistanceUnit.CM)
-            .forwardPodY(2.25)//55mm 2,16inch
-            .strafePodX(-3.5)//-85mm -3,35 inch
+            .distanceUnit(DistanceUnit.MM)
+            .forwardPodY(60.7)//60.7mm 2,4inch
+            .strafePodX(-89.4)//-89.4mm -3,54 inch
             .hardwareMapName(pinPointName)
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
             .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)

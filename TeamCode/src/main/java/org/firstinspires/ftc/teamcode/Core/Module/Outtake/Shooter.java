@@ -31,10 +31,10 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighMotor;
 @Config
 public class Shooter extends HighModule {
     public HighMotor motorUp, motorDown;
-    public double velocityUp, velocityDown, upTolerance, downTolerance, toleranceCompensation = 0.2, upOffset = 0, downOffset = 0 , compOffset = 0;
+    public double velocityUp, velocityDown, upTolerance, downTolerance, toleranceCompensation = 0.2, upOffset = 0, downOffset = 0, compOffset = 0;
     public double targetUp, targetUpCompensated, targetDown;
     public boolean shouldCompensate = false;
-    private double lastVelocityDown , lastVelocityUp;
+    private double lastVelocityDown, lastVelocityUp;
     public double jerk = 0;
 
     public Shooter(HardwareMap hwMap) {
@@ -120,7 +120,8 @@ public class Shooter extends HighModule {
     }
 
     public double getVelocityErrorCompensation() {
-        return 2 * target - (velocityUp + velocityDown);    }
+        return 2 * target - (velocityUp + velocityDown);
+    }
 
     public boolean upAtTarget() {
         return Math.abs(getTargetUp() - velocityUp) <= (upTolerance + upOffset);
@@ -133,21 +134,21 @@ public class Shooter extends HighModule {
     @Override
     public boolean atTarget() {
         if (shouldCompensate) {
-                double targetSum = getTargetUp() + targetDown;
-                double actualSum = velocityUp + velocityDown;
-                double sumError = Math.abs(targetSum - actualSum);
-                double targetDiff = targetDown - getTargetUp();
-                double actualDiff = velocityDown - velocityUp;
-                double diffError = Math.abs(targetDiff - actualDiff);
-                double allowedSumError = toleranceCompensation + compOffset;
-                double allowedDiffError = allowedSumError * 3;
-                return (sumError <= allowedSumError) && (diffError <= allowedDiffError);
+            double targetSum = getTargetUp() + targetDown;
+            double actualSum = velocityUp + velocityDown;
+            double sumError = Math.abs(targetSum - actualSum);
+            double targetDiff = targetDown - getTargetUp();
+            double actualDiff = velocityDown - velocityUp;
+            double diffError = Math.abs(targetDiff - actualDiff);
+            double allowedSumError = toleranceCompensation + compOffset;
+            double allowedDiffError = allowedSumError * 3;
+            return (sumError <= allowedSumError) && (diffError <= allowedDiffError);
         }
         return upAtTarget() && downAtTarget();
     }
 
     public boolean atTargetCompensated() {
-        return Math.abs( (getTargetUp()+targetDown) - (velocityUp + velocityDown)) <= (toleranceCompensation+compOffset);
+        return Math.abs((getTargetUp() + targetDown) - (velocityUp + velocityDown)) <= (toleranceCompensation + compOffset);
     }
 
     public void setToleranceCompensationOffset(double offset) {
@@ -192,20 +193,24 @@ public class Shooter extends HighModule {
     }
 
     public double getTargetUp() {
-        if(shouldCompensate){
+        if (shouldCompensate) {
             return targetUpCompensated;
         }
         return targetUp;
     }
-    public double getToleranceCompensation(){
+
+    public double getToleranceCompensation() {
         return toleranceCompensation + compOffset;
     }
-    public double getUpOffset(){
+
+    public double getUpOffset() {
         return upTolerance + upOffset;
     }
-    public double getDownOffset(){
+
+    public double getDownOffset() {
         return downTolerance + downOffset;
     }
+
     public void setPIDCoefficientsDown(double kp, double kd, double ki, double kf) {
         motorDown.setVelocityPIDCoefficients(kp, ki, kd, kf, 1);
     }
@@ -240,11 +245,11 @@ public class Shooter extends HighModule {
         motorDown.setVelocityPIDFSA(0, 0, 0, 0, 0, 0, 1);
     }
 
-    public void enableCompensation(){
+    public void enableCompensation() {
         shouldCompensate = true;
     }
 
-    public void disableCompensation(){
+    public void disableCompensation() {
         shouldCompensate = false;
     }
 
@@ -252,11 +257,14 @@ public class Shooter extends HighModule {
     public void update() {
         velocityUp = motorUp.getCurrentVelocity();
         velocityDown = motorDown.getCurrentVelocity();
-        jerk = Math.min((lastVelocityDown - velocityDown) , (lastVelocityUp - velocityUp));
+        jerk = Math.min(Math.abs(lastVelocityDown - velocityDown), Math.abs(lastVelocityUp - velocityUp));
         if (shouldCompensate) {
             targetUpCompensated = targetUp + getVelocityErrorDown() * kC;
             motorUp.setTarget(targetUpCompensated);
         }
+
+        lastVelocityDown = velocityDown;
+        lastVelocityUp = velocityUp;
         motorUp.update();
         motorDown.update();
     }

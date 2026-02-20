@@ -44,26 +44,28 @@ public class PinpointLocalizer implements Localizer {
      *
      * @param map the HardwareMap
      */
-    public PinpointLocalizer(HardwareMap map, PinpointConstants constants){ this(map, constants, new Pose());}
+    public PinpointLocalizer(HardwareMap map, PinpointConstants constants) {
+        this(map, constants, new Pose());
+    }
 
     /**
      * This creates a new PinpointLocalizer from a HardwareMap and a Pose, with the Pose
      * specifying the starting pose of the localizer.
      *
-     * @param map the HardwareMap
+     * @param map          the HardwareMap
      * @param setStartPose the Pose to start from
      */
     @SuppressLint("NewApi")
-    public PinpointLocalizer(HardwareMap map, PinpointConstants constants, Pose setStartPose){
+    public PinpointLocalizer(HardwareMap map, PinpointConstants constants, Pose setStartPose) {
 
-        odo = map.get(GoBildaPinpointDriver.class,constants.hardwareMapName);
+        odo = map.get(GoBildaPinpointDriver.class, constants.hardwareMapName);
         setOffsets(constants.forwardPodY, constants.strafePodX, constants.distanceUnit);
 
-        if(constants.yawScalar.isPresent()) {
+        if (constants.yawScalar.isPresent()) {
             odo.setYawScalar(constants.yawScalar.getAsDouble());
         }
 
-        if(constants.customEncoderResolution.isPresent()) {
+        if (constants.customEncoderResolution.isPresent()) {
             odo.setEncoderResolution(constants.customEncoderResolution.getAsDouble(), constants.distanceUnit);
         } else {
             odo.setEncoderResolution(constants.encoderResolution);
@@ -166,6 +168,7 @@ public class PinpointLocalizer implements Localizer {
 
     /**
      * This returns the Y encoder value as none of the odometry tuners are required for this localizer
+     *
      * @return returns the Y encoder value
      */
     @Override
@@ -175,6 +178,7 @@ public class PinpointLocalizer implements Localizer {
 
     /**
      * This returns the X encoder value as none of the odometry tuners are required for this localizer
+     *
      * @return returns the X encoder value
      */
     @Override
@@ -184,6 +188,7 @@ public class PinpointLocalizer implements Localizer {
 
     /**
      * This returns either the factory tuned yaw scalar or the yaw scalar tuned by yourself.
+     *
      * @return returns the yaw scalar
      */
     @Override
@@ -193,9 +198,10 @@ public class PinpointLocalizer implements Localizer {
 
     /**
      * This sets the offsets and converts inches to millimeters
+     *
      * @param xOffset How far to the side from the center of the robot is the x-pod? Use positive values if it's to the left and negative if it's to the right.
      * @param yOffset How far forward from the center of the robot is the y-pod? Use positive values if it's forward and negative if it's to the back.
-     * @param unit The units that the measurements are given in
+     * @param unit    The units that the measurements are given in
      */
     private void setOffsets(double xOffset, double yOffset, DistanceUnit unit) {
         odo.setOffsets(xOffset, yOffset, unit);
@@ -271,5 +277,9 @@ public class PinpointLocalizer implements Localizer {
     @Override
     public void setHeading(double heading) {
         odo.setHeading(heading, AngleUnit.RADIANS);
+    }
+
+    public double getFreq() {
+        return odo.getFrequency();
     }
 }

@@ -43,8 +43,8 @@ public class Robot extends HighModule {
     public List<LynxModule> allHubs;
 
     boolean isAuto;
-    public boolean shootingSequence = false , holdingSequence = false, shouldAlignTurret = true;
-    private Pose cameraPose = new Pose(0,0,0);
+    public boolean shootingSequence = false, holdingSequence = false, shouldAlignTurret = true;
+    private Pose cameraPose = new Pose(0, 0, 0);
     int shootingState = 0;
 
     public int cycles = 0;
@@ -70,11 +70,11 @@ public class Robot extends HighModule {
         drive.setStartingPose(startPose);
         drive.setPose(startPose);
         if (!isAuto) {
-                if(allianceColor == Blue){
-                    drive.startFieldCentricDrive(gamepad, true, Math.PI);
-                }else {
-                    drive.startFieldCentricDrive(gamepad, true, 0);
-                }
+            if (allianceColor == Blue) {
+                drive.startFieldCentricDrive(gamepad, true, Math.PI);
+            } else {
+                drive.startFieldCentricDrive(gamepad, true, 0);
+            }
         }
         outtake = new Outtake(hardwareMap, allianceColor, telemetry);
         intake = new Intake(hardwareMap);
@@ -101,12 +101,14 @@ public class Robot extends HighModule {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
     }
-    public void resetWithCamera(){
+
+    public void resetWithCamera() {
         drive.setStartingPose(new Pose(6, 6, 0));
         cameraPose = camera.getAprilTagPose(outtake.turret.getCurrentAngleWrappedDegrees());
         drive.setPose(cameraPose);
 
     }
+
     public void setAction(Actions action) {
         lastAction = action;
         switch (action) {
@@ -114,6 +116,7 @@ public class Robot extends HighModule {
                 shootingSequence = true;
                 intake.canStop = false;
                 shootingState = 0;
+                outtake.shooter.disableCompensation();
                 break;
             case StopShoot:
                 shootingSequence = false;
@@ -128,6 +131,7 @@ public class Robot extends HighModule {
     public boolean isDone() {
         return !drive.isBusy();
     }
+
     @Override
     public void update() {
         if (voltageTimer.milliseconds() >= 500) {
@@ -140,7 +144,6 @@ public class Robot extends HighModule {
                 case 0:
                     if (outtake.atTarget()) {
                         outtake.openBlocker();
-                        outtake.shooter.enableCompensation();
                         intake.canStop = false;
                         shootingState++;
                         cycles = 1;
@@ -149,11 +152,8 @@ public class Robot extends HighModule {
                     break;
                 case 1:
                     if (cycles <= 3 || holdingSequence) {
-                        if (outtake.atTargetCompensated()) {
+                        if (outtake.atTargetCompensated() || (cycles <= 1 && outtake.atTarget())) {
                             intake.setPower(IntakeMotor.States.Collect);
-                            if(cycles <= 3){
-                                outtake.addErrorToleranceScaled();
-                            }
                             shootingState++;
                             timerShoot.reset();
                         }
@@ -170,20 +170,25 @@ public class Robot extends HighModule {
                     }
                     break;
                 case 2:
-                    boolean shootingPulse  = timerShoot.milliseconds() >= 25;
-                    boolean ballFired = (outtake.hasShot || timerShoot.milliseconds() >= 400 || outtake.shooter.jerk >= 0.3) && shootingPulse;
-                    if(ballFired) {
-                        if(!outtake.atTargetCompensated()){
+                    boolean shootingPulse = timerShoot.milliseconds() >= 25;
+                    boolean ballFired = (outtake.hasShot || timerShoot.milliseconds() >= 400 || outtake.shooter.jerk >= 0.45) && shootingPulse;
+                    if (ballFired) {
+                        if (cycles <= 3) {
+                            outtake.shooter.setToleranceCompensationOffset(0.25);
+                        }
+                        if (!outtake.atTargetCompensated()) {
                             intake.setPower(IntakeMotor.States.Wait);
                         }
-                        cycles++;
+                        outtake.shooter.enableCompensation();
                         shootingState = 1;
+                        cycles++;
                     } else if (timerShoot.milliseconds() > 1000) {
-                        if(!outtake.atTargetCompensated()){
+                        if (!outtake.atTargetCompensated()) {
                             intake.setPower(IntakeMotor.States.Wait);
                         }
-                        cycles++;
+                        outtake.shooter.enableCompensation();
                         shootingState = 1;
+                        cycles++;
                     }
                     break;
             }
@@ -191,23 +196,25 @@ public class Robot extends HighModule {
         intake.update();
         drive.update();
         outtake.update(drive.getPose());
-        if(shouldAlignTurret){
+        if (shouldAlignTurret) {
             outtake.alignTurret();
         }
         led.update();
+//        telemetry.addData("Freq pinpoint", drive.poseTracker.localizer);
+        telemetry.addData("Ball fired status", outtake.hasShot);
         telemetry.addData("atTargetCompensated", outtake.shooter.atTargetCompensated());
-        telemetry.addData("Camera pose " , cameraPose);
+        telemetry.addData("Camera pose ", cameraPose);
         telemetry.addData("atTarget", outtake.shooter.atTarget());
-        if(state == States.Collect){
-            if(intake.isFull){
+        if (state == States.Collect) {
+            if (intake.isFull) {
                 led.setColor(Green);
-            } else if(intake.isPartial){
+            } else if (intake.isPartial) {
                 led.setColor(Yellow);
             } else {
                 led.setColor(Red);
             }
         } else {
-            if(outtake.atTarget()){
+            if (outtake.atTarget()) {
                 led.setColor(Green);
             } else {
                 led.setColor(Purple);
