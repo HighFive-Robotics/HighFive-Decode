@@ -41,6 +41,7 @@ public class ShooterCalibration extends LinearOpMode {
     boolean shootingSequence = false, holdingSequence = false;
     public static boolean dacia = false;
     ElapsedTime timerShoot;
+    Pose cameraPose = new Pose(6,6,0);
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -77,7 +78,6 @@ public class ShooterCalibration extends LinearOpMode {
                 outtake.offsetTurretToRight(2.5);
             }
             if (gamepad1.psWasPressed()) drive.resetTeleOpHeading();
-            if (gamepad1.psWasPressed()) drive.resetTeleOpHeading();
             if (!shootingSequence) {
                 if (gamepad1.right_trigger >= 0.4) {
                     motor.setPower(1);
@@ -97,7 +97,19 @@ public class ShooterCalibration extends LinearOpMode {
                 outtake.shooter.updateAllCoefficients();
             }
             if (gamepad1.optionsWasPressed()) {
-                dacia = !dacia;
+                cameraPose = camera.getMegaTagFieldPose(outtake.turret.getCurrentAngleWrappedDegrees());
+                if(cameraPose != null ){
+                    drive.setPose(cameraPose);
+                    outtake.turret.setOffset(0);
+                }else {
+                    cameraPose = new Pose(-99,-99,-99);
+                }
+            }
+            if(gamepad1.shareWasPressed()){
+                cameraPose = camera.getMegaTagFieldPose(outtake.turret.getCurrentAngleWrappedDegrees());
+                if(cameraPose == null){
+                    cameraPose = new Pose(-99,-99,-99);
+                }
             }
 
             if (shootingSequence) {
@@ -158,12 +170,14 @@ public class ShooterCalibration extends LinearOpMode {
             if (!shootingSequence) {
                 outtake.shooter.disableCompensation();
             }
+
             outtake.update(drive.getPose());
             outtake.alignTurret();
-            outtake.debug();
+            //outtake.debug();
             //telemetry.addData("holding" , holdingSequence);
             telemetry.addData("Robot Pose" , drive.getPose());
-            camera.getMt1Location(outtake.turret.getCurrentAngleWrappedDegrees(), telemetry);
+            telemetry.addData("Camera Pose", cameraPose);
+            //camera.getMt1Location(outtake.turret.getCurrentAngleWrappedDegrees(), telemetry);
             //telemetry.addData("shouldCompensate " , outtake.shooter.shouldCompensate);
             drive.update();
             telemetry.update();
