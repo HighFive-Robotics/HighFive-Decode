@@ -98,6 +98,8 @@ public class HighCamera{
         return null;
     }
     public Pose getMegaTagFieldPose() {
+        if (pipeline != Pipelines.AprilTagLocation) setPipeline(Pipelines.AprilTagLocation);
+
         LLResult result = getResult();
         if (result != null) {
             Pose3D mt1 = result.getBotpose();
@@ -114,6 +116,8 @@ public class HighCamera{
     }
 
     public Pose getMegaTagFieldPose(double heading) {
+        if (pipeline != Pipelines.AprilTagLocation) setPipeline(Pipelines.AprilTagLocation);
+
         ll.updateRobotOrientation(heading);
         LLResult result = getResult();
         if (result != null) {
