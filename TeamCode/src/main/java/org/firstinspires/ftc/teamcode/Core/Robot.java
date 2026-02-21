@@ -212,7 +212,7 @@ public class Robot extends HighModule {
             outtake.alignTurret();
         }
         led.update();
-//        telemetry.addData("Freq pinpoint", drive.poseTracker.localizer);\
+//        telemetry.addData("Freq pinpoint", drive.poseTracker.localizer);
         telemetry.addData("States", shootingState);
         telemetry.addData("Jerk ", outtake.shooter.jerk);
         telemetry.addData("Ball fired status", outtake.hasShot);

@@ -103,7 +103,7 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
                 robot.outtake.setShootingVelocityOffset(-2);
             }
 
-            if(gamepad2.psWasPressed()){
+            if(gamepad2.ps){
                 robot.resetWithCamera();
             }
 
