@@ -107,6 +107,7 @@ public class Robot extends HighModule {
         cameraPose = camera.getMegaTagFieldPose(outtake.turret.getCurrentAngleWrappedDegrees());
         if(cameraPose != null ){
             drive.setPose(cameraPose);
+            outtake.turret.setOffset(0);
         }else {
             cameraPose = new Pose(-99,-99,-99);
         }
