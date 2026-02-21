@@ -27,12 +27,11 @@ public class Outtake extends HighModule {
 
     public Pose robotPose;
     public final ElapsedTime timer = new ElapsedTime();
-    private double distanceToGoal;
+    public double distanceToGoal;
     public volatile boolean hasShot = false;
     private Thread breakBeamThread;
     private volatile boolean isRunning = true;
     public boolean isShooting = false;
-
 
 
     public Outtake(HardwareMap hardwareMap, Constants.Color color, Telemetry telemetry) {
@@ -65,6 +64,7 @@ public class Outtake extends HighModule {
         breakBeamThread.setPriority(Thread.MAX_PRIORITY);
         breakBeamThread.start();
     }
+
     public void stopBreakBeamThread() {
         isRunning = false;
         if (breakBeamThread != null) {
@@ -121,10 +121,12 @@ public class Outtake extends HighModule {
     public void offsetTurretToLeft(double angle) {
         turret.addOffsetDegrees(angle);
     }
+
     @Override
-    public boolean atTarget(){
+    public boolean atTarget() {
         return shooter.atTarget() && turret.atTarget();
     }
+
     public boolean atTargetCompensated() {
         return shooter.atTargetCompensated() && turret.atTarget();
     }
@@ -164,17 +166,21 @@ public class Outtake extends HighModule {
     public boolean checkErrorToleranceCompensation(double error) {
         return Math.abs(shooter.getVelocityErrorCompensation()) <= error;
     }
-    public void addErrorToleranceScaled(){
-        double offset = Range.scale(distanceToGoal , 40  , 420 , 0.6 , 0.18);
+
+    public void addErrorToleranceScaled() {
+        double offset = Range.clip(Range.scale(distanceToGoal, 60, 360, 0.25, 0.15), 0.15, 0.25);
         shooter.addToleranceCompensationOffset(offset);
     }
-    public void resetErrorTolerance(){
+
+    public void resetErrorTolerance() {
         shooter.setToleranceCompensationOffset(0);
-        setToleranceOffset(0,0);
+        setToleranceOffset(0, 0);
     }
-    public double getDistanceToGoalTime(){
-        return distanceToGoal<=240?275:375;
+
+    public double getDistanceToGoalTime() {
+        return distanceToGoal <= 240 ? 275 : 375;
     }
+
     @Override
     public void update() {
         shooter.update();
@@ -206,9 +212,9 @@ public class Outtake extends HighModule {
     }
 
     public void debug() {
-        telemetry.addData("Shooter Down Tollerence + Offset" , shooter.getDownOffset());
-        telemetry.addData("Shooter Up Tollerence + Offset" , shooter.getUpOffset());
-        telemetry.addData("Shooter Compensation Tolerance + Offset" , shooter.getToleranceCompensation());
+        telemetry.addData("Shooter Down Tollerence + Offset", shooter.getDownOffset());
+        telemetry.addData("Shooter Up Tollerence + Offset", shooter.getUpOffset());
+        telemetry.addData("Shooter Compensation Tolerance + Offset", shooter.getToleranceCompensation());
         telemetry.addData("Distance ", distanceToGoal);
         telemetry.addData("Kc ", kC);
         telemetry.addData("Down Velocity", shooter.motorDown.getCurrentVelocity());

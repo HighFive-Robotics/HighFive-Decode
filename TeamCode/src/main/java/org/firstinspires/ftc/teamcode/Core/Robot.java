@@ -157,6 +157,7 @@ public class Robot extends HighModule {
                     if (cycles <= 3 || holdingSequence) {
                         if (outtake.atTargetCompensated() || (cycles <= 1 && outtake.atTarget())) {
                             intake.setPower(IntakeMotor.States.Collect);
+                            intake.intakeMotor.update();
                             shootingState++;
                             timerShoot.reset();
                         }
@@ -179,20 +180,20 @@ public class Robot extends HighModule {
                     boolean ballFired = (outtake.hasShot || checkShoot); //|| timerShoot.milliseconds() >= 450
                     if (ballFired) {
                         if (cycles <= 3) {
-                            outtake.shooter.addToleranceCompensationOffset(0.15);
+                            outtake.addErrorToleranceScaled();
                         }
-                        if(!outtake.atTargetCompensated()){
+                        if (!outtake.atTargetCompensated()) {
                             intake.setPower(IntakeMotor.States.Wait);
+                            intake.intakeMotor.update();
                         }
-                        intake.intakeMotor.update();
                         outtake.shooter.enableCompensation();
                         shootingState = 1;
                         cycles++;
                     } else if (timerShoot.milliseconds() > 1000) {
-                        if(!outtake.atTargetCompensated()){
+                        if (!outtake.atTargetCompensated()) {
                             intake.setPower(IntakeMotor.States.Wait);
+                            intake.intakeMotor.update();
                         }
-                        intake.intakeMotor.update();
                         outtake.shooter.enableCompensation();
                         shootingState = 1;
                         cycles++;

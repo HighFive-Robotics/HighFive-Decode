@@ -42,6 +42,9 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
             if (gamepad2.rightBumperWasPressed()) {
                 robot.setAction(Robot.Actions.Shoot);
             }
+            if(gamepad2.left_bumper){
+                robot.outtake.setShootingVelocity();
+            }
             if(gamepad2.rightBumperWasReleased()){
                 robot.holdingSequence = false;
             }
@@ -103,8 +106,12 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
             if(gamepad2.psWasPressed()){
                 robot.resetWithCamera();
             }
-            
-            robot.outtake.setShootingVelocity();
+
+            if(robot.outtake.distanceToGoal >= 260){
+                rumbled = true;
+                robot.outtake.setShootingVelocity();
+            }
+
             robot.outtake.debug();
             telemetry.addData("Shoot BreakBeam :", robot.outtake.hasShot);
             telemetry.update();
