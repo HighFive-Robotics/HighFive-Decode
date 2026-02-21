@@ -6,6 +6,8 @@ import static org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor.Stat
 import static org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor.States.Spit;
 import static org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor.States.Wait;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -29,9 +31,10 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         robot = new Robot(hardwareMap ,finalAutoPose, false , autoColor, telemetry, gamepad1);
         finalAutoPose = new Pose();
-
+        robot.outtake.startBreakBeamThread();
         Constants.Globals.afterAuto = false;
 
         waitForStart();
@@ -105,8 +108,7 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
                 robot.resetWithCamera();
             }
             robot.outtake.debug();
-            telemetry.addData("Velocity Down:", velocityDown.toString());
-            telemetry.addData("Shoot :", robot.outtake.hasShot);
+            telemetry.addData("Shoot BreakBeam :", robot.outtake.hasShot);
             telemetry.update();
             robot.update();
         }

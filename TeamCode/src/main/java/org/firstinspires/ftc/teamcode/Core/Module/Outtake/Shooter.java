@@ -33,9 +33,9 @@ public class Shooter extends HighModule {
     public HighMotor motorUp, motorDown;
     public double velocityUp, velocityDown, upTolerance, downTolerance, toleranceCompensation = 0.2, upOffset = 0, downOffset = 0, compOffset = 0;
     public double targetUp, targetUpCompensated, targetDown;
-    public boolean shouldCompensate = false , wasAtTarget = false;
+    public boolean shouldCompensate = false, wasAtTarget = false;
     private double lastVelocityDown, lastVelocityUp;
-    public double jerk = 0 ;
+    public double jerk = 0;
 
     public Shooter(HardwareMap hwMap) {
         target = 0;
@@ -150,8 +150,9 @@ public class Shooter extends HighModule {
     public boolean atTargetCompensated() {
         return Math.abs((getTargetUp() + targetDown) - (velocityUp + velocityDown)) <= (toleranceCompensation + compOffset);
     }
+
     public boolean detectShoot() {
-        if (atTarget()) {
+        if (atTargetCompensated()) {
             wasAtTarget = true;
             return false;
         }
@@ -161,6 +162,7 @@ public class Shooter extends HighModule {
         }
         return false;
     }
+
     public void setToleranceCompensationOffset(double offset) {
         this.compOffset = offset;
     }
@@ -267,10 +269,12 @@ public class Shooter extends HighModule {
     public void update() {
         velocityUp = motorUp.getCurrentVelocity();
         velocityDown = motorDown.getCurrentVelocity();
-        jerk = Math.min(Math.abs(lastVelocityDown - velocityDown), Math.abs(lastVelocityUp - velocityUp));
+        jerk = Math.max(Math.abs(lastVelocityDown - velocityDown), Math.abs(-lastVelocityUp + velocityUp));
         if (shouldCompensate) {
             targetUpCompensated = targetUp + getVelocityErrorDown() * kC;
             motorUp.setTarget(targetUpCompensated);
+        } else {
+            motorUp.setTarget(targetUp);
         }
 
         lastVelocityDown = velocityDown;

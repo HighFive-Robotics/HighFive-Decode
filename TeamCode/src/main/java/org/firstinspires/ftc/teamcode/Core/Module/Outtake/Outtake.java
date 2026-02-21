@@ -42,7 +42,6 @@ public class Outtake extends HighModule {
         breakBeamOuttake = hardwareMap.get(DigitalChannel.class, breakBeamOuttakeName);
         breakBeamOuttake.setMode(DigitalChannel.Mode.INPUT);
         this.telemetry = telemetry;
-        startBreakBeamThread();
     }
 
     public void startBreakBeamThread() {
@@ -55,16 +54,11 @@ public class Outtake extends HighModule {
                     hasShot = true;
                 }
                 if (hasShot) {
-                    if (timer.milliseconds() >= 30) {
+                    if (timer.milliseconds() >= 65) {
                         hasShot = false;
                     }
                 }
                 lastState = currentState;
-                try {
-                    Thread.sleep(2);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
             }
         });
 

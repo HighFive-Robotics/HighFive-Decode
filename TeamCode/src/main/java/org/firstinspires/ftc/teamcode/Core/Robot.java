@@ -118,6 +118,7 @@ public class Robot extends HighModule {
                 shootingState = 0;
                 outtake.shooter.disableCompensation();
                 outtake.isShooting = true;
+                outtake.shooter.wasAtTarget = false;
                 timerShoot.reset();
                 break;
             case StopShoot:
@@ -166,6 +167,7 @@ public class Robot extends HighModule {
                         outtake.shooter.disableCompensation();
                         outtake.isShooting = false;
                         outtake.closeBlocker();
+                        outtake.shooter.wasAtTarget = false;
                         intake.canStop = true;
                         shootingSequence = false;
                         shootingState = -1;
@@ -173,18 +175,20 @@ public class Robot extends HighModule {
                     }
                     break;
                 case 2:
-                    boolean shootingPulse = timerShoot.milliseconds() >= 25;
-                    boolean ballFired = (outtake.hasShot || timerShoot.milliseconds() >= 400 || outtake.shooter.jerk >= 0.4) && shootingPulse;
+                    boolean checkShoot = outtake.shooter.detectShoot();
+                    boolean ballFired = (outtake.hasShot|| checkShoot); //  || timerShoot.milliseconds() >= 450
                     if (ballFired) {
                         if (cycles <= 3) {
                             outtake.shooter.setToleranceCompensationOffset(0.25);
                         }
                         intake.setPower(IntakeMotor.States.Wait);
+                        intake.intakeMotor.update();
                         outtake.shooter.enableCompensation();
                         shootingState = 1;
                         cycles++;
-                    } else if (timerShoot.milliseconds() > 1000) {
+                    } else if (timerShoot.milliseconds() > 10000) {
                         intake.setPower(IntakeMotor.States.Wait);
+                        intake.intakeMotor.update();
                         outtake.shooter.enableCompensation();
                         shootingState = 1;
                         cycles++;
@@ -199,7 +203,9 @@ public class Robot extends HighModule {
             outtake.alignTurret();
         }
         led.update();
-//        telemetry.addData("Freq pinpoint", drive.poseTracker.localizer);
+//        telemetry.addData("Freq pinpoint", drive.poseTracker.localizer);\
+        telemetry.addData("States", shootingState);
+        telemetry.addData("Jerk ", outtake.shooter.jerk);
         telemetry.addData("Ball fired status", outtake.hasShot);
         telemetry.addData("atTargetCompensated", outtake.shooter.atTargetCompensated());
         telemetry.addData("Camera pose ", cameraPose);
