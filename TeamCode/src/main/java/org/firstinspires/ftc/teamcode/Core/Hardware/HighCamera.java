@@ -12,6 +12,7 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.Constants;
 
@@ -96,6 +97,19 @@ public class HighCamera{
             return new Pose(poseX,poseY,poseHeading);
         }
         return null;
+    }
+    public void getMt1Location(double heading , Telemetry telemetry){
+        if (pipeline != Pipelines.AprilTagLocation) setPipeline(Pipelines.AprilTagLocation);
+        ll.updateRobotOrientation(heading);
+        LLResult result = getResult();
+        if (result != null && result.isValid()) {
+            Pose3D botpose = result.getBotpose();
+            if (botpose != null) {
+                double x = botpose.getPosition().x;
+                double y = botpose.getPosition().y;
+                telemetry.addData("MT1 Location", "(" + x + ", " + y + ")");
+            }
+        }
     }
     public Pose getMegaTagFieldPose() {
         if (pipeline != Pipelines.AprilTagLocation) setPipeline(Pipelines.AprilTagLocation);

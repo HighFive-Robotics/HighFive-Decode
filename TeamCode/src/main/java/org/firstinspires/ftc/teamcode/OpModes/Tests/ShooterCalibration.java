@@ -161,17 +161,7 @@ public class ShooterCalibration extends LinearOpMode {
             outtake.debug();
             //telemetry.addData("holding" , holdingSequence);
             telemetry.addData("Robot Pose" , drive.getPose());
-            camera.ll.updateRobotOrientation(outtake.turret.getCurrentAngleWrappedDegrees());
-            LLResult result = camera.ll.getLatestResult();
-            if (result != null && result.isValid()) {
-                Pose3D botpose = result.getBotpose();
-                if (botpose != null) {
-                    double x = botpose.getPosition().x;
-                    double y = botpose.getPosition().y;
-                    double heading = botpose.getOrientation().getYaw();
-                    telemetry.addData("MT1 Location", "(" + x + ", " + y +", " + heading  +")");
-                }
-            }
+            camera.getMt1Location(outtake.turret.getCurrentAngleWrappedDegrees(), telemetry);
             //telemetry.addData("shouldCompensate " , outtake.shooter.shouldCompensate);
             drive.update();
             telemetry.update();
