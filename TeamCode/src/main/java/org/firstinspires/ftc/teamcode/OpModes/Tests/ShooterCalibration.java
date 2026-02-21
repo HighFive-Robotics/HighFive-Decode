@@ -7,11 +7,13 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
+import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighCamera;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Outtake;
@@ -44,6 +46,7 @@ public class ShooterCalibration extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         camera = new HighCamera(hardwareMap, HighCamera.Pipelines.AprilTagLocation);
         camera.startCapture();
+        camera.setPipeline(HighCamera.Pipelines.AprilTagLocation);
         drive = Constants.createFollower(hardwareMap);
         drive.setStartingPose(new Pose(6, 6, 0));
         drive.startFieldCentricDrive(gamepad1, true, 0);
@@ -156,9 +159,19 @@ public class ShooterCalibration extends LinearOpMode {
             outtake.update(drive.getPose());
             outtake.alignTurret();
             outtake.debug();
-            telemetry.addData("holding" , holdingSequence);
+            //telemetry.addData("holding" , holdingSequence);
             telemetry.addData("Robot Pose" , drive.getPose());
-            telemetry.addData("shouldCompensate " , outtake.shooter.shouldCompensate);
+            LLResult result = camera.ll.getLatestResult();
+            if (result != null && result.isValid()) {
+                Pose3D botpose = result.getBotpose();
+                if (botpose != null) {
+                    double x = botpose.getPosition().x;
+                    double y = botpose.getPosition().y;
+                    double heading = botpose.getOrientation().getYaw();
+                    telemetry.addData("MT1 Location", "(" + x + ", " + y +", " + heading  +")");
+                }
+            }
+            //telemetry.addData("shouldCompensate " , outtake.shooter.shouldCompensate);
             drive.update();
             telemetry.update();
         }

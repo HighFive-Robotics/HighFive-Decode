@@ -28,7 +28,7 @@ public class HighCamera{
         }
         int getPipelineNumber(){return pipelineNumber;}
     };
-    Limelight3A ll;
+    public Limelight3A ll;
     Pipelines pipeline;
     public HighCamera(@NonNull HardwareMap hardwareMap , @NonNull Pipelines pipeline){
         ll = hardwareMap.get(Limelight3A.class , cameraName);
