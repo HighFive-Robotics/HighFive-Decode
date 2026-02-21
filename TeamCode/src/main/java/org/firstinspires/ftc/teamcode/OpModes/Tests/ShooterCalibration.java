@@ -161,6 +161,7 @@ public class ShooterCalibration extends LinearOpMode {
             outtake.debug();
             //telemetry.addData("holding" , holdingSequence);
             telemetry.addData("Robot Pose" , drive.getPose());
+            camera.ll.updateRobotOrientation(outtake.turret.getCurrentAngleWrappedDegrees());
             LLResult result = camera.ll.getLatestResult();
             if (result != null && result.isValid()) {
                 Pose3D botpose = result.getBotpose();
