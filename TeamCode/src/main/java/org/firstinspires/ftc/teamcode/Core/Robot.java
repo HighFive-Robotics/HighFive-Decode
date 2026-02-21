@@ -103,7 +103,6 @@ public class Robot extends HighModule {
     }
 
     public void resetWithCamera() {
-        drive.setStartingPose(new Pose(6, 6, 0));
         cameraPose = camera.getMegaTagFieldPose(outtake.turret.getCurrentAngleWrappedDegrees());
         if(cameraPose != null ){
             drive.setPose(cameraPose);
@@ -111,7 +110,6 @@ public class Robot extends HighModule {
         }else {
             cameraPose = new Pose(-99,-99,-99);
         }
-
     }
 
     public void setAction(Actions action) {

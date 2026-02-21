@@ -141,8 +141,7 @@ public class HighCamera{
                 double xInches = (mt1.getPosition().x * 39.3701) + 72.0;
                 double yInches = (mt1.getPosition().y * 39.3701) + 72.0;
                 double headingRadians = Math.toRadians(mt1.getOrientation().getYaw());
-
-                return new Pose(xInches, yInches, headingRadians);
+                return new Pose(xInches, yInches).rotate(-Math.PI , false);
             }
         }
         return null;
