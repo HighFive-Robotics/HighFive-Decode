@@ -132,16 +132,16 @@ public class HighCamera{
 
     public Pose getMegaTagFieldPose(double heading) {
         if (pipeline != Pipelines.AprilTagLocation) setPipeline(Pipelines.AprilTagLocation);
-        ll.updateRobotOrientation(heading);
+        ll.updateRobotOrientation(heading+90);
         LLResult result = getResult();
         if (result != null) {
-            Pose3D mt1 = result.getBotpose();
+            Pose3D mt1 = result.getBotpose_MT2();
             if (mt1 != null) {
                 // Convert meters to inches and shift the center (0,0) to the corner (0,0) by adding 72
                 double xInches = (mt1.getPosition().x * 39.3701) + 72.0;
-                double yInches = (mt1.getPosition().y * 39.3701) + 72.0;
+                double yInches = -(mt1.getPosition().y * 39.3701) + 72.0;
                 double headingRadians = Math.toRadians(mt1.getOrientation().getYaw());
-                return new Pose(xInches, yInches).rotate(-Math.PI , false);
+                return new Pose(xInches, yInches, headingRadians);
             }
         }
         return null;
