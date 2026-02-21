@@ -43,6 +43,7 @@ public class HighCamera{
         ll.stop();
     }
     public void setPipeline(@NonNull Pipelines pipeline){
+        if (this.pipeline == pipeline)return;
         ll.pipelineSwitch(pipeline.getPipelineNumber());
         this.pipeline = pipeline;
     }
