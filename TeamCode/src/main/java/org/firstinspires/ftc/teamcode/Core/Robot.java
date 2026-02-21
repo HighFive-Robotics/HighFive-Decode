@@ -104,8 +104,10 @@ public class Robot extends HighModule {
 
     public void resetWithCamera() {
         drive.setStartingPose(new Pose(6, 6, 0));
-        cameraPose = camera.getAprilTagPose(outtake.turret.getCurrentAngleWrappedDegrees());
-        drive.setPose(cameraPose);
+        cameraPose = camera.getMegaTagFieldPose(outtake.turret.getCurrentAngleWrappedDegrees());
+        if(cameraPose != null ){
+            drive.setStartingPose(cameraPose);
+        }
 
     }
 
