@@ -170,7 +170,7 @@ public class Outtake extends HighModule {
     public void addErrorToleranceScaled() {
         double offset;
         if(distanceToGoal <= 140){
-            offset = Range.clip(Range.scale(distanceToGoal, 60, 140, 0.45, 0.25), 0.15, 0.45);
+            offset = Range.clip(Range.scale(distanceToGoal, 60, 140, 0.45, 0.3), 0.15, 0.45);
         }else{
             offset = Range.clip(Range.scale(distanceToGoal, 140, 360, 0.25, 0.15), 0.15, 0.25);
         }

@@ -43,7 +43,7 @@ public class Robot extends HighModule {
     public List<LynxModule> allHubs;
 
     boolean isAuto;
-    public boolean shootingSequence = false, holdingSequence = false, shouldAlignTurret = true , visionAlign = false;
+    public boolean shootingSequence = false, holdingSequence = false, shouldAlignTurret = true, visionAlign = false;
     private Pose cameraPose = new Pose(0, 0, 0);
     int shootingState = 0;
 
@@ -106,10 +106,14 @@ public class Robot extends HighModule {
         Double tx = camera.getHorizontalOffset();
         outtake.turret.updateVisionOffset(tx);
     }
-    public void enableResetWithCamera(){
+
+    public void enableResetWithCamera() {
+        camera.ll.start();
         visionAlign = true;
     }
-    public void disableResetWithCamera(){
+
+    public void disableResetWithCamera() {
+        camera.ll.pause();
         visionAlign = false;
     }
 
@@ -211,7 +215,7 @@ public class Robot extends HighModule {
         if (shouldAlignTurret) {
             outtake.alignTurret();
         }
-        if(visionAlign){
+        if (visionAlign) {
             resetWithCamera();
         }
         led.update();

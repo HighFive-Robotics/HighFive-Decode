@@ -24,6 +24,13 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
 
     Robot robot;
 
+    public enum LaunchZone{
+        Far,
+        Close
+    }
+
+    LaunchZone zone = LaunchZone.Far;
+
     int i = 0;
     ArrayList<Double> velocityDown = new ArrayList<>();
     boolean rumbled = false;
@@ -37,16 +44,32 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
         robot.outtake.startBreakBeamThread();
         Constants.Globals.afterAuto = false;
 
+        gamepad1.setLedColor(132 / 255.0, 88 / 255.0, 164 / 255.0, 2147483647);
+        gamepad2.setLedColor(132 / 255.0, 88 / 255.0, 164 / 255.0, 2147483647);
         waitForStart();
         while(opModeIsActive()){
             if (gamepad2.rightBumperWasPressed()) {
                 robot.setAction(Robot.Actions.Shoot);
-            }
-            if(gamepad2.left_bumper){
-                robot.outtake.setShootingVelocity();
+                robot.holdingSequence = true;
             }
             if(gamepad2.rightBumperWasReleased()){
                 robot.holdingSequence = false;
+            }
+
+            if(gamepad2.left_bumper){
+                robot.outtake.setShootingVelocity();
+            }
+
+            if(zone == LaunchZone.Close){
+                rumbled = true;
+                if(robot.outtake.distanceToGoal <= 250){
+                    robot.outtake.setShootingVelocity();
+                }
+            } else {
+                if(robot.outtake.distanceToGoal >= 300){
+                    rumbled = true;
+                    robot.outtake.setShootingVelocity();
+                }
             }
 
             if (gamepad2.left_trigger >= 0.6){
@@ -62,6 +85,7 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
             if (gamepad2.dpad_right) {
                 robot.outtake.offsetTurretToRight(2.5);
             }
+
             if (gamepad2.dpadUpWasPressed()) {
                 robot.outtake.turret.setTarget(0);
                 robot.outtake.turret.setOffset(0);
@@ -100,21 +124,24 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
                 robot.drive.resetTeleOpHeading();
             }
 
-            if(gamepad1.optionsWasPressed()){
-                dynamicUpdate = !dynamicUpdate;
-            }
-
-            if(dynamicUpdate){
+            /*if(dynamicUpdate){
                 robot.outtake.setShootingVelocityOffset(-2);
-            }
+            }*/
 
             if(gamepad2.ps){
                 robot.resetWithCamera();
             }
 
-            if(robot.outtake.distanceToGoal >= 260){
-                rumbled = true;
-                robot.outtake.setShootingVelocity();
+            if(gamepad2.optionsWasPressed()){
+                if(zone == LaunchZone.Far){
+                    zone = LaunchZone.Close;
+                    gamepad1.setLedColor(49 / 255.0, 155 / 255.0, 164 / 255.0 , 2147483647);
+                    gamepad2.setLedColor(49 / 255.0, 155 / 255.0, 164 / 255.0 , 2147483647);
+                } else {
+                    zone = LaunchZone.Far;
+                    gamepad1.setLedColor(132 / 255.0, 88 / 255.0, 164 / 255.0, 2147483647);
+                    gamepad2.setLedColor(132 / 255.0, 88 / 255.0, 164 / 255.0, 2147483647);
+                }
             }
 
             robot.outtake.debug();
