@@ -86,6 +86,14 @@ public class HighCamera{
         }
         return null;
     }
+    public Double getHorizontalOffset() {
+        if (pipeline != Pipelines.AprilTagLocation) setPipeline(Pipelines.AprilTagLocation);
+        LLResult result = getResult();
+        if (resultIsValid(result)) {
+            return result.getTx();
+        }
+        return null;
+    }
     public Pose getAprilTagPose(double heading){
         if (pipeline != Pipelines.AprilTagLocation) setPipeline(Pipelines.AprilTagLocation);
         ll.updateRobotOrientation(heading);

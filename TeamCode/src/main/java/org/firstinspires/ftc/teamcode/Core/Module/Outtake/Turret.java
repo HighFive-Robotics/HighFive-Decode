@@ -290,7 +290,13 @@ public class Turret extends HighModule {
         motor.resetMotor();
         motor.setTarget(0);
     }
-
+    public void updateVisionOffset(Double tx) {
+        if (tx != null) {
+            double visionKp = 0.02;
+            double correction = -tx * visionKp;
+            addOffsetDegrees(correction);
+        }
+    }
     @Override
     public void update() {
         ticks = motor.getCurrentPosition();

@@ -83,7 +83,12 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
                 gamepad2.rumble(200);
                 rumbled = false;
             }
-
+            if(gamepad2.squareWasPressed()){
+                robot.enableResetWithCamera();
+            }
+            if(gamepad2.circleWasPressed()){
+                robot.disableResetWithCamera();
+            }
             if(gamepad1.psWasPressed()){
                 if(gamepad1.dpad_up) {
                     if (robot.allianceColor == Constants.Color.Blue) {

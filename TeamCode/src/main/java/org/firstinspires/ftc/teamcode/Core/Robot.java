@@ -43,7 +43,7 @@ public class Robot extends HighModule {
     public List<LynxModule> allHubs;
 
     boolean isAuto;
-    public boolean shootingSequence = false, holdingSequence = false, shouldAlignTurret = true;
+    public boolean shootingSequence = false, holdingSequence = false, shouldAlignTurret = true , visionAlign = false;
     private Pose cameraPose = new Pose(0, 0, 0);
     int shootingState = 0;
 
@@ -103,13 +103,14 @@ public class Robot extends HighModule {
     }
 
     public void resetWithCamera() {
-        cameraPose = camera.getMegaTagFieldPose(outtake.turret.getCurrentAngleWrappedDegrees());
-        if(cameraPose != null ){
-            drive.setPose(cameraPose);
-            outtake.turret.setOffset(0);
-        }else {
-            cameraPose = new Pose(-99,-99,-99);
-        }
+        Double tx = camera.getHorizontalOffset();
+        outtake.turret.updateVisionOffset(tx);
+    }
+    public void enableResetWithCamera(){
+        visionAlign = true;
+    }
+    public void disableResetWithCamera(){
+        visionAlign = false;
     }
 
     public void setAction(Actions action) {
@@ -209,6 +210,9 @@ public class Robot extends HighModule {
         outtake.update(drive.getPose());
         if (shouldAlignTurret) {
             outtake.alignTurret();
+        }
+        if(visionAlign){
+            resetWithCamera();
         }
         led.update();
 //        telemetry.addData("Freq pinpoint", drive.poseTracker.localizer);
