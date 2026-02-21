@@ -22,7 +22,7 @@ import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Outtake;
 @TeleOp(name = "Shooter Calibration", group = "Tests")
 public class ShooterCalibration extends LinearOpMode {
 
-    enum Mode{
+    enum Mode {
         Up,
         Down,
         Test,
@@ -38,9 +38,10 @@ public class ShooterCalibration extends LinearOpMode {
     public int shootingState;
     public int cycles;
     Follower drive;
-    boolean shootingSequence=false , holdingSequence = false;
+    boolean shootingSequence = false, holdingSequence = false;
     public static boolean dacia = false;
     ElapsedTime timerShoot;
+
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -51,11 +52,12 @@ public class ShooterCalibration extends LinearOpMode {
         drive.setStartingPose(new Pose(6, 6, 0));
         drive.startFieldCentricDrive(gamepad1, true, 0);
         motor = hardwareMap.get(DcMotorEx.class, intakeMotorName);
-        outtake = new Outtake(hardwareMap , Constants.Color.Red , telemetry);
+        outtake = new Outtake(hardwareMap, Constants.Color.Red, telemetry);
         outtake.turret.reset();
         timerShoot = new ElapsedTime();
         double tolerance;
         telemetry.addLine("Init");
+        FtcDashboard.getInstance().startCameraStream(camera.ll, 0);
         waitForStart();
         while (opModeIsActive()) {
             if (gamepad1.yWasPressed()) {
@@ -63,7 +65,7 @@ public class ShooterCalibration extends LinearOpMode {
                 holdingSequence = true;
                 shootingState = 0;
             }
-            if(gamepad1.yWasReleased()){
+            if (gamepad1.yWasReleased()) {
                 holdingSequence = false;
             }
             if (gamepad1.leftBumperWasPressed()) outtake.openBlocker();
@@ -88,7 +90,7 @@ public class ShooterCalibration extends LinearOpMode {
             if (gamepad1.square) {
                 outtake.setShootingVelocity();
             }
-            if(gamepad1.dpad_up){
+            if (gamepad1.dpad_up) {
                 outtake.setShootingVelocityOffset(-2);
             }
             if (gamepad1.circle) {
@@ -111,7 +113,7 @@ public class ShooterCalibration extends LinearOpMode {
                         if (cycles <= 3 || holdingSequence) {
                             if (outtake.atTargetCompensated()) {
                                 motor.setPower(1);
-                                if(cycles <= 3){
+                                if (cycles <= 3) {
                                     outtake.shooter.addToleranceCompensationOffset(0.25);
                                 }
                                 shootingState++;
@@ -130,14 +132,14 @@ public class ShooterCalibration extends LinearOpMode {
                         break;
                     case 2:
                         boolean ballFired = outtake.hasShot || timerShoot.milliseconds() >= 275 || outtake.checkErrorToleranceDown(0.25);
-                        if(ballFired) {
-                            if(!outtake.atTargetCompensated()){
+                        if (ballFired) {
+                            if (!outtake.atTargetCompensated()) {
                                 motor.setPower(0);
                             }
                             cycles++;
                             shootingState = 1;
                         } else if (timerShoot.milliseconds() > 1000) {
-                            if(!outtake.atTargetCompensated()){
+                            if (!outtake.atTargetCompensated()) {
                                 motor.setPower(0);
                             }
                             cycles++;
@@ -146,21 +148,21 @@ public class ShooterCalibration extends LinearOpMode {
                         break;
                 }
             }
-            if(dacia && mode == Mode.None){
+            if (dacia && mode == Mode.None) {
                 outtake.shooter.setManualVelocity(velocityDown);
             }
-            if(mode == Mode.Up){
+            if (mode == Mode.Up) {
                 outtake.shooter.setUpTargetVelocity(velocityUp);
                 outtake.shooter.setDownTargetVelocity(velocityDown);
             }
-            if(!shootingSequence){
+            if (!shootingSequence) {
                 outtake.shooter.disableCompensation();
             }
             outtake.update(drive.getPose());
             outtake.alignTurret();
             outtake.debug();
             //telemetry.addData("holding" , holdingSequence);
-            telemetry.addData("Robot Pose" , drive.getPose());
+            telemetry.addData("Robot Pose", drive.getPose());
             camera.ll.updateRobotOrientation(outtake.turret.getCurrentAngleWrappedDegrees());
             LLResult result = camera.ll.getLatestResult();
             if (result != null && result.isValid()) {
@@ -169,7 +171,7 @@ public class ShooterCalibration extends LinearOpMode {
                     double x = botpose.getPosition().x;
                     double y = botpose.getPosition().y;
                     double heading = botpose.getOrientation().getYaw();
-                    telemetry.addData("MT1 Location", "(" + x + ", " + y +", " + heading  +")");
+                    telemetry.addData("MT1 Location", "(" + x + ", " + y + ", " + heading + ")");
                 }
             }
             //telemetry.addData("shouldCompensate " , outtake.shooter.shouldCompensate);
