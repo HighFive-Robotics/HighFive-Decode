@@ -46,10 +46,6 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
                 robot.holdingSequence = false;
             }
 
-            if(gamepad2.left_bumper){
-                robot.outtake.setShootingVelocity();
-            }
-
             if (gamepad2.left_trigger >= 0.6){
                 robot.outtake.openBlocker();
             }
@@ -107,6 +103,8 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
             if(gamepad2.psWasPressed()){
                 robot.resetWithCamera();
             }
+            
+            robot.outtake.setShootingVelocity();
             robot.outtake.debug();
             telemetry.addData("Shoot BreakBeam :", robot.outtake.hasShot);
             telemetry.update();

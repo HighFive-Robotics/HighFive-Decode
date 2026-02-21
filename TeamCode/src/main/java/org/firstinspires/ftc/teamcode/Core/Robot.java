@@ -176,18 +176,22 @@ public class Robot extends HighModule {
                     break;
                 case 2:
                     boolean checkShoot = outtake.shooter.detectShoot();
-                    boolean ballFired = (outtake.hasShot|| checkShoot); //  || timerShoot.milliseconds() >= 450
+                    boolean ballFired = (outtake.hasShot || checkShoot); //|| timerShoot.milliseconds() >= 450
                     if (ballFired) {
                         if (cycles <= 3) {
-                            outtake.shooter.setToleranceCompensationOffset(0.25);
+                            outtake.shooter.addToleranceCompensationOffset(0.15);
                         }
-                        intake.setPower(IntakeMotor.States.Wait);
+                        if(!outtake.atTargetCompensated()){
+                            intake.setPower(IntakeMotor.States.Wait);
+                        }
                         intake.intakeMotor.update();
                         outtake.shooter.enableCompensation();
                         shootingState = 1;
                         cycles++;
-                    } else if (timerShoot.milliseconds() > 10000) {
-                        intake.setPower(IntakeMotor.States.Wait);
+                    } else if (timerShoot.milliseconds() > 1000) {
+                        if(!outtake.atTargetCompensated()){
+                            intake.setPower(IntakeMotor.States.Wait);
+                        }
                         intake.intakeMotor.update();
                         outtake.shooter.enableCompensation();
                         shootingState = 1;

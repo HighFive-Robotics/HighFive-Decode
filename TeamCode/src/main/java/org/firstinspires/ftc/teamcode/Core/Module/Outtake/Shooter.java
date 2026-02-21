@@ -156,7 +156,7 @@ public class Shooter extends HighModule {
             wasAtTarget = true;
             return false;
         }
-        if (wasAtTarget && (jerk >= 0.45)) {
+        if (wasAtTarget && (jerk >= 0.3)) {
             wasAtTarget = false;
             return true;
         }
