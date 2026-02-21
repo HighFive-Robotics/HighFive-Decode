@@ -117,7 +117,6 @@ public class HighCamera{
 
     public Pose getMegaTagFieldPose(double heading) {
         if (pipeline != Pipelines.AprilTagLocation) setPipeline(Pipelines.AprilTagLocation);
-
         ll.updateRobotOrientation(heading);
         LLResult result = getResult();
         if (result != null) {

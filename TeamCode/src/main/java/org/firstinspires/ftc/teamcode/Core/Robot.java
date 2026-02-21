@@ -106,7 +106,9 @@ public class Robot extends HighModule {
         drive.setStartingPose(new Pose(6, 6, 0));
         cameraPose = camera.getMegaTagFieldPose(outtake.turret.getCurrentAngleWrappedDegrees());
         if(cameraPose != null ){
-            drive.setStartingPose(cameraPose);
+            drive.setPose(cameraPose);
+        }else {
+            cameraPose = new Pose(-99,-99,-99);
         }
 
     }
@@ -215,7 +217,7 @@ public class Robot extends HighModule {
         telemetry.addData("Jerk ", outtake.shooter.jerk);
         telemetry.addData("Ball fired status", outtake.hasShot);
         telemetry.addData("atTargetCompensated", outtake.shooter.atTargetCompensated());
-        telemetry.addData("Camera pose ", cameraPose);
+        telemetry.addData("Camera pose ", cameraPose.toString());
         telemetry.addData("atTarget", outtake.shooter.atTarget());
         if (state == States.Collect) {
             if (intake.isFull) {
