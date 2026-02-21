@@ -24,6 +24,7 @@ import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterF
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighModule;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighMotor;
@@ -149,18 +150,6 @@ public class Shooter extends HighModule {
 
     public boolean atTargetCompensated() {
         return Math.abs((getTargetUp() + targetDown) - (velocityUp + velocityDown)) <= (toleranceCompensation + compOffset);
-    }
-
-    public boolean detectShoot() {
-        if (atTargetCompensated()) {
-            wasAtTarget = true;
-            return false;
-        }
-        if (wasAtTarget && (jerk >= 0.3)) {
-            wasAtTarget = false;
-            return true;
-        }
-        return false;
     }
 
     public void setToleranceCompensationOffset(double offset) {

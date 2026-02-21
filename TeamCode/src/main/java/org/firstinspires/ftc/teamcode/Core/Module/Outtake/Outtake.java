@@ -168,8 +168,21 @@ public class Outtake extends HighModule {
     }
 
     public void addErrorToleranceScaled() {
-        double offset = Range.clip(Range.scale(distanceToGoal, 60, 360, 0.25, 0.15), 0.15, 0.25);
+        double offset = Range.clip(Range.scale(distanceToGoal, 60, 360, 0.4, 0.15), 0.15, 0.4);
         shooter.addToleranceCompensationOffset(offset);
+    }
+
+    public boolean detectShoot() {
+        if (atTargetCompensated()) {
+            shooter.wasAtTarget = true;
+            return false;
+        }
+        double jerkOffset = Range.clip(Range.scale(distanceToGoal, 60, 360, 0.15, 0.3), 0.15, 0.3);
+        if (shooter.wasAtTarget && (shooter.jerk >= jerkOffset)) {
+            shooter.wasAtTarget = false;
+            return true;
+        }
+        return false;
     }
 
     public void resetErrorTolerance() {

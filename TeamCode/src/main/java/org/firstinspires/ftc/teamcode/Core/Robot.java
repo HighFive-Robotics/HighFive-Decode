@@ -180,7 +180,7 @@ public class Robot extends HighModule {
                     }
                     break;
                 case 2:
-                    boolean checkShoot = outtake.shooter.detectShoot();
+                    boolean checkShoot = outtake.detectShoot();
                     boolean ballFired = (outtake.hasShot || checkShoot); //|| timerShoot.milliseconds() >= 450
                     if (ballFired) {
                         if (cycles <= 3) {
