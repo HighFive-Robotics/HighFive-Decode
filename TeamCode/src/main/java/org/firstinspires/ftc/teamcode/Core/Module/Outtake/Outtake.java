@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.breakBeamOutt
 import static org.firstinspires.ftc.teamcode.Constants.Globals.BlueGoalDistance;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.RedGoalDistance;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.LinkageCamera.ArtifactPose;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.kC;
 
 import com.pedropathing.geometry.Pose;
@@ -21,6 +22,7 @@ public class Outtake extends HighModule {
 
     public Shooter shooter;
     public Turret turret;
+    public LinkageCamera linkageCamera;
     public Blocker blocker;
     public DigitalChannel breakBeamOuttake;
     private final Telemetry telemetry;
@@ -34,10 +36,11 @@ public class Outtake extends HighModule {
     public boolean isShooting = false;
 
 
-    public Outtake(HardwareMap hardwareMap, Constants.Color color, Telemetry telemetry) {
+    public Outtake(HardwareMap hardwareMap, Constants.Color color, Telemetry telemetry , boolean isAuto) {
         shooter = new Shooter(hardwareMap);
         turret = new Turret(hardwareMap, color, telemetry);
-        blocker = new Blocker(hardwareMap, Blocker.ClosedPosition, true);
+        linkageCamera = new LinkageCamera(hardwareMap,ArtifactPose,isAuto);
+        blocker = new Blocker(hardwareMap, Blocker.ClosedPosition, isAuto);
         breakBeamOuttake = hardwareMap.get(DigitalChannel.class, breakBeamOuttakeName);
         breakBeamOuttake.setMode(DigitalChannel.Mode.INPUT);
         this.telemetry = telemetry;
@@ -170,7 +173,7 @@ public class Outtake extends HighModule {
     public void addErrorToleranceScaled() {
         double offset;
         if(distanceToGoal <= 140){
-            offset = Range.clip(Range.scale(distanceToGoal, 60, 140, 0.45, 0.3), 0.15, 0.45);
+            offset = Range.clip(Range.scale(distanceToGoal, 60, 140, 0.4, 0.25), 0.15, 0.45);
         }else{
             offset = Range.clip(Range.scale(distanceToGoal, 140, 360, 0.25, 0.15), 0.15, 0.25);
         }
@@ -182,7 +185,7 @@ public class Outtake extends HighModule {
             shooter.wasAtTarget = true;
             return false;
         }
-        double jerkOffset = Range.clip(Range.scale(distanceToGoal, 60, 360, 0.15, 0.3), 0.15, 0.3);
+        double jerkOffset = 0.35;
         if (shooter.wasAtTarget && (shooter.jerk >= jerkOffset)) {
             shooter.wasAtTarget = false;
             return true;
@@ -204,6 +207,7 @@ public class Outtake extends HighModule {
         shooter.update();
         turret.update();
         blocker.update();
+        linkageCamera.update();
 //        if (hasShot) {
 //            if (timer.milliseconds() >= 30 || !breakBeamOuttake.getState()) {
 //                hasShot = false;

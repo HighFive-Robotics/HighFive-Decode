@@ -42,6 +42,7 @@ public class HighCamera{
     public void stopCapture(){
         ll.stop();
     }
+    public void pauseCapture(){ll.pause();}
     public void setPipeline(@NonNull Pipelines pipeline){
         if (this.pipeline == pipeline)return;
         ll.pipelineSwitch(pipeline.getPipelineNumber());
@@ -155,20 +156,40 @@ public class HighCamera{
         return null;
     }
 
-    public Pose getBallPose() {
+    public double[] getBallData() {
         if (pipeline != Pipelines.BallDetection) setPipeline(Pipelines.BallDetection);
         LLResult result = getResult();
         if (resultIsValid(result)) {
-            double[] py = result.getPythonOutput();
-
-            if (py[0] == 1.0) {
-                double forwardInch = py[1];
-                double strafeInch = py[2];
-                double headingDeg = py[3];
-                return new Pose(forwardInch, strafeInch, Math.toRadians(headingDeg));
+            double[] pythonOutput = result.getPythonOutput();
+            if (pythonOutput != null && pythonOutput.length >= 4) {
+                if (pythonOutput[0] == 0.0 && pythonOutput[1] == 0.0) {
+                    return null;
+                }
+                return pythonOutput;
             }
         }
         return null;
+    }
+    public boolean hasTarget() {
+        return getBallData() != null;
+    }
+    public Constants.Color getBallColor(){
+        double[] data = getBallData();
+        if (data == null) return Constants.Color.None;
+        return data[3] == 1.0 ? Constants.Color.Green : Constants.Color.Purple;
+    }
+    public Pose getBallPose(Pose robotPose){
+        double[] data = getBallData();
+        if (data == null) return null;
+        double x  = data[0];
+        double y = data[1];
+        double heading = data[2];
+        return new Pose(robotPose.getX() + x , robotPose.getY() + y , robotPose.getHeading() + heading);
+    }
+    public String showBallData(){
+        double[] data = getBallData();
+        if(data == null) return "NO VALID DATA";
+        else return "FORWARD(X): "+data[0]+" STRAFE(Y): "+data[1] + " HEADING: " + data[2];
     }
     public boolean motifIsValid(Constants.Case motif){
         return motif != Constants.Case.None;

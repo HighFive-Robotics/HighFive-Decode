@@ -53,7 +53,7 @@ public class ShooterCalibration extends LinearOpMode {
         drive.setStartingPose(new Pose(6, 6, 0));
         drive.startFieldCentricDrive(gamepad1, true, 0);
         motor = hardwareMap.get(DcMotorEx.class, intakeMotorName);
-        outtake = new Outtake(hardwareMap, Constants.Color.Red, telemetry);
+        outtake = new Outtake(hardwareMap, Constants.Color.Red, telemetry,true);
         outtake.turret.reset();
         timerShoot = new ElapsedTime();
         double tolerance;

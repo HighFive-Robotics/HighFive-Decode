@@ -40,10 +40,9 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         robot = new Robot(hardwareMap ,finalAutoPose, false , autoColor, telemetry, gamepad1);
-        finalAutoPose = new Pose();
+        finalAutoPose = new Pose(6,6,0);
         robot.outtake.startBreakBeamThread();
         Constants.Globals.afterAuto = false;
-
         gamepad1.setLedColor(132 / 255.0, 88 / 255.0, 164 / 255.0, 2147483647);
         gamepad2.setLedColor(132 / 255.0, 88 / 255.0, 164 / 255.0, 2147483647);
         waitForStart();
@@ -66,12 +65,11 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
                     robot.outtake.setShootingVelocity();
                 }
             } else {
-                if(robot.outtake.distanceToGoal >= 300){
+                if(robot.outtake.distanceToGoal >= 250){
                     rumbled = true;
                     robot.outtake.setShootingVelocity();
                 }
             }
-
             if (gamepad2.left_trigger >= 0.6){
                 robot.outtake.openBlocker();
             }
@@ -85,7 +83,6 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
             if (gamepad2.dpad_right) {
                 robot.outtake.offsetTurretToRight(2.5);
             }
-
             if (gamepad2.dpadUpWasPressed()) {
                 robot.outtake.turret.setTarget(0);
                 robot.outtake.turret.setOffset(0);
@@ -94,7 +91,6 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
             if (gamepad2.dpadDownWasPressed()) {
                 robot.shouldAlignTurret = true;
             }
-
             if(gamepad1.left_trigger >= 0.8){
                 robot.intake.setPower(Spit);
             } else if(gamepad1.right_trigger >= 0.8){
@@ -102,7 +98,6 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
             } else if(robot.intake.canStop) {
                 robot.intake.setPower(Wait);
             }
-
             if(robot.outtake.atTarget() && rumbled){
                 gamepad2.rumble(200);
                 rumbled = false;
@@ -123,27 +118,23 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
                 }
                 robot.drive.resetTeleOpHeading();
             }
-
             /*if(dynamicUpdate){
                 robot.outtake.setShootingVelocityOffset(-2);
             }*/
-
             if(gamepad2.ps){
-                robot.resetWithCamera();
+                robot.setAction(Robot.Actions.ResetTurretCamera);
             }
-
             if(gamepad2.optionsWasPressed()){
                 if(zone == LaunchZone.Far){
                     zone = LaunchZone.Close;
                     gamepad1.setLedColor(49 / 255.0, 155 / 255.0, 164 / 255.0 , 2147483647);
                     gamepad2.setLedColor(49 / 255.0, 155 / 255.0, 164 / 255.0 , 2147483647);
                 } else {
-                    zone = LaunchZone.Far;
+                    zone = LaunchZone.Far; 
                     gamepad1.setLedColor(132 / 255.0, 88 / 255.0, 164 / 255.0, 2147483647);
                     gamepad2.setLedColor(132 / 255.0, 88 / 255.0, 164 / 255.0, 2147483647);
                 }
             }
-
             robot.outtake.debug();
             telemetry.addData("Shoot BreakBeam :", robot.outtake.hasShot);
             telemetry.update();

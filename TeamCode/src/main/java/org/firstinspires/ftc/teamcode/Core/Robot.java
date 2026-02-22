@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Core;
 
+import static org.firstinspires.ftc.teamcode.Constants.CameraConstants.toleranceTurretDeg;
 import static org.firstinspires.ftc.teamcode.Constants.Color.Blue;
 import static org.firstinspires.ftc.teamcode.Constants.Color.Green;
 import static org.firstinspires.ftc.teamcode.Constants.Color.Purple;
@@ -21,6 +22,7 @@ import org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
 
 import org.firstinspires.ftc.teamcode.Core.Module.Others.Led;
+import org.firstinspires.ftc.teamcode.Core.Module.Outtake.LinkageCamera;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Outtake;
 
 import java.util.List;
@@ -43,9 +45,10 @@ public class Robot extends HighModule {
     public List<LynxModule> allHubs;
 
     boolean isAuto;
-    public boolean shootingSequence = false, holdingSequence = false, shouldAlignTurret = true, visionAlign = false;
+    public boolean shootingSequence = false, holdingSequence = false, shouldAlignTurret = true, visionAlign = false , resetWithCamera= false;
     private Pose cameraPose = new Pose(0, 0, 0);
     int shootingState = 0;
+    Double tx = null;
 
     public int cycles = 0;
 
@@ -56,6 +59,7 @@ public class Robot extends HighModule {
 
     public enum Actions {
         Shoot,
+        ResetTurretCamera,
         StopShoot,
         None
     }
@@ -76,7 +80,7 @@ public class Robot extends HighModule {
                 drive.startFieldCentricDrive(gamepad, true, 0);
             }
         }
-        outtake = new Outtake(hardwareMap, allianceColor, telemetry);
+        outtake = new Outtake(hardwareMap, allianceColor, telemetry,isAuto);
         intake = new Intake(hardwareMap);
         led = new Led(hardwareMap);
         allHubs = hardwareMap.getAll(LynxModule.class);
@@ -93,7 +97,7 @@ public class Robot extends HighModule {
         drive = Constants.createFollower(hardwareMap);
         camera = new HighCamera(hardwareMap, HighCamera.Pipelines.AprilTagId);
         drive.setStartingPose(startPose);
-        outtake = new Outtake(hardwareMap, allianceColor, telemetry);
+        outtake = new Outtake(hardwareMap, allianceColor, telemetry,isAuto);
         intake = new Intake(hardwareMap);
         led = new Led(hardwareMap);
         allHubs = hardwareMap.getAll(LynxModule.class);
@@ -133,6 +137,11 @@ public class Robot extends HighModule {
                 shootingSequence = false;
                 intake.canStop = true;
                 shootingState = 0;
+                break;
+            case ResetTurretCamera:
+                outtake.linkageCamera.setState(LinkageCamera.States.Goal, 300);
+                camera.startCapture();
+                resetWithCamera = true;
                 break;
             case None:
                 break;
@@ -185,7 +194,7 @@ public class Robot extends HighModule {
                     break;
                 case 2:
                     boolean checkShoot = outtake.detectShoot();
-                    boolean ballFired = (outtake.hasShot || checkShoot); //|| timerShoot.milliseconds() >= 450
+                    boolean ballFired = (outtake.hasShot || checkShoot || timerShoot.milliseconds() >= 475); //
                     if (ballFired) {
                         if (cycles <= 3) {
                             outtake.addErrorToleranceScaled();
@@ -207,6 +216,15 @@ public class Robot extends HighModule {
                         cycles++;
                     }
                     break;
+            }
+        }
+        if(resetWithCamera && outtake.linkageCamera.atTarget()){
+            tx = camera.getHorizontalOffset();
+            outtake.turret.updateVisionOffset(tx);
+            if(tx != null && Math.abs(tx) <= toleranceTurretDeg){
+                resetWithCamera = false;
+                outtake.linkageCamera.setState(LinkageCamera.States.Artifact);
+                camera.pauseCapture();
             }
         }
         intake.update();

@@ -26,7 +26,7 @@ public class Constants {
     public static class Globals {
         public static double voltage = 12.0;
         public static boolean afterAuto = false;
-        public static Pose finalAutoPose = new Pose(0, 0, 0);
+        public static Pose finalAutoPose = new Pose(6, 6   , 0);
         public static Color autoColor = Color.Red;
         public static Case randomizedCase = Case.None;
         public static Pose BlueGoalCorner = new Pose(8, 136), BlueGoalWallUp = new Pose(10, 136), BlueGoalWallLeft = new Pose(10, 134), BlueGoalDistance = new Pose(18.5, 123.5);
@@ -67,6 +67,7 @@ public class Constants {
         public static String ledName1 = "L1";
         public static String ledName2 = "L2";
         public static String cameraName = "limelight";
+        public static String cameraServoName = "CS";
     }
 
     public static class Intake {
@@ -106,11 +107,17 @@ public class Constants {
             public static double ticksPerPI = 430.0;
             public static double minimumErrorAngleForWalls = Math.PI / 15;
         }
+        @Config
+        public static class LinkageCamera{
+            public static double ArtifactPose = 0.6;
+            public static double GoalPose = 0.35;
+        }
 
     }
     @Config
     public static class CameraConstants {
         public static double xOffset = 0, yOffset = 0;
+        public static double toleranceTurretDeg = 1;
     }
 
 
