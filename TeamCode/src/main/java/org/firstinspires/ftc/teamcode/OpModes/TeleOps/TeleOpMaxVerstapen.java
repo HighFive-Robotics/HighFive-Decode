@@ -32,10 +32,7 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
 
     LaunchZone zone = LaunchZone.Far;
 
-    int i = 0;
-    ArrayList<Double> velocityDown = new ArrayList<>();
     boolean rumbled = false;
-    boolean dynamicUpdate = false;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -52,23 +49,24 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
             if (gamepad2.rightBumperWasPressed()) {
                 robot.setAction(Robot.Actions.Shoot);
                 robot.holdingSequence = true;
+                rumbled = true;
             }
             if(gamepad2.rightBumperWasReleased()){
                 robot.holdingSequence = false;
             }
 
             if(gamepad2.left_bumper){
-                robot.outtake.setShootingVelocity();
+                if(robot.outtake.distanceToGoal >= 40){
+                    robot.outtake.setShootingVelocity();
+                }
             }
 
             if(zone == LaunchZone.Close){
-                rumbled = true;
-                if(robot.outtake.distanceToGoal <= 250){
+                if(robot.outtake.distanceToGoal <= 250 && robot.outtake.distanceToGoal >= 40){
                     robot.outtake.setShootingVelocity();
                 }
             } else {
                 if(robot.outtake.distanceToGoal >= 250){
-                    rumbled = true;
                     robot.outtake.setShootingVelocity();
                 }
             }
@@ -100,8 +98,8 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
             } else if(robot.intake.canStop) {
                 robot.intake.setPower(Wait);
             }
-            if(robot.outtake.atTarget() && rumbled){
-                gamepad2.rumble(200);
+            if(robot.lastAction == Robot.Actions.Shoot && rumbled){
+                gamepad1.rumble(200);
                 rumbled = false;
             }
             if(gamepad2.squareWasPressed()){
@@ -120,12 +118,16 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
                 }
                 robot.drive.resetTeleOpHeading();
             }
-            /*if(dynamicUpdate){
-                robot.outtake.setShootingVelocityOffset(-2);
-            }*/
             if(gamepad2.ps){
                 robot.setAction(Robot.Actions.ResetTurretCamera);
             }
+            if(gamepad2.leftStickButtonWasPressed()){
+                robot.outtake.turret.reset();
+            }
+            if(Math.abs(gamepad2.right_stick_x) >= 0.4){
+                robot.outtake.turret.addOffsetDegrees(0.3 * gamepad2.right_stick_x);
+            }
+            
             if(gamepad2.optionsWasPressed()){
                 if(zone == LaunchZone.Far){
                     zone = LaunchZone.Close;
@@ -137,8 +139,6 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
                     gamepad2.setLedColor(132 / 255.0, 88 / 255.0, 164 / 255.0, 2147483647);
                 }
             }
-            robot.outtake.debug();
-            telemetry.addData("Shoot BreakBeam :", robot.outtake.hasShot);
             telemetry.update();
             robot.update();
         }

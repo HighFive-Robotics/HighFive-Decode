@@ -71,12 +71,12 @@ public class Shooter extends HighModule {
 
 
     public void setUpTargetVelocity(double velocity) {
-        this.targetUp = velocity;
+        this.targetUp = Range.clip(velocity, 0, 7.2);
         motorUp.setTarget(velocity);
     }
 
     public void setDownTargetVelocity(double velocity) {
-        this.targetDown = velocity;
+        this.targetDown = Range.clip(velocity, 0, 6.8);
         motorDown.setTarget(velocity);
     }
 

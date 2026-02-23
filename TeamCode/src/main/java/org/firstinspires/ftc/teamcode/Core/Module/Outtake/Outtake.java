@@ -172,10 +172,10 @@ public class Outtake extends HighModule {
 
     public void addErrorToleranceScaled() {
         double offset;
-        if(distanceToGoal <= 140){
-            offset = Range.clip(Range.scale(distanceToGoal, 60, 140, 0.4, 0.25), 0.15, 0.45);
+        if(distanceToGoal <= 180){
+            offset = Range.clip(Range.scale(distanceToGoal, 60, 180, 0.5, 0.3), 0.15, 0.5);
         }else{
-            offset = Range.clip(Range.scale(distanceToGoal, 140, 360, 0.25, 0.15), 0.15, 0.25);
+            offset = Range.clip(Range.scale(distanceToGoal, 180, 360, 0.25, 0.15), 0.15, 0.25);
         }
         shooter.addToleranceCompensationOffset(offset);
     }
