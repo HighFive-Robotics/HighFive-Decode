@@ -2,8 +2,8 @@ package org.firstinspires.ftc.teamcode.Core.Module.Outtake;
 
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.blockerServoName;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.cameraServoName;
-import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.LinkageCamera.ArtifactPose;
-import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.LinkageCamera.GoalPose;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.LinkageCameraConstants.ArtifactPose;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.LinkageCameraConstants.GoalPose;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -44,7 +44,7 @@ public class LinkageCamera extends HighModule {
         }
     }
 
-    public void setState(States state, double time) {
+    public void   setState(States state, double time) {
         this.state = state;
         switch (state) {
             case Artifact:

@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.Core.Module.Outtake.LinkageCamera;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
 import java.util.ArrayList;
@@ -45,6 +46,7 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
         Constants.Globals.afterAuto = false;
         gamepad1.setLedColor(132 / 255.0, 88 / 255.0, 164 / 255.0, 2147483647);
         gamepad2.setLedColor(132 / 255.0, 88 / 255.0, 164 / 255.0, 2147483647);
+        robot.outtake.linkageCamera.setState(LinkageCamera.States.Artifact);
         waitForStart();
         while(opModeIsActive()){
             if (gamepad2.rightBumperWasPressed()) {
@@ -130,7 +132,7 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
                     gamepad1.setLedColor(49 / 255.0, 155 / 255.0, 164 / 255.0 , 2147483647);
                     gamepad2.setLedColor(49 / 255.0, 155 / 255.0, 164 / 255.0 , 2147483647);
                 } else {
-                    zone = LaunchZone.Far; 
+                    zone = LaunchZone.Far;
                     gamepad1.setLedColor(132 / 255.0, 88 / 255.0, 164 / 255.0, 2147483647);
                     gamepad2.setLedColor(132 / 255.0, 88 / 255.0, 164 / 255.0, 2147483647);
                 }

@@ -178,6 +178,9 @@ public class HighCamera{
         if (data == null) return Constants.Color.None;
         return data[3] == 1.0 ? Constants.Color.Green : Constants.Color.Purple;
     }
+    public String getBallColorData(double id){
+        return id == 1.0 ? "Green" : "Purple";
+    }
     public Pose getBallPose(Pose robotPose){
         double[] data = getBallData();
         if (data == null) return null;
@@ -186,10 +189,10 @@ public class HighCamera{
         double heading = data[2];
         return new Pose(robotPose.getX() + x , robotPose.getY() + y , robotPose.getHeading() + heading);
     }
-    public String showBallData(){
+    public String getBallInfo(){
         double[] data = getBallData();
         if(data == null) return "NO VALID DATA";
-        else return "FORWARD(X): "+data[0]+" STRAFE(Y): "+data[1] + " HEADING: " + data[2];
+        else return "FORWARD(X): "+data[0]+" STRAFE(Y): "+data[1] + " HEADING: " + data[2] + " Color: " + getBallColorData(data[3]);
     }
     public boolean motifIsValid(Constants.Case motif){
         return motif != Constants.Case.None;

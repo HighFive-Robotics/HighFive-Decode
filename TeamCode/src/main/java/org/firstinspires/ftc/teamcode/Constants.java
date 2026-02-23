@@ -108,7 +108,7 @@ public class Constants {
             public static double minimumErrorAngleForWalls = Math.PI / 15;
         }
         @Config
-        public static class LinkageCamera{
+        public static class LinkageCameraConstants{
             public static double ArtifactPose = 0.6;
             public static double GoalPose = 0.35;
         }

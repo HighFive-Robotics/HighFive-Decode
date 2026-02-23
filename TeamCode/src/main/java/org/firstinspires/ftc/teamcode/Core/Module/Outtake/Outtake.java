@@ -5,7 +5,7 @@ import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.breakBeamOutt
 import static org.firstinspires.ftc.teamcode.Constants.Globals.BlueGoalDistance;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.RedGoalDistance;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
-import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.LinkageCamera.ArtifactPose;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.LinkageCameraConstants.ArtifactPose;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.kC;
 
 import com.pedropathing.geometry.Pose;
