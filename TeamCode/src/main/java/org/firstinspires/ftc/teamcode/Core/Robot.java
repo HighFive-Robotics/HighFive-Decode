@@ -220,18 +220,9 @@ public class Robot extends HighModule {
         }
         if(resetWithCamera && outtake.linkageCamera.atTarget()){
             tx = camera.getHorizontalOffset();
-            double id = camera.getAprilTagId();
-            switch (allianceColor){
-                case Red:
-                    if(id == 24){
-                        outtake.turret.updateVisionOffset(tx);
-                    }
-                    break;
-                case Blue:
-                    if(id == 20){
-                        outtake.turret.updateVisionOffset(tx);
-                    }
-                    break;
+            int id = camera.getAprilTagIdLocation();
+            if(idIsValid(id)){
+                outtake.turret.updateVisionOffset(tx);
             }
             if(tx != null && Math.abs(tx) <= toleranceTurretDeg){
                 resetWithCamera = false;
@@ -275,6 +266,9 @@ public class Robot extends HighModule {
         for (LynxModule hub : allHubs) {
             hub.clearBulkCache();
         }
+    }
+    public boolean idIsValid(int i){
+        return i == 20 && allianceColor==Blue || i == 24 && allianceColor==Red;
     }
 
 }

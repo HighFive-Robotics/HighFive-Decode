@@ -62,6 +62,14 @@ public class HighCamera{
             return aprilTags.get(0).getFiducialId();
         }else return -1;
     }
+    public int getAprilTagIdLocation(){
+        if(pipeline != Pipelines.AprilTagLocation) setPipeline(Pipelines.AprilTagLocation);
+        LLResult result = getResult();
+        if(resultIsValid(result)){
+            List<LLResultTypes.FiducialResult> aprilTags = result.getFiducialResults();
+            return aprilTags.get(0).getFiducialId();
+        }else return -1;
+    }
     public Constants.Case getMotif(){
         int id = getAprilTagId();
         switch (id){
