@@ -24,7 +24,7 @@ public class AutoBlue extends LinearOpMode {
 
     public Pose startPose = new Pose(17, 111.5, Math.toRadians(0));
 
-    public Pose shootPose = new Pose(55, 85, Math.toRadians(-40));
+    public Pose shootPose = new Pose(45, 95, Math.toRadians(-40));
     public Pose lastShootPose = new Pose(50, 112.5, Math.toRadians(-25));
     public Pose preOpenGatePose = new Pose(20, 68, Math.toRadians(-90));
     public Pose openGatePose = new Pose(12, 68, Math.toRadians(-90));
@@ -153,11 +153,11 @@ public class AutoBlue extends LinearOpMode {
                 .build();
 
         Constants.Globals.afterAuto = true;
-        robot.shouldAlignTurret = false;
+        robot.shouldAlignTurret = true;
         telemetry.addLine("Ready for Action");
         telemetry.update();
         waitForStart();
-        robot.outtake.setShootingVelocity(150);
+        robot.outtake.setShootingVelocity(200);
         robot.update();
         autoTimer.reset();
         while (opModeIsActive()) {
@@ -165,82 +165,87 @@ public class AutoBlue extends LinearOpMode {
                 case 0:
                     robot.drive.followPath(preloadPath, true);
                     robot.intake.setPower(IntakeMotor.States.Collect);
-                    robot.outtake.turret.setTargetDegrees(167);
+                    robot.outtake.setShootingVelocity(120);
                     state++;
                     break;
                 case 1:
-                    if((robot.isDone()) || autoTimer.milliseconds() > 5000) {
-                        robot.setAction(Robot.Actions.Shoot);
-                        timer.reset();
-                        state = 100;
-                    }
-                    break;
-                case 100:
-                    if(!robot.shootingSequence || timer.milliseconds() >= 4000) {
-                        robot.drive.turnTo(preCollectSpikeMark1Pose.getHeading());
+                    if((robot.isDone())) {
+                        robot.setAction(Robot.Actions.ResetTurretCamera);
                         timer.reset();
                         state = 2;
                     }
                     break;
                 case 2:
-                    if(robot.isDone()){
-                        robot.intake.setPower(IntakeMotor.States.Collect);
-                        robot.outtake.closeBlocker();
-                        robot.outtake.setShootingVelocity(130);
-                        robot.outtake.turret.setTargetDegrees(-45);
-                        robot.drive.followPath(goForSpike1, true);
+                    if(!robot.resetWithCamera || autoTimer.milliseconds() > 5000) {
+                        robot.setAction(Robot.Actions.Shoot);
+                        timer.reset();
                         state = 3;
                     }
                     break;
                 case 3:
-                    if(robot.drive.atParametricEnd()){
-                        robot.drive.followPath(collectSpike1, true);
+                    if(!robot.shootingSequence || timer.milliseconds() >= 4000) {
+                        robot.drive.turnTo(preCollectSpikeMark1Pose.getHeading());
+                        timer.reset();
+                        state = 4;
+                    }
+                    break;
+                case 4:
+                    if(robot.isDone()){
+                        robot.intake.setPower(IntakeMotor.States.Collect);
+                        robot.outtake.closeBlocker();
+                        robot.outtake.setShootingVelocity(120);
+                        robot.drive.followPath(goForSpike1, true);
                         state = 5;
                     }
                     break;
                 case 5:
-                    if (robot.isDone() || robot.intake.isFull) {
-                        robot.drive.followPath(goForShoot1, true);
+                    if(robot.drive.atParametricEnd()){
+                        robot.drive.followPath(collectSpike1, true);
                         state = 6;
                     }
                     break;
                 case 6:
-                    if (robot.isDone()) {
-                        robot.intake.setPower(IntakeMotor.States.Wait);
-                        robot.setAction(Robot.Actions.Shoot);
-                        timer.reset();
+                    if (robot.isDone() || robot.intake.isFull) {
+                        robot.drive.followPath(goForShoot1, true);
                         state = 7;
                     }
                     break;
                 case 7:
-                    if (!robot.shootingSequence || timer.milliseconds() >= 5000) {
-                        robot.drive.followPath(goForSpike2, true);
-                        robot.outtake.turret.setTargetDegrees(173);
-                        state = 700;
-                    }
-                    break;
-                case 700:
-                    if (robot.drive.atParametricEnd()) {
-                        robot.intake.setPower(IntakeMotor.States.Collect);
-                        robot.outtake.closeBlocker();
-                        robot.drive.followPath(collectSpike2, true);
+                    if (robot.isDone()) {
+                        robot.intake.setPower(IntakeMotor.States.Wait);
+                        robot.setAction(Robot.Actions.Shoot);
+                        timer.reset();
                         state = 8;
                     }
                     break;
                 case 8:
+                    if (!robot.shootingSequence || timer.milliseconds() >= 5000) {
+                        robot.drive.followPath(goForSpike2, true);
+                        state = 9;
+                    }
+                    break;
+                case 9:
+                    if (robot.drive.atParametricEnd()) {
+                        robot.intake.setPower(IntakeMotor.States.Collect);
+                        robot.outtake.closeBlocker();
+                        robot.drive.followPath(collectSpike2, true);
+                        state = 10;
+                    }
+                    break;
+                case 10:
                     if (robot.drive.atParametricEnd()) {
                         robot.drive.followPath(openGate, true);
                         state++;
                     }
                     break;
-                case 9:
+                case 11:
                     if (robot.isDone()) {
                         robot.drive.followPath(holdGate, true);
                         timer.reset();
                         state++;
                     }
                     break;
-                case 10:
+                case 12:
                     if ((robot.isDone() && timer.milliseconds() >= 1500) || timer.milliseconds() >= 1500) {
                         robot.intake.setPower(IntakeMotor.States.Collect);
                         robot.drive.followPath(goShoot2, true);
@@ -249,22 +254,21 @@ public class AutoBlue extends LinearOpMode {
                         robot.intake.setPower(IntakeMotor.States.Wait);
                     }
                     break;
-                case 11:
+                case 13:
                     if(robot.isDone()){
                         robot.setAction(Robot.Actions.Shoot);
                         timer.reset();
                         state++;
                     }
                     break;
-                case 12:
+                case 14:
                     if (!robot.shootingSequence || timer.milliseconds() >= 5000) {
-                        robot.outtake.turret.setTargetDegrees(-100);
                         robot.intake.setPower(IntakeMotor.States.Collect);
                         robot.drive.followPath(goForSpike3, true);
                         state++;
                     }
                     break;
-                case 13:
+                case 15:
                     if (robot.drive.atParametricEnd()) {
                         robot.intake.setPower(IntakeMotor.States.Collect);
                         robot.drive.setMaxPower(0.8);
@@ -272,51 +276,49 @@ public class AutoBlue extends LinearOpMode {
                         state++;
                     }
                     break;
-                case 14:
+                case 16:
                     if (robot.isDone()) {
                         robot.drive.setMaxPower(1);
                         robot.drive.followPath(goShootSpike3, true);
-                        state = 15;
+                        state = 17;
                     }
                     break;
-                case 15:
+                case 17:
                     if (robot.isDone()) {
                         robot.setAction(Robot.Actions.Shoot);
                         timer.reset();
                         state++;
                     }
                     break;
-                case 16:
+                case 18:
                     if (!robot.shootingSequence || timer.milliseconds() >= 5000) {
-                        robot.outtake.turret.setTargetDegrees(0);
                         robot.outtake.setShootingVelocity(90);
                         robot.intake.setPower(IntakeMotor.States.Collect);
                         robot.drive.followPath(goCollectLoadingZone1, true);
                         state++;
                     }
                     break;
-                case 17:
+                case 19:
                     if (robot.isDone()|| robot.intake.isFull) {
                         robot.drive.followPath(loading1);
                         timer.reset();
                         state++;
                     }
                     break;
-                case 18:
+                case 20:
                     if (robot.isDone() || robot.intake.isFull) {
                         robot.drive.followPath(loading2);
                         timer.reset();
                         state++;
                     }
                     break;
-                case 19:
+                case 21:
                     if (timer.milliseconds() >= 750 || robot.intake.isFull) {
-                        robot.outtake.turret.setTargetDegrees(-85);
                         robot.drive.followPath(goShootLast);
                         state++;
                     }
                     break;
-                case 20:
+                case 22:
                     if (robot.isDone()) {
                         robot.setAction(Robot.Actions.Shoot);
                         timer.reset();
@@ -327,6 +329,7 @@ public class AutoBlue extends LinearOpMode {
             finalAutoPose = robot.drive.getPose();
             robot.update();
             telemetry.addData("State: ", state);
+            telemetry.addData("Distance:", robot.outtake.distanceToGoal);
             telemetry.update();
         }
         robot.outtake.stopBreakBeamThread();

@@ -56,18 +56,22 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
             }
 
             if(gamepad2.left_bumper){
-                if(robot.outtake.distanceToGoal >= 40){
+                if(robot.outtake.distanceToGoal >= 50){
                     robot.outtake.setShootingVelocity();
                 }
             }
 
             if(zone == LaunchZone.Close){
-                if(robot.outtake.distanceToGoal <= 250 && robot.outtake.distanceToGoal >= 40){
+                if(robot.outtake.distanceToGoal >= 50 && robot.outtake.distanceToGoal <= 250){
                     robot.outtake.setShootingVelocity();
+                } else if(robot.outtake.distanceToGoal < 50){
+                    robot.outtake.setShootingVelocity(50);
                 }
             } else {
-                if(robot.outtake.distanceToGoal >= 250){
+                if(robot.outtake.distanceToGoal >= 250 && robot.outtake.distanceToGoal <= 415){
                     robot.outtake.setShootingVelocity();
+                } else if(robot.outtake.distanceToGoal > 415){
+                    robot.outtake.setShootingVelocity(415);
                 }
             }
             if (gamepad2.left_trigger >= 0.6){
@@ -139,6 +143,9 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
                     gamepad2.setLedColor(132 / 255.0, 88 / 255.0, 164 / 255.0, 2147483647);
                 }
             }
+            telemetry.addData("Distance:", robot.outtake.distanceToGoal);
+            telemetry.addData("Bleah:",robot.outtake.distanceToGoal >= 50 && robot.outtake.distanceToGoal <= 250);
+            telemetry.addData("Bleah2:",robot.outtake.distanceToGoal >= 250 && robot.outtake.distanceToGoal <= 415);
             telemetry.update();
             robot.update();
         }
