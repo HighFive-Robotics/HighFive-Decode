@@ -220,12 +220,15 @@ public class Robot extends HighModule {
         }
         if(resetWithCamera && outtake.linkageCamera.atTarget()){
             tx = camera.getHorizontalOffset();
-            outtake.turret.updateVisionOffset(tx);
-            if(tx != null && Math.abs(tx) <= toleranceTurretDeg){
-                resetWithCamera = false;
-                outtake.linkageCamera.setState(LinkageCamera.States.Artifact);
-                camera.pauseCapture();
-          }
+            int id = camera.getAprilTagIdLocation();
+            if(idIsValid(id)){
+                outtake.turret.updateVisionOffset(tx);
+                if(tx != null && Math.abs(tx) <= toleranceTurretDeg){
+                    resetWithCamera = false;
+                    outtake.linkageCamera.setState(LinkageCamera.States.Artifact);
+                    camera.pauseCapture();
+                }
+            }
         }
         intake.update();
         drive.update();
