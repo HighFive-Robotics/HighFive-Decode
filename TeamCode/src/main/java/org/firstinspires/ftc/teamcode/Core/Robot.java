@@ -220,7 +220,19 @@ public class Robot extends HighModule {
         }
         if(resetWithCamera && outtake.linkageCamera.atTarget()){
             tx = camera.getHorizontalOffset();
-            outtake.turret.updateVisionOffset(tx);
+            double id = camera.getAprilTagId();
+            switch (allianceColor){
+                case Red:
+                    if(id == 24){
+                        outtake.turret.updateVisionOffset(tx);
+                    }
+                    break;
+                case Blue:
+                    if(id == 20){
+                        outtake.turret.updateVisionOffset(tx);
+                    }
+                    break;
+            }
             if(tx != null && Math.abs(tx) <= toleranceTurretDeg){
                 resetWithCamera = false;
                 outtake.linkageCamera.setState(LinkageCamera.States.Artifact);
