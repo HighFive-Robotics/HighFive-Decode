@@ -223,11 +223,11 @@ public class Robot extends HighModule {
             int id = camera.getAprilTagIdLocation();
             if(idIsValid(id)){
                 outtake.turret.updateVisionOffset(tx);
-            }
-            if(tx != null && Math.abs(tx) <= toleranceTurretDeg){
-                resetWithCamera = false;
-                outtake.linkageCamera.setState(LinkageCamera.States.Artifact);
-                camera.pauseCapture();
+                if(tx != null && Math.abs(tx) <= toleranceTurretDeg){
+                    resetWithCamera = false;
+                    outtake.linkageCamera.setState(LinkageCamera.States.Artifact);
+                    camera.pauseCapture();
+                }
             }
         }
         intake.update();
@@ -268,7 +268,7 @@ public class Robot extends HighModule {
         }
     }
     public boolean idIsValid(int i){
-        return i == 20 && allianceColor==Blue || i == 24 && allianceColor==Red;
+        return (i == 20 && allianceColor==Blue) || (i == 24 && allianceColor==Red);
     }
 
 }
