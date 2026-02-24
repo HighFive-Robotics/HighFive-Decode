@@ -162,7 +162,7 @@ public class Robot extends HighModule {
         if (shootingSequence) {
             switch (shootingState) {
                 case 0:
-                    if (outtake.atTarget()) {
+                    if (outtake.atTarget() || (isAuto && (outtake.shooter.atTargetIndividual() && outtake.turret.atTarget()))) {
                         outtake.openBlocker();
                         intake.canStop = false;
                         shootingState++;

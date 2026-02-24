@@ -101,8 +101,8 @@ public class Constants {
         }
         @Config
         public static class TurretParams {
-            public static double kpTurret = 0.026, kdTurret = 0.0025, kiTurret = 0.026, kfTurret = 0.0001;
-            public static double kp2Turret = 0.035, kd2Turret = 0.0025, ki2Turret = 0.035, thresholdSmallPID = 35;
+            public static double kpTurret = 0.04, kdTurret = 0.0014, kiTurret = 0.06, kfTurret = 0.0001;
+            public static double kp2Turret = 0.052, kd2Turret = 0.00055, ki2Turret = 0.002, thresholdSmallPID = 35;
             public static double minimumTicks = -502, maximumTicks = 502;
             public static double ticksPerPI = 430.0;
             public static double minimumErrorAngleForWalls = Math.PI / 15;
@@ -110,7 +110,7 @@ public class Constants {
         @Config
         public static class LinkageCameraConstants{
             public static double ArtifactPose = 0.6;
-            public static double GoalPose = 0.35;
+            public static double GoalPose = 0.265;
         }
 
     }

@@ -56,7 +56,7 @@ public class Turret extends HighModule {
                 .setPIDCoefficients(kp2Turret, ki2Turret, kd2Turret, kfTurret, HighMotor.FeedForwardType.Lift,1)
                 .setEncoder(true,false)
                 .build();
-        motor.setTolerance(5);
+        motor.setTolerance(8);
         this.telemetry = telemetry;
         this.allianceColor = allianceColor;
     }
@@ -143,7 +143,7 @@ public class Turret extends HighModule {
     }
 
     /** This method sets the Target Angle to our turret, in which we calculate the Target Ticks, using the method calculateTargetTicksFromAngle().
-     *  After we calculate the Target Ticks, we make a verification that if the difference isn't bigger than 1 degree or 0.017 radians to not change the PID target
+     *  After we calculate the Target Ticks, we make a verification that if the difference isn't bigger than 1 degree or 0.005 radians to not change the PID target
      *  so we don't reset the integral sum that often, better loop time and for the [-7π/6,-π] and [π,7π/6] to not have bugs, when rotating to 5π/6 or to -5π/6.
      * @param targetInRadians This is the verification we make so the Target Angle that we want to set to our turret stays within the range of [-π,π].
      */
@@ -152,7 +152,7 @@ public class Turret extends HighModule {
         targetInRadians = targetInRadians + angleOffset;
         this.targetAngle = wrapAroundAngle(targetInRadians);
         targetTicks = calculateTargetTicksFromAngle();
-        if(Math.abs(targetAngle - lastTargetAngle) >= 0.017){
+        if(Math.abs(targetAngle - lastTargetAngle) >= 0.005){
             motor.setTarget(targetTicks);
             lastTargetAngle = targetAngle;
         }
@@ -169,7 +169,7 @@ public class Turret extends HighModule {
     }
 
     /** This method sets the Target Angle in degrees to our turret, in which we calculate the Target Ticks, using the method calculateTargetTicksFromAngle().
-     *  After we calculate the Target Ticks, we make a verification that if the difference isn't bigger than 1 degree or 0.017 radians to not change the PID target
+     *  After we calculate the Target Ticks, we make a verification that if the difference isn't bigger than 1 degree or 0.005 radians to not change the PID target
      *  so we don't reset the integral sum that often, better loop time and for the [-7π/6,-π] and [π,7π/6] to not have bugs, when rotating to 5π/6 or to -5π/6.
      * @param target This is the verification we make so the Target Angle that we want to set to our turret stays within the range of [-π,π].
      */
@@ -177,7 +177,7 @@ public class Turret extends HighModule {
         target = Math.toRadians(target) + angleOffset;
         this.targetAngle = wrapAroundAngle(target);
         targetTicks = calculateTargetTicksFromAngle();
-        if(Math.abs(targetAngle - lastTargetAngle) >= 0.017){
+        if(Math.abs(targetAngle - lastTargetAngle) >= 0.005){
             motor.setTarget(targetTicks);
             lastTargetAngle = targetAngle;
         }

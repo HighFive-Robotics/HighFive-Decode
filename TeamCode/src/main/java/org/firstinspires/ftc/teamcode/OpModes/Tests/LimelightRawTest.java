@@ -49,12 +49,14 @@ public class LimelightRawTest extends LinearOpMode {
             if(gamepad1.crossWasPressed()){
                 data = camera.getBallInfo();
                 cameraPose = camera.getBallPose(drive.getPose());
-                path = new Path(
-                        new BezierLine(
-                                drive.getPose(),
-                                cameraPose
-                        )
-                );
+                if(data != null){
+                    path = new Path(
+                            new BezierLine(
+                                    drive.getPose(),
+                                    cameraPose
+                            )
+                    );
+                }
             }
             if(gamepad1.triangleWasPressed()){
                 drive.followPath(path);

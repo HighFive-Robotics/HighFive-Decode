@@ -65,8 +65,8 @@ public class Shooter extends HighModule {
                 .setUseZeroPowerBehaviour(false)
                 .build();
         motorUp.setTolerance(0.08);
-        upTolerance = 0.05;
-        downTolerance = 0.1;
+        upTolerance = 0.08;
+        downTolerance = 0.15;
     }
 
 
@@ -237,7 +237,9 @@ public class Shooter extends HighModule {
         updateCoefficientsDown();
         updateCoefficientsUp();
     }
-
+    public boolean atTargetIndividual(){
+        return upAtTarget() && downAtTarget();
+    }
     public void nanUp() {
         motorUp.setVelocityPIDFSA(0, 0, 0, 0, 0, 0, 1);
     }

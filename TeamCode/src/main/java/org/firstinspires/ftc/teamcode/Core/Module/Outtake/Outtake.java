@@ -232,6 +232,15 @@ public class Outtake extends HighModule {
         }
         update();
     }
+    public double calculateDistanceToGoal(Pose robotPose) {
+        switch (autoColor) {
+            case Blue:
+                return 2.54 * Math.hypot(BlueGoalDistance.getX() - robotPose.getX(), BlueGoalDistance.getY() - robotPose.getY());
+            case Red:
+                return 2.54 * Math.hypot(RedGoalDistance.getX() - robotPose.getX(), RedGoalDistance.getY() - robotPose.getY());
+        }
+        return -1;
+    }
 
     public void debug() {
         telemetry.addData("Shooter Down Tollerence + Offset", shooter.getDownOffset());
