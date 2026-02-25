@@ -17,6 +17,9 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighCamera;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.LinkageCamera;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Outtake;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+
 @TeleOp(name = "Limelight MT1 Raw Test", group = "Tests")
 public class LimelightRawTest extends LinearOpMode {
 
@@ -29,7 +32,6 @@ public class LimelightRawTest extends LinearOpMode {
         drive = Constants.createFollower(hardwareMap);
         drive.setStartingPose(new Pose(6,6,0));
         drive.setPose(new Pose(6,6,0));
-        drive.startFieldCentricDrive(gamepad1, true, 0);
         camera = new HighCamera(hardwareMap , HighCamera.Pipelines.BallDetection);
         outtake = new Outtake(hardwareMap, Constants.Color.Red , telemetry , true);
         outtake.linkageCamera.setState(LinkageCamera.States.Artifact , 300);
@@ -50,7 +52,7 @@ public class LimelightRawTest extends LinearOpMode {
             if(gamepad1.circleWasPressed()){
                 outtake.linkageCamera.setState(LinkageCamera.States.Goal , 300);
             }
-            if(gamepad1.crossWasPressed()){
+            if(gamepad1.cross){
                 cameraPose = camera.getBallPose(drive.getPose());
                 if(cameraPose != null) {
                     telemetry.addLine("Target Found");
@@ -75,7 +77,9 @@ public class LimelightRawTest extends LinearOpMode {
                 isAutoDriving = false;
             }
             data = camera.getBallInfo();
-            telemetry.addData("BALL INFO" , data);
+
+            telemetry.addData("BALL INFO" , Arrays.toString(camera.ll.getLatestResult().getPythonOutput()));
+            telemetry.addData("BALL INFO" ,camera.getBallInfo());
             telemetry.addData("Auto Driving", isAutoDriving);
             telemetry.update();
             drive.update();

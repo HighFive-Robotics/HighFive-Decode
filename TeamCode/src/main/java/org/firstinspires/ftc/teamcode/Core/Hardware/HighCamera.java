@@ -18,61 +18,80 @@ import org.firstinspires.ftc.teamcode.Constants;
 
 import java.util.List;
 
-public class HighCamera{
-    public enum Pipelines{
+public class HighCamera {
+    public enum Pipelines {
         AprilTagId(0),
         AprilTagLocation(1),
         BallDetection(9);
+
         final int pipelineNumber;
-        Pipelines(int pipelineNumber){
+        Pipelines(int pipelineNumber) {
             this.pipelineNumber = pipelineNumber;
         }
-        int getPipelineNumber(){return pipelineNumber;}
-    };
+        int getPipelineNumber() { return pipelineNumber; }
+    }
+
     public Limelight3A ll;
     Pipelines pipeline;
-    public HighCamera(@NonNull HardwareMap hardwareMap , @NonNull Pipelines pipeline){
-        ll = hardwareMap.get(Limelight3A.class , cameraName);
+
+    public HighCamera(@NonNull HardwareMap hardwareMap, @NonNull Pipelines pipeline) {
+        ll = hardwareMap.get(Limelight3A.class, cameraName);
         ll.setPollRateHz(100);
         setPipeline(pipeline);
     }
-    public void startCapture(){
+
+    public void startCapture() {
         ll.start();
     }
-    public void stopCapture(){
+
+    public void stopCapture() {
         ll.stop();
     }
-    public void pauseCapture(){ll.pause();}
-    public void setPipeline(@NonNull Pipelines pipeline){
-        if (this.pipeline == pipeline)return;
+
+    public void pauseCapture() {
+        ll.pause();
+    }
+
+    public void setPipeline(@NonNull Pipelines pipeline) {
+        if (this.pipeline == pipeline) return;
         ll.pipelineSwitch(pipeline.getPipelineNumber());
         this.pipeline = pipeline;
     }
-    public LLResult getResult(){
+
+    public LLResult getResult() {
         LLResult result = ll.getLatestResult();
-        if(result != null && result.isValid()){
+        if (result != null && result.isValid()) {
             return result;
-        }else return null;
+        } else return null;
     }
-    public int getAprilTagId(){
-        if(pipeline != Pipelines.AprilTagId) setPipeline(Pipelines.AprilTagId);
+
+    public int getAprilTagId() {
+        if (pipeline != Pipelines.AprilTagId) setPipeline(Pipelines.AprilTagId);
         LLResult result = getResult();
-        if(resultIsValid(result)){
+        if (resultIsValid(result)) {
             List<LLResultTypes.FiducialResult> aprilTags = result.getFiducialResults();
-            return aprilTags.get(0).getFiducialId();
-        }else return -1;
+            if (!aprilTags.isEmpty()) {
+                return aprilTags.get(0).getFiducialId();
+            }
+        }
+        return -1;
     }
-    public int getAprilTagIdLocation(){
-        if(pipeline != Pipelines.AprilTagLocation) setPipeline(Pipelines.AprilTagLocation);
+
+    public int getAprilTagIdLocation() {
+        if (pipeline != Pipelines.AprilTagLocation) setPipeline(Pipelines.AprilTagLocation);
         LLResult result = getResult();
-        if(resultIsValid(result)){
+        if (resultIsValid(result)) {
             List<LLResultTypes.FiducialResult> aprilTags = result.getFiducialResults();
-            return aprilTags.get(0).getFiducialId();
-        }else return -1;
+            if (!aprilTags.isEmpty()) {
+                return aprilTags.get(0).getFiducialId();
+            }
+        }
+        return -1;
     }
-    public Constants.Case getMotif(){
+
+    public Constants.Case getMotif() {
         int id = getAprilTagId();
-        switch (id){
+        switch (id) {
             case 21:
                 return Constants.Case.GPP;
             case 22:
@@ -83,18 +102,23 @@ public class HighCamera{
                 return Constants.Case.None;
         }
     }
-    public Pose getAprilTagPose(){
+
+    public Pose getAprilTagPose() {
         if (pipeline != Pipelines.AprilTagLocation) setPipeline(Pipelines.AprilTagLocation);
         LLResult result = getResult();
-        if(resultIsValid(result)){
-            LLResultTypes.FiducialResult fr = result.getFiducialResults().get(0);
-            double poseX = fr.getRobotPoseTargetSpace().getPosition().z * 39.37;
-            double poseY = -fr.getRobotPoseTargetSpace().getPosition().x * 39.37;
-            double poseHeading = Math.toRadians(-fr.getRobotPoseTargetSpace().getOrientation().getYaw());
-            return new Pose(poseX,poseY,poseHeading);
+        if (resultIsValid(result)) {
+            List<LLResultTypes.FiducialResult> results = result.getFiducialResults();
+            if (!results.isEmpty()) {
+                LLResultTypes.FiducialResult fr = results.get(0);
+                double poseX = fr.getRobotPoseTargetSpace().getPosition().z * 39.37;
+                double poseY = -fr.getRobotPoseTargetSpace().getPosition().x * 39.37;
+                double poseHeading = Math.toRadians(-fr.getRobotPoseTargetSpace().getOrientation().getYaw());
+                return new Pose(poseX, poseY, poseHeading);
+            }
         }
         return null;
     }
+
     public Double getHorizontalOffset() {
         if (pipeline != Pipelines.AprilTagLocation) setPipeline(Pipelines.AprilTagLocation);
         LLResult result = getResult();
@@ -103,20 +127,25 @@ public class HighCamera{
         }
         return null;
     }
-    public Pose getAprilTagPose(double heading){
+
+    public Pose getAprilTagPose(double heading) {
         if (pipeline != Pipelines.AprilTagLocation) setPipeline(Pipelines.AprilTagLocation);
         ll.updateRobotOrientation(heading);
         LLResult result = getResult();
-        if(resultIsValid(result)){
-            LLResultTypes.FiducialResult fr = result.getFiducialResults().get(0);
-            double poseX = -fr.getRobotPoseTargetSpace().getPosition().x * 39.37;
-            double poseY = fr.getRobotPoseTargetSpace().getPosition().z * 39.37;
-            double poseHeading = Math.toRadians(-fr.getRobotPoseTargetSpace().getOrientation().getYaw());
-            return new Pose(poseX,poseY,poseHeading);
+        if (resultIsValid(result)) {
+            List<LLResultTypes.FiducialResult> results = result.getFiducialResults();
+            if (!results.isEmpty()) {
+                LLResultTypes.FiducialResult fr = results.get(0);
+                double poseX = -fr.getRobotPoseTargetSpace().getPosition().x * 39.37;
+                double poseY = fr.getRobotPoseTargetSpace().getPosition().z * 39.37;
+                double poseHeading = Math.toRadians(-fr.getRobotPoseTargetSpace().getOrientation().getYaw());
+                return new Pose(poseX, poseY, poseHeading);
+            }
         }
         return null;
     }
-    public void getMt1Location(double heading , Telemetry telemetry){
+
+    public void getMt1Location(double heading, Telemetry telemetry) {
         if (pipeline != Pipelines.AprilTagLocation) setPipeline(Pipelines.AprilTagLocation);
         ll.updateRobotOrientation(heading);
         LLResult result = getResult();
@@ -129,9 +158,9 @@ public class HighCamera{
             }
         }
     }
+
     public Pose getMegaTagFieldPose() {
         if (pipeline != Pipelines.AprilTagLocation) setPipeline(Pipelines.AprilTagLocation);
-
         LLResult result = getResult();
         if (result != null) {
             Pose3D mt1 = result.getBotpose();
@@ -149,7 +178,7 @@ public class HighCamera{
 
     public Pose getMegaTagFieldPose(double heading) {
         if (pipeline != Pipelines.AprilTagLocation) setPipeline(Pipelines.AprilTagLocation);
-        ll.updateRobotOrientation(heading+90);
+        ll.updateRobotOrientation(heading + 90);
         LLResult result = getResult();
         if (result != null) {
             Pose3D mt1 = result.getBotpose_MT2();
@@ -163,54 +192,63 @@ public class HighCamera{
         }
         return null;
     }
-
     public double[] getBallData() {
         if (pipeline != Pipelines.BallDetection) setPipeline(Pipelines.BallDetection);
-        LLResult result = getResult();
-        if (resultIsValid(result)) {
+        LLResult result = ll.getLatestResult();
+        if (result != null) {
             double[] pythonOutput = result.getPythonOutput();
-            if (pythonOutput != null) {
-                if (pythonOutput[0] == 0.0 && pythonOutput[1] == 0.0) {
-                    return null;
-                }
+            if (pythonOutput != null && pythonOutput.length >= 4) {
                 return pythonOutput;
             }
         }
         return null;
     }
+
     public boolean hasTarget() {
         return getBallData() != null;
     }
-    public Constants.Color getBallColor(){
+
+    public Constants.Color getBallColor() {
         double[] data = getBallData();
-        if (data == null) return Constants.Color.None;
+        if (data == null || data.length < 4) return Constants.Color.None;
         return data[3] == 1.0 ? Constants.Color.Green : Constants.Color.Purple;
     }
-    public String getBallColorData(double id){
+
+    public String getBallColorData(double id) {
         return id == 1.0 ? "Green" : "Purple";
     }
-    public Pose getBallPose(Pose robotPose){
+
+    public Pose getBallPose(Pose robotPose) {
         double[] data = getBallData();
-        if (data == null) return null;
+        if (data == null || data.length < 3) return null;
+
         double x_robot = data[0];
         double y_robot = data[1];
         double heading_offset = data[2];
         double robotHeading = robotPose.getHeading();
+        if(y_robot <=  -2.5) y_robot+= -2;
+        if(x_robot >=  3)  x_robot += 7;
         double fieldX = robotPose.getX() + (x_robot * Math.cos(robotHeading)) - (y_robot * Math.sin(robotHeading));
         double fieldY = robotPose.getY() + (x_robot * Math.sin(robotHeading)) + (y_robot * Math.cos(robotHeading));
         double fieldHeading = robotHeading + heading_offset;
 
         return new Pose(fieldX, fieldY, fieldHeading);
     }
-    public String getBallInfo(){
+
+    public String getBallInfo() {
         double[] data = getBallData();
-        if(data == null) return "NO VALID DATA";
-        else return "FORWARD(X): "+data[0]+" STRAFE(Y): "+data[1] + " HEADING: " + data[2] + " Color: " + getBallColorData(data[3]);
+        if (data == null || data.length < 4) {
+            return "No Ball Target Detected";
+        }
+        return String.format("FORWARD(X): %.2f STRAFE(Y): %.2f HEADING: %.2f Color: %s",
+                data[0], data[1], data[2], getBallColorData(data[3]));
     }
-    public boolean motifIsValid(Constants.Case motif){
+
+    public boolean motifIsValid(Constants.Case motif) {
         return motif != Constants.Case.None;
     }
-    public boolean resultIsValid(LLResult result){
+
+    public boolean resultIsValid(LLResult result) {
         return result != null && result.isValid();
     }
 }
