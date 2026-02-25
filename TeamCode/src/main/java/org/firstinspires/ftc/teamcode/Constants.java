@@ -105,7 +105,7 @@ public class Constants {
             public static double kp2Turret = 0.052, kd2Turret = 0.00055, ki2Turret = 0.002, thresholdSmallPID = 35;
             public static double minimumTicks = -502, maximumTicks = 502;
             public static double ticksPerPI = 430.0;
-            public static double minimumErrorAngleForWalls = Math.PI / 15;
+            public static double minimumErrorAngleForWalls = Math.PI / 10;
         }
         @Config
         public static class LinkageCameraConstants{

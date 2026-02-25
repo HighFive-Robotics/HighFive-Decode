@@ -3,10 +3,11 @@ package org.firstinspires.ftc.teamcode.OpModes.Autos;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.finalAutoPose;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
-
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -16,8 +17,8 @@ import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
-@Autonomous(name = "🔵AutoClose🔵")
-public class AutoBlue extends LinearOpMode {
+@Autonomous(name = "🔵AutoCloseOld🔵")
+public class AutoBlueLM5 extends LinearOpMode {
 
     public Robot robot;
     public int state = 0;
@@ -46,6 +47,7 @@ public class AutoBlue extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         robot = new Robot(hardwareMap, startPose, true, Constants.Color.Blue, telemetry, gamepad1);
         robot.outtake.turret.reset();
         robot.outtake.startBreakBeamThread();
@@ -145,15 +147,13 @@ public class AutoBlue extends LinearOpMode {
 
         waitForStart();
         autoTimer.reset();
-        robot.outtake.calculateDistanceToGoal(shootPose);
-        robot.outtake.setShootingVelocity();
+        robot.outtake.setShootingVelocity(120);
         while (opModeIsActive()) {
             switch (state) {
                 case 0:
                     robot.drive.followPath(preloadPath, true);
                     robot.intake.setPower(IntakeMotor.States.Collect);
-                    robot.outtake.calculateDistanceToGoal(shootPose);
-                    robot.outtake.setShootingVelocity();
+                    robot.outtake.setShootingVelocity(100);
                     state++;
                     break;
                 case 1:
@@ -181,8 +181,6 @@ public class AutoBlue extends LinearOpMode {
                     if (robot.isDone()) {
                         robot.intake.setPower(IntakeMotor.States.Collect);
                         robot.outtake.closeBlocker();
-                        robot.outtake.calculateDistanceToGoal(shootPose);
-                        robot.outtake.setShootingVelocity();
                         robot.drive.followPath(goForSpike1, true);
                         state++;
                     }
@@ -324,6 +322,13 @@ public class AutoBlue extends LinearOpMode {
             finalAutoPose = robot.drive.getPose();
             robot.update();
             telemetry.addData("State: ", state);
+            telemetry.addData("Distance: ", robot.outtake.distanceToGoal);
+            telemetry.addData("Target Up: ", robot.outtake.shooter.getTargetUp());
+            telemetry.addData("Velo Up: ", robot.outtake.shooter.getVelocityErrorUp());
+            telemetry.addData("Target Down: ", robot.outtake.shooter.getTargetDown());
+            telemetry.addData("Velo Down: ", robot.outtake.shooter.getVelocityErrorDown());
+            telemetry.addData("State: ", state);
+
            // telemetry.addData("Distance:", robot.outtake.distanceToGoal);
             telemetry.update();
         }

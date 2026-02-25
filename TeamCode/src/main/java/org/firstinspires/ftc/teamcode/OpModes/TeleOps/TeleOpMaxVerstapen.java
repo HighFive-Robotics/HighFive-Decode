@@ -129,7 +129,7 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
                 robot.outtake.turret.reset();
             }
             if(Math.abs(gamepad2.right_stick_x) >= 0.4){
-                robot.outtake.turret.addOffsetDegrees(0.3 * gamepad2.right_stick_x);
+                robot.outtake.turret.addOffsetDegrees(-0.3 * gamepad2.right_stick_x);
             }
             
             if(gamepad2.optionsWasPressed()){
