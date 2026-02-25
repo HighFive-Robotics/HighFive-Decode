@@ -77,9 +77,9 @@ public class Turret extends HighModule {
             angleWallUp = Math.atan2(BlueGoalWallUp.getY() - robotPose.getY(), BlueGoalWallUp.getX() - robotPose.getX());
             angleWallLeft = Math.atan2(BlueGoalWallLeft.getY() - robotPose.getY(), BlueGoalWallLeft.getX() - robotPose.getX());
 
-            errorCorner = Math.abs(-3*Math.PI/4-angleCorner);
-            errorWallUp = Math.abs(-Math.PI/2-angleWallUp);
-            errorWallLeft = Math.abs(-Math.PI - angleWallLeft);
+            errorCorner = Math.abs(3*Math.PI/4-angleCorner);
+            errorWallUp = Math.abs(Math.PI/2-angleWallUp);
+            errorWallLeft = Math.abs(Math.PI - angleWallLeft);
 
             if(errorWallLeft <= minimumErrorAngleForWalls && errorWallLeft <= errorCorner){
                 return angleWallLeft - robotPose.getHeading();
