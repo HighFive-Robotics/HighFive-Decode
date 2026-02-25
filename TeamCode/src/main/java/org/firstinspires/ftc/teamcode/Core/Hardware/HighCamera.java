@@ -22,7 +22,7 @@ public class HighCamera{
     public enum Pipelines{
         AprilTagId(0),
         AprilTagLocation(1),
-        BallDetection(8);
+        BallDetection(9);
         final int pipelineNumber;
         Pipelines(int pipelineNumber){
             this.pipelineNumber = pipelineNumber;
@@ -169,7 +169,7 @@ public class HighCamera{
         LLResult result = getResult();
         if (resultIsValid(result)) {
             double[] pythonOutput = result.getPythonOutput();
-            if (pythonOutput != null && pythonOutput.length >= 4) {
+            if (pythonOutput != null) {
                 if (pythonOutput[0] == 0.0 && pythonOutput[1] == 0.0) {
                     return null;
                 }
@@ -192,10 +192,15 @@ public class HighCamera{
     public Pose getBallPose(Pose robotPose){
         double[] data = getBallData();
         if (data == null) return null;
-        double x  = data[0];
-        double y = data[1];
-        double heading = data[2];
-        return new Pose(robotPose.getX() + x , robotPose.getY() + y , robotPose.getHeading() + heading);
+        double x_robot = data[0];
+        double y_robot = data[1];
+        double heading_offset = data[2];
+        double robotHeading = robotPose.getHeading();
+        double fieldX = robotPose.getX() + (x_robot * Math.cos(robotHeading)) - (y_robot * Math.sin(robotHeading));
+        double fieldY = robotPose.getY() + (x_robot * Math.sin(robotHeading)) + (y_robot * Math.cos(robotHeading));
+        double fieldHeading = robotHeading + heading_offset;
+
+        return new Pose(fieldX, fieldY, fieldHeading);
     }
     public String getBallInfo(){
         double[] data = getBallData();

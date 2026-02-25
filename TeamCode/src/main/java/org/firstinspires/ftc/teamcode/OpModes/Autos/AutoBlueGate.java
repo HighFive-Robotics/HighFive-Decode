@@ -290,7 +290,7 @@ PathChain ca = robot.drive.pathBuilder()
             telemetry.addData("Velo Down: ", robot.outtake.shooter.getVelocityErrorDown());
             telemetry.addData("State: ", state);
 
-           // telemetry.addData("Distance:", robot.outtake.distanceToGoal);
+            // telemetry.addData("Distance:", robot.outtake.distanceToGoal);
             telemetry.update();
         }
         robot.outtake.stopBreakBeamThread();

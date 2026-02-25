@@ -241,7 +241,12 @@ public class Outtake extends HighModule {
         }
         return -1;
     }
-
+    public void setShootingVelocityForPose(Pose pose){
+        setShootingVelocity(calculateDistanceToGoal(pose));
+    }
+    public void setShootingVelocityForPose(Pose pose , double offset){
+        setShootingVelocity(calculateDistanceToGoal(pose) + offset);
+    }
     public void debug() {
         telemetry.addData("Shooter Down Tollerence + Offset", shooter.getDownOffset());
         telemetry.addData("Shooter Up Tollerence + Offset", shooter.getUpOffset());

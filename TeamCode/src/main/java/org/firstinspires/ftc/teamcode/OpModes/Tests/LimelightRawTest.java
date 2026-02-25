@@ -35,10 +35,14 @@ public class LimelightRawTest extends LinearOpMode {
         outtake.linkageCamera.setState(LinkageCamera.States.Artifact , 300);
         Pose cameraPose = new Pose(6,6,0);
         Path path = new Path(new BezierLine(new Pose(6,6,0) , new Pose(6,6,0)));
-        String data = "NO DATA YET";
+        camera.setPipeline(HighCamera.Pipelines.BallDetection);
+        String data;
+        camera.startCapture();
         telemetry.addLine("Wait for Start");
         telemetry.update();
         waitForStart();
+        boolean isAutoDriving = false;
+
         while (opModeIsActive()) {
             if(gamepad1.squareWasPressed()){
                 outtake.linkageCamera.setState(LinkageCamera.States.Artifact , 300);
@@ -47,27 +51,35 @@ public class LimelightRawTest extends LinearOpMode {
                 outtake.linkageCamera.setState(LinkageCamera.States.Goal , 300);
             }
             if(gamepad1.crossWasPressed()){
-                data = camera.getBallInfo();
                 cameraPose = camera.getBallPose(drive.getPose());
-                if(data != null){
-                    path = new Path(
-                            new BezierLine(
-                                    drive.getPose(),
-                                    cameraPose
-                            )
-                    );
+                if(cameraPose != null) {
+                    telemetry.addLine("Target Found");
+                    path = new Path(new BezierLine(
+                            drive.getPose(),cameraPose
+
+                    ));
+                    path.setLinearHeadingInterpolation(drive.getPose().getHeading(), cameraPose.getHeading());
+
+                } else {
+                    telemetry.addLine("NO TARGET FOUND");
                 }
             }
             if(gamepad1.triangleWasPressed()){
-                drive.followPath(path);
+                if (cameraPose != null) {
+                    isAutoDriving = true;
+                    drive.followPath(path);
+                }
             }
             if (gamepad1.psWasPressed()) drive.resetTeleOpHeading();
-
+            if (isAutoDriving && !drive.isBusy()) {
+                isAutoDriving = false;
+            }
+            data = camera.getBallInfo();
             telemetry.addData("BALL INFO" , data);
+            telemetry.addData("Auto Driving", isAutoDriving);
             telemetry.update();
             drive.update();
             outtake.update(drive.getPose());
         }
-
     }
 }
