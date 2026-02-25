@@ -18,11 +18,11 @@ import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
-@Autonomous(name = "🔵AutoCloseGate🔵")
-public class AutoBlueGate extends LinearOpMode {
+@Autonomous(name = "🔵AutoCloseMix🔵")
+public class AutoBlueMix extends LinearOpMode {
 
     public Robot robot;
-    public int state = 0, cycles = 0;
+    public int state = 0;
 
     public Pose startPose = new Pose(13, 113, Math.toRadians(0));
 
@@ -295,7 +295,6 @@ public class AutoBlueGate extends LinearOpMode {
                     break;
                 case 13:
                     if (!robot.shootingSequence) {
-                        cycles++;
                         robot.drive.followPath(preCollectGate, true);
                         timer.reset();
                         state++;
@@ -329,14 +328,9 @@ public class AutoBlueGate extends LinearOpMode {
                     break;
                 case 18:
                     if (timer.milliseconds() >= 1250 || robot.intake.isFull) {
-                        if(cycles <= 2){
-                            robot.drive.followPath(shootGate, true);
-                            state = 12;
-                        } else {
-                            robot.drive.followPath(shootGateFinal, true);
-                            state++;
-                        }
+                        robot.drive.followPath(shootGateFinal, true);
                         robot.intake.setPower(IntakeMotor.States.Collect);
+                        state++;
                     }
                     break;
                 case 19:
@@ -344,6 +338,54 @@ public class AutoBlueGate extends LinearOpMode {
                         robot.intake.setPower(IntakeMotor.States.Wait);
                         robot.setAction(Robot.Actions.Shoot);
                         state = 20;
+                    }
+                    break;
+                case 20:
+                    if (robot.isDone()) {
+                        robot.intake.setPower(IntakeMotor.States.Wait);
+                        robot.setAction(Robot.Actions.Shoot);
+                        state = 17;
+                    }
+                    break;
+                case 21:
+                    if (!robot.shootingSequence) {
+                        robot.outtake.setShootingVelocityForPose(shootPose3);
+                        robot.drive.followPath(preCollectLoading2, true);
+                        robot.intake.setPower(IntakeMotor.States.Collect);
+                        timer.reset();
+                        state++;
+                    }
+                    break;
+                case 22:
+                    if (robot.drive.atParametricEnd()) {
+                        robot.drive.followPath(collectLoading2, true);
+                        robot.drive.setMaxPower(0.75);
+                        timer.reset();
+                        state++;
+                    }
+                    break;
+                case 23:
+                    if (robot.drive.atParametricEnd()) {
+                        timer.reset();
+                        state = 20;
+                    }
+                    break;
+                case 24:
+                    if (timer.milliseconds() >= 400) {
+                        robot.outtake.alignTurret(shootPose3);
+                        robot.outtake.turret.setOffset(0);
+                        robot.drive.setMaxPower(1);
+                        robot.drive.followPath(shootLoading2Final, true);
+                        timer.reset();
+                        state++;
+                    }
+                    break;
+                case 25:
+                    if (robot.isDone()) {
+                        robot.intake.setPower(IntakeMotor.States.Wait);
+                        robot.setAction(Robot.Actions.Shoot);
+                        timer.reset();
+                        state++;
                     }
                     break;
             }

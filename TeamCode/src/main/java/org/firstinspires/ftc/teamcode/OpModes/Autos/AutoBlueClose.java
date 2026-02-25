@@ -227,7 +227,7 @@ public class AutoBlueClose extends LinearOpMode {
                 case 3:
                     if (!robot.shootingSequence) {
                         robot.drive.followPath(goForSpike2, true);
-                        robot.outtake.setShootingVelocity(135);
+                        robot.outtake.setShootingVelocityForPose(shootPose2);
                         timer.reset();
                         state++;
                     }
@@ -271,7 +271,7 @@ public class AutoBlueClose extends LinearOpMode {
                     break;
                 case 9:
                     if (robot.drive.atParametricEnd()) {
-                        robot.drive.followPath(openGate, true);
+                        robot.drive.followPath(openGate);
                         state++;
                     }
                     break;
@@ -325,7 +325,7 @@ public class AutoBlueClose extends LinearOpMode {
                     break;
                 case 17:
                     if (!robot.shootingSequence) {
-                        robot.outtake.setShootingVelocity(90);
+                        robot.outtake.setShootingVelocityForPose(shootPose3);
                         robot.drive.followPath(preCollectLoading2, true);
                         robot.intake.setPower(IntakeMotor.States.Collect);
                         timer.reset();
