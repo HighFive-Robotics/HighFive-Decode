@@ -68,6 +68,7 @@ public class Constants {
         public static String ledName2 = "L2";
         public static String cameraName = "limelight";
         public static String cameraServoName = "CS";
+        public static String brakeName = "BS";
     }
 
     public static class Intake {

@@ -14,10 +14,12 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Hardware.HighCamera;
+import org.firstinspires.ftc.teamcode.Core.Module.Others.BrakePiston;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.LinkageCamera;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Outtake;
 
 import java.lang.reflect.Array;
+import java.text.BreakIterator;
 import java.util.Arrays;
 
 @TeleOp(name = "Limelight MT1 Raw Test", group = "Tests")
@@ -26,6 +28,7 @@ public class LimelightRawTest extends LinearOpMode {
     Follower drive;
     HighCamera camera;
     Outtake outtake;
+    BrakePiston brake;
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -34,6 +37,7 @@ public class LimelightRawTest extends LinearOpMode {
         drive.setPose(new Pose(6,6,0));
         camera = new HighCamera(hardwareMap , HighCamera.Pipelines.BallDetection);
         outtake = new Outtake(hardwareMap, Constants.Color.Red , telemetry , true);
+        brake = new BrakePiston(hardwareMap , BrakePiston.FloatingPosition, true);
         outtake.linkageCamera.setState(LinkageCamera.States.Artifact , 300);
         Pose cameraPose = new Pose(6,6,0);
         Path path = new Path(new BezierLine(new Pose(6,6,0) , new Pose(6,6,0)));
@@ -76,13 +80,17 @@ public class LimelightRawTest extends LinearOpMode {
             if (isAutoDriving && !drive.isBusy()) {
                 isAutoDriving = false;
             }
-            data = camera.getBallInfo();
-
-            telemetry.addData("BALL INFO" , Arrays.toString(camera.ll.getLatestResult().getPythonOutput()));
+            if(gamepad1.dpadUpWasPressed()){
+                brake.setState(BrakePiston.States.Float);
+            }
+            if(gamepad1.dpadDownWasPressed()){
+                brake.setState(BrakePiston.States.Brake);
+            }
             telemetry.addData("BALL INFO" ,camera.getBallInfo());
             telemetry.addData("Auto Driving", isAutoDriving);
             telemetry.update();
             drive.update();
+            brake.update();
             outtake.update(drive.getPose());
         }
     }

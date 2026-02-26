@@ -111,6 +111,10 @@ public class Outtake extends HighModule {
     public void alignTurret(Pose robotPose) {
         turret.setTarget(turret.getTargetAngleFromDistance(robotPose));
     }
+    public void alignTurret(Pose robotPose , double offsetDegrees) {
+        turret.setTarget(turret.getTargetAngleFromDistance(robotPose));
+        turret.addOffsetDegrees(offsetDegrees);
+    }
 
     public void alignTurret() {
         alignTurret(robotPose);
@@ -174,6 +178,15 @@ public class Outtake extends HighModule {
         double offset;
         if(distanceToGoal <= 180){
             offset = Range.clip(Range.scale(distanceToGoal, 60, 180, 0.5, 0.3), 0.15, 0.5);
+        }else{
+            offset = Range.clip(Range.scale(distanceToGoal, 180, 360, 0.25, 0.15), 0.15, 0.25);
+        }
+        shooter.addToleranceCompensationOffset(offset);
+    }
+    public void addErrorToleranceScaledAuto() {
+        double offset;
+        if(distanceToGoal <= 180){
+            offset = Range.clip(Range.scale(distanceToGoal, 60, 180, 0.4, 0.265), 0.15, 0.5);
         }else{
             offset = Range.clip(Range.scale(distanceToGoal, 180, 360, 0.25, 0.15), 0.15, 0.25);
         }
