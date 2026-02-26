@@ -8,6 +8,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
+
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -18,7 +19,7 @@ import org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
 @Autonomous(name = "🔵AutoCloseLoadingZone🔵")
-public class AutoBlueClose extends LinearOpMode {
+public class  AutoBlueClose extends LinearOpMode {
 
     public Robot robot;
     public int state = 0;
@@ -29,21 +30,22 @@ public class AutoBlueClose extends LinearOpMode {
     public Pose shootPose2 = new Pose(55, 81.5, Math.toRadians(180));
     public Pose shootPoseTurret2 = new Pose(55, 81.5, Math.toRadians(-100));
     public Pose shootPoseTurretLoading2 = new Pose(55, 81.5, Math.toRadians(-90));
-    public Pose shootPose3 = new Pose(50, 120, Math.toRadians(-90));
+    public Pose shootPose3 = new Pose(50, 110, Math.toRadians(-90));
 
     public Pose preCollectSpikeMark2Pose = new Pose(45, 60, Math.toRadians(180));
     public Pose collectSpikeMark2Pose = new Pose(12, 60, Math.toRadians(180));
     public Pose controlPointSpike2 = new Pose(48.5, 61);
 
     public Pose collectSpikeMark1Pose = new Pose(18, 81.5, Math.toRadians(180));
-    public Pose preOpenGatePose = new Pose(25, 70, Math.toRadians(-90));
-    public Pose openGatePose = new Pose(16, 70, Math.toRadians(-90));
+    public Pose preOpenGatePose = new Pose(20, 70, Math.toRadians(-90));
+    public Pose openGatePose = new Pose(15.3, 70, Math.toRadians(-90));
     public Pose controlPointGate = new Pose(53, 67.5);
 
-    public Pose preCollectGatePose = new Pose(19, 68, Math.toRadians(-150));
+    public Pose preCollectGatePose = new Pose(18.5, 58, Math.toRadians(140));
     public Pose controlPointCollectGate1 = new Pose(55, 68.5);
-    public Pose controlPointCollectGate2 = new Pose(24, 70.5);
-    public Pose collectGatePose = new Pose(7, 55, Math.toRadians(110));
+    public Pose controlPointCollectGate2 = new Pose(19.75, 65);
+    public Pose collectGatePose = new Pose(12, 58, Math.toRadians(140));
+    public Pose collectGatePose2 = new Pose(12, 59, Math.toRadians(140));
     public Pose controlPointGateCollectGate1 = new Pose(16, 47);
     public Pose controlPointGateCollectGate2 = new Pose(50, 69);
     public Pose controlPointGateCollectFinalGate1 = new Pose(19, 40.5);
@@ -55,16 +57,17 @@ public class AutoBlueClose extends LinearOpMode {
     public Pose preCollectLoadingZone1 = new Pose(18, 30, Math.toRadians(-90));
     public Pose collectLoadingZone1 = new Pose(18, 12, Math.toRadians(-90));
 
-    public Pose preCollectLoadingZone2 = new Pose(5.5, 35, Math.toRadians(-90));
-    public Pose collectLoadingZone2 = new Pose(5.5, 12, Math.toRadians(-90));
-
+    public Pose preCollectLoadingZone2 = new Pose(7, 50, Math.toRadians(-90));
+    public Pose collectLoadingZone2 = new Pose(7, 12, Math.toRadians(-90));
 
     private final ElapsedTime autoTimer = new ElapsedTime();
     private final ElapsedTime timer = new ElapsedTime();
 
+    boolean failsafe = true;
+
     @Override
     public void runOpMode() throws InterruptedException {
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        telemetry.setMsTransmissionInterval(300);
         robot = new Robot(hardwareMap, startPose, true, Constants.Color.Blue, telemetry, gamepad1);
         robot.outtake.turret.reset();
         robot.outtake.startBreakBeamThread();
@@ -116,13 +119,18 @@ public class AutoBlueClose extends LinearOpMode {
                 .build();
 
         PathChain preCollectGate = robot.drive.pathBuilder()
-                .addPath(new BezierCurve(shootPose2,controlPointCollectGate1,controlPointCollectGate2, preCollectGatePose))
-                .setTangentHeadingInterpolation()
+                .addPath(new BezierLine(shootPose2, preCollectGatePose))
+                .setLinearHeadingInterpolation(shootPose2.getHeading(),preCollectGatePose.getHeading())
                 .build();
 
         PathChain collectGate = robot.drive.pathBuilder()
                 .addPath(new BezierLine(preCollectGatePose, collectGatePose))
                 .setLinearHeadingInterpolation(preCollectGatePose.getHeading(),collectGatePose.getHeading())
+                .build();
+
+        PathChain startCollectingGate = robot.drive.pathBuilder()
+                .addPath(new BezierLine(preCollectGatePose, collectGatePose2))
+                .setLinearHeadingInterpolation(preCollectGatePose.getHeading(),collectGatePose2.getHeading())
                 .build();
 
         PathChain shootGate = robot.drive.pathBuilder()
@@ -159,7 +167,7 @@ public class AutoBlueClose extends LinearOpMode {
 
         PathChain preCollectLoading1 = robot.drive.pathBuilder()
                 .addPath(new BezierLine(shootPose2, preCollectLoadingZone1))
-                .setLinearHeadingInterpolation(shootPose2.getHeading(),preCollectLoadingZone1.getHeading())
+                .setLinearHeadingInterpolation(preCollectLoadingZone1.getHeading(),preCollectLoadingZone1.getHeading())
                 .build();
 
         PathChain collectLoading1 = robot.drive.pathBuilder()
@@ -179,7 +187,7 @@ public class AutoBlueClose extends LinearOpMode {
 
         PathChain preCollectLoading2 = robot.drive.pathBuilder()
                 .addPath(new BezierLine(shootPose2, preCollectLoadingZone2))
-                .setLinearHeadingInterpolation(shootPose2.getHeading(),preCollectLoadingZone2.getHeading())
+                .setLinearHeadingInterpolation(preCollectLoadingZone2.getHeading(),preCollectLoadingZone2.getHeading())
                 .build();
 
         PathChain collectLoading2 = robot.drive.pathBuilder()
@@ -200,26 +208,30 @@ public class AutoBlueClose extends LinearOpMode {
         telemetry.addLine("Ready for Action");
         telemetry.update();
         robot.update();
-
+        Constants.CameraConstants.toleranceTurretDeg = 0.7;
+        Constants.OuttakeConstants.TurretParams.minimumErrorAngleForWalls = Math.PI / 5;
         waitForStart();
         autoTimer.reset();
-        robot.outtake.setShootingVelocity(120);
+        robot.outtake.setShootingVelocity(robot.outtake.calculateDistanceToGoal(shootPose1)+2);
         while (opModeIsActive()) {
             switch (state) {
                 case 0:
                     robot.drive.followPath(preloadPath, true);
                     robot.intake.setPower(IntakeMotor.States.Collect);
+                    robot.outtake.turret.motor.setMaxPIDPower(0.6);
                     robot.outtake.alignTurret(shootPose1);
-                    state = 1;
+                    state= 1;
                     break;
                 case 1:
-                    if (robot.drive.atParametricEnd()) {
-                        robot.outtake.setShootingVelocity(100);
+                    if(robot.isDone()){
+                        robot.outtake.setShootingVelocityForPose(shootPose1);
                         robot.setAction(Robot.Actions.ResetTurretCamera);
+                        timer.reset();
                         state = 2;
                     }
+                    break;
                 case 2:
-                    if (robot.isDone() && !robot.resetWithCamera) {
+                    if (robot.isDone() && (!robot.resetWithCamera || timer.milliseconds() >= 1150)) {
                         robot.setAction(Robot.Actions.Shoot);
                         state++;
                     }
@@ -227,7 +239,8 @@ public class AutoBlueClose extends LinearOpMode {
                 case 3:
                     if (!robot.shootingSequence) {
                         robot.drive.followPath(goForSpike2, true);
-                        robot.outtake.setShootingVelocityForPose(shootPose2);
+                        robot.outtake.alignTurret(shootPose2 , 2);
+                        robot.outtake.setShootingVelocity(robot.outtake.calculateDistanceToGoal(shootPose2)-2);
                         timer.reset();
                         state++;
                     }
@@ -243,7 +256,6 @@ public class AutoBlueClose extends LinearOpMode {
                     if (robot.drive.atParametricEnd()) {
                         robot.intake.setPower(IntakeMotor.States.Collect);
                         robot.drive.followPath(shootSpike2, true);
-                        robot.outtake.alignTurret(shootPose2);
                         state++;
                     }
                     break;
@@ -256,7 +268,7 @@ public class AutoBlueClose extends LinearOpMode {
                     break;
                 case 7:
                     if (!robot.shootingSequence) {
-                        robot.drive.followPath(collectSpike1);
+                        robot.drive.followPath(collectSpike1)  ;
                         robot.intake.setPower(IntakeMotor.States.Collect);
                         timer.reset();
                         state++;
@@ -282,7 +294,8 @@ public class AutoBlueClose extends LinearOpMode {
                     }
                     break;
                 case 11:
-                    if (timer.milliseconds() >= 650) {
+                    if (timer.milliseconds() >= 425) {
+                        robot.outtake.alignTurret(shootPose2, 2.5);
                         robot.drive.followPath(shootSpike1, true);
                         state++;
                     }
@@ -325,7 +338,7 @@ public class AutoBlueClose extends LinearOpMode {
                     break;
                 case 17:
                     if (!robot.shootingSequence) {
-                        robot.outtake.setShootingVelocityForPose(shootPose3);
+                        robot.shouldAlignTurret = false;
                         robot.drive.followPath(preCollectLoading2, true);
                         robot.intake.setPower(IntakeMotor.States.Collect);
                         timer.reset();
@@ -333,7 +346,7 @@ public class AutoBlueClose extends LinearOpMode {
                     }
                     break;
                 case 18:
-                    if (robot.drive.atParametricEnd()) {
+                    if (robot.drive.atParametricEnd()  || robot.intake.isPartial) {
                         robot.drive.followPath(collectLoading2, true);
                         robot.drive.setMaxPower(0.75);
                         timer.reset();
@@ -341,14 +354,16 @@ public class AutoBlueClose extends LinearOpMode {
                     }
                     break;
                 case 19:
-                    if (robot.drive.atParametricEnd()) {
+                    if (robot.drive.atParametricEnd() || robot.intake.isPartial) {
                         timer.reset();
-                        state = 20;
+                        state = 24;
                     }
                     break;
                 case 20:
-                    if (timer.milliseconds() >= 400) {
-                        robot.outtake.alignTurret(shootPose3);
+                    if ((timer.milliseconds() >= 300  || robot.intake.isFull) && autoTimer.milliseconds() <= 27000) {
+                        robot.outtake.alignTurret(shootPose3, -4.5);
+                        robot.drive.setMaxPower(1);
+                        robot.outtake.setShootingVelocityForPose(shootPose3);
                         robot.outtake.turret.setOffset(0);
                         robot.drive.setMaxPower(1);
                         robot.drive.followPath(shootLoading2Final, true);
@@ -365,6 +380,7 @@ public class AutoBlueClose extends LinearOpMode {
                     }
                     break;
             }
+
             finalAutoPose = robot.drive.getPose();
             robot.update();
 
@@ -374,7 +390,9 @@ public class AutoBlueClose extends LinearOpMode {
             telemetry.addData("Shooting Seq Active", robot.shootingSequence);
             telemetry.update();
         }
+
         robot.outtake.stopBreakBeamThread();
         Constants.CameraConstants.toleranceTurretDeg = 1;
+        Constants.OuttakeConstants.TurretParams.minimumErrorAngleForWalls = Math.PI / 10;
     }
 }
