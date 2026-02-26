@@ -24,7 +24,7 @@ public class  AutoBlueMix extends LinearOpMode {
     public Robot robot;
     public int state = 0;
 
-    public Pose startPose = new Pose(13, 113, Math.toRadians(0));65u  
+    public Pose startPose = new Pose(13, 113, Math.toRadians(0));
 
     public Pose shootPose1 = new Pose(45, 95, Math.toRadians(180));
     public Pose shootPose2 = new Pose(55, 81.5, Math.toRadians(180));
