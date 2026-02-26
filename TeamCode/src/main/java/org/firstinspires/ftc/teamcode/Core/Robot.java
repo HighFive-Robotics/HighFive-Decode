@@ -162,40 +162,21 @@ public class Robot extends HighModule {
         if (shootingSequence) {
             switch (shootingState) {
                 case 0:
-                    if (isAuto) {
-                        if(outtake.shooter.atTargetIndividual() && outtake.turret.atTarget()){
-                            outtake.openBlocker();
-                            intake.canStop = false;
-                            shootingState++;
-                            cycles = 1;
-                            timerShoot.reset();
-                        }
-                    }else {
-                        if(outtake.atTarget()){
-                            outtake.openBlocker();
-                            intake.canStop = false;
-                            shootingState++;
-                            cycles = 1;
-                            timerShoot.reset();
-                        }
+                    if(outtake.atTarget()){
+                        outtake.openBlocker();
+                        intake.canStop = false;
+                        shootingState++;
+                        cycles = 1;
+                        timerShoot.reset();
                     }
                     break;
                 case 1:
                     if (cycles <= 3 || holdingSequence) {
-                        if(!isAuto){
-                            if (outtake.atTargetCompensated() || (cycles <= 1 && outtake.atTarget())) {
-                                intake.setPower(IntakeMotor.States.Collect);
-                                intake.intakeMotor.update();
-                                shootingState++;
-                                timerShoot.reset();
-                            }
-                        }else{
-                            if (outtake.atTarget() || (cycles <= 1 && outtake.atTarget())) {
-                                intake.setPower(IntakeMotor.States.Collect);
-                                intake.intakeMotor.update();
-                                shootingState++;
-                                timerShoot.reset();
-                            }
+                        if (outtake.atTargetCompensated() || (cycles <= 1 && outtake.atTarget())) {
+                            intake.setPower(IntakeMotor.States.Collect);
+                            intake.intakeMotor.update();
+                            shootingState++;
+                            timerShoot.reset();
                         }
                     } else {
                         intake.setPower(IntakeMotor.States.Wait);
@@ -213,7 +194,7 @@ public class Robot extends HighModule {
                     break;
                 case 2:
                     boolean checkShoot = outtake.detectShoot();
-                    boolean ballFired = (outtake.hasShot || checkShoot || timerShoot.milliseconds() >= 475); //
+                    boolean ballFired = (outtake.hasShot || checkShoot || timerShoot.milliseconds() >= 475);
                     if (ballFired) {
                         if (cycles <= 3) {
                             if(!isAuto)outtake.addErrorToleranceScaled();

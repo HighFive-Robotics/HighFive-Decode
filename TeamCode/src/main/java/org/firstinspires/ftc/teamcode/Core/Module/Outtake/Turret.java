@@ -303,11 +303,11 @@ public class Turret extends HighModule {
         currentAngle = (ticks / ticksPerPI) * Math.PI;
         if(Math.abs(targetTicks - ticks) <= thresholdSmallPID){
             if(!smallPid){
-                motor.setPIDCoefficients(kp2Turret,ki2Turret,kd2Turret,kfTurret, HighMotor.FeedForwardType.Lift,1);
+                motor.setPIDCoefficients(kp2Turret,ki2Turret,kd2Turret,kfTurret, HighMotor.FeedForwardType.Lift);
                 smallPid = true;
             }
         } else if (smallPid){
-            motor.setPIDCoefficients(kpTurret,kiTurret,kdTurret,kfTurret, HighMotor.FeedForwardType.Lift,1);
+            motor.setPIDCoefficients(kpTurret,kiTurret,kdTurret,kfTurret, HighMotor.FeedForwardType.Lift);
             smallPid = false;
         }
         motor.update();

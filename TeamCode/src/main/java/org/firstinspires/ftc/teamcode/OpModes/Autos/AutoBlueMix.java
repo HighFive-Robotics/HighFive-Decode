@@ -24,20 +24,20 @@ public class  AutoBlueMix extends LinearOpMode {
     public Robot robot;
     public int state = 0;
 
-    public Pose startPose = new Pose(13, 113, Math.toRadians(0));65u  
+    public Pose startPose = new Pose(13, 113, Math.toRadians(0));
 
     public Pose shootPose1 = new Pose(45, 95, Math.toRadians(180));
     public Pose shootPose2 = new Pose(55, 81.5, Math.toRadians(180));
     public Pose shootPoseTurret2 = new Pose(55, 81.5, Math.toRadians(-100));
     public Pose shootPoseTurretLoading2 = new Pose(55, 81.5, Math.toRadians(-90));
-    public Pose shootPose3 = new Pose(50, 115, Math.toRadians(-90));
+    public Pose shootPose3 = new Pose(50, 110, Math.toRadians(-90));
 
     public Pose preCollectSpikeMark2Pose = new Pose(45, 60, Math.toRadians(180));
     public Pose collectSpikeMark2Pose = new Pose(12, 60, Math.toRadians(180));
     public Pose controlPointSpike2 = new Pose(48.5, 61);
 
     public Pose collectSpikeMark1Pose = new Pose(18, 81.5, Math.toRadians(180));
-    public Pose preOpenGatePose = new Pose(25, 70, Math.toRadians(-90));
+    public Pose preOpenGatePose = new Pose(20, 70, Math.toRadians(-90));
     public Pose openGatePose = new Pose(15.3, 70, Math.toRadians(-90));
     public Pose controlPointGate = new Pose(53, 67.5);
 
@@ -45,6 +45,7 @@ public class  AutoBlueMix extends LinearOpMode {
     public Pose controlPointCollectGate1 = new Pose(55, 68.5);
     public Pose controlPointCollectGate2 = new Pose(19.75, 65);
     public Pose collectGatePose = new Pose(8.5, 51.5, Math.toRadians(110));
+    public Pose collectGatePose2 = new Pose(8.5, 65, Math.toRadians(110));
     public Pose controlPointGateCollectGate1 = new Pose(16, 47);
     public Pose controlPointGateCollectGate2 = new Pose(50, 69);
     public Pose controlPointGateCollectFinalGate1 = new Pose(19, 40.5);
@@ -56,11 +57,13 @@ public class  AutoBlueMix extends LinearOpMode {
     public Pose preCollectLoadingZone1 = new Pose(18, 30, Math.toRadians(-90));
     public Pose collectLoadingZone1 = new Pose(18, 12, Math.toRadians(-90));
 
-    public Pose preCollectLoadingZone2 = new Pose(7, 35, Math.toRadians(-90));
+    public Pose preCollectLoadingZone2 = new Pose(7, 50, Math.toRadians(-90));
     public Pose collectLoadingZone2 = new Pose(7, 12, Math.toRadians(-90));
 
     private final ElapsedTime autoTimer = new ElapsedTime();
     private final ElapsedTime timer = new ElapsedTime();
+
+    boolean failsafe = true;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -73,7 +76,7 @@ public class  AutoBlueMix extends LinearOpMode {
         robot.camera.startCapture();
         robot.drive.setConstants(Constants.FConstants);
         Constants.Globals.afterAuto = true;
-        robot.shouldAlignTurret = false;//TODO
+        robot.shouldAlignTurret = false;
         telemetry.setMsTransmissionInterval(500);
         PathChain preloadPath = robot.drive.pathBuilder()
                 .addPath(new BezierLine(startPose, shootPose1))
@@ -123,6 +126,11 @@ public class  AutoBlueMix extends LinearOpMode {
         PathChain collectGate = robot.drive.pathBuilder()
                 .addPath(new BezierLine(preCollectGatePose, collectGatePose))
                 .setLinearHeadingInterpolation(preCollectGatePose.getHeading(),collectGatePose.getHeading())
+                .build();
+
+        PathChain startCollectingGate = robot.drive.pathBuilder()
+                .addPath(new BezierLine(preCollectGatePose, collectGatePose2))
+                .setLinearHeadingInterpolation(preCollectGatePose.getHeading(),collectGatePose2.getHeading())
                 .build();
 
         PathChain shootGate = robot.drive.pathBuilder()
@@ -219,7 +227,6 @@ public class  AutoBlueMix extends LinearOpMode {
                         robot.outtake.setShootingVelocityForPose(shootPose1);
                         robot.setAction(Robot.Actions.ResetTurretCamera);
                         timer.reset();
-                        robot.outtake.turret.motor.setMaxPIDPower(1);
                         state = 2;
                     }
                     break;
@@ -288,7 +295,7 @@ public class  AutoBlueMix extends LinearOpMode {
                     break;
                 case 11:
                     if (timer.milliseconds() >= 425) {
-                        robot.outtake.alignTurret(shootPose2 );
+                        robot.outtake.alignTurret(shootPose2);
                         robot.drive.followPath(shootSpike1, true);
                         state++;
                     }
@@ -319,7 +326,7 @@ public class  AutoBlueMix extends LinearOpMode {
                         robot.intake.setPower(IntakeMotor.States.Wait);
                         robot.drive.followPath(collectGate, true);
                         timer.reset();
-                        state=16;
+                        state = 16;
                     }
                     break;
                 case 16:
@@ -329,19 +336,24 @@ public class  AutoBlueMix extends LinearOpMode {
                     }
                     break;
                 case 17:
-                    if (robot.isDone() || robot.intake.isFull) {
+                    if (robot.isDone() || robot.intake.isPartial) {
                         timer.reset();
-                        //robot.intake.setPower(IntakeMotor.States.Collect);
                         state++;
                     }
                     break;
                 case 18:
-                    if (timer.milliseconds() >= 700 || robot.intake.isFull) {
+                    if (timer.milliseconds() >= 550 || robot.intake.isFull) {
+                        robot.drive.setMaxPower(1);
                         robot.outtake.setShootingVelocityForPose(shootPose2);
                         robot.drive.followPath(shootGate, true);
+                        robot.drive.setMaxPower(1);
                         robot.shouldAlignTurret = true;
                         robot.intake.setPower(IntakeMotor.States.Collect);
                         state++;
+                    } else if (failsafe){
+                        robot.drive.followPath(startCollectingGate, true);
+                        robot.drive.setMaxPower(0.5);
+                        failsafe = false;
                     }
                     break;
                 case 19:
@@ -368,7 +380,7 @@ public class  AutoBlueMix extends LinearOpMode {
                     }
                     break;
                 case 22:
-                    if (robot.drive.atParametricEnd()  || robot.intake.isFull) {
+                    if (robot.drive.atParametricEnd()  || robot.intake.isPartial) {
                         robot.drive.followPath(collectLoading2, true);
                         robot.drive.setMaxPower(0.75);
                         timer.reset();
@@ -382,8 +394,9 @@ public class  AutoBlueMix extends LinearOpMode {
                     }
                     break;
                 case 24:
-                    if (timer.milliseconds() >= 300  || robot.intake.isFull) {
+                    if ((timer.milliseconds() >= 300  || robot.intake.isFull) && autoTimer.milliseconds() <= 27000) {
                         robot.outtake.alignTurret(shootPose3);
+                        robot.drive.setMaxPower(1);
                         robot.outtake.setShootingVelocityForPose(shootPose3);
                         robot.outtake.turret.setOffset(0);
                         robot.drive.setMaxPower(1);
