@@ -20,7 +20,7 @@ import org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.LinkageCamera;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
-@Autonomous(name = "🔵AutoFar Detectie🔵")
+@Autonomous(name = "🔵AutoFar🔵")
 public class AutoBlueFarDetection extends LinearOpMode {
 
     public Robot robot;
