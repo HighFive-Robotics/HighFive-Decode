@@ -28,11 +28,11 @@ public class AutoBlueFarDetection extends LinearOpMode {
 
 
     public Pose startPose = new Pose(50, 6, Math.toRadians(180));
-    public Pose precollectSpikeMark3Pose = new Pose(38, 34, Math.toRadians(180));
+    public Pose precollectSpikeMark3Pose = new Pose(50, 34, Math.toRadians(180));
     public Pose controlPoint1 = new Pose(60, 38);
     public Pose controlPointLoading1 = new Pose(29, 11);
     public Pose controlPointLoading2 = new Pose(14, 21);
-    public Pose collectSpikeMark3Pose = new Pose(12, 34, Math.toRadians(180));
+    public Pose collectSpikeMark3Pose = new Pose(9, 34, Math.toRadians(180));
     public Pose collectLoadingZone1 = new Pose(6, 8, Math.toRadians(180));
     public Pose preCollectLoadingZone1 = new Pose(25, 7, Math.toRadians(180));
     public Pose loadingArtifact = new Pose(7, 10, Math.toRadians(-90));
@@ -185,7 +185,7 @@ public class AutoBlueFarDetection extends LinearOpMode {
                     }
                     break;
                 case 8:
-                    if (robot.isDone() || robot.intake.isFull) {
+                    if (robot.isDone()) {
                         robot.shouldAlignTurret = true;
                         robot.drive.followPath(goShootSpike);
                         robot.outtake.setShootingVelocityForPose(startPose, -8.5);

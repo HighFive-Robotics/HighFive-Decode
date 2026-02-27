@@ -25,14 +25,14 @@ public class AutoRedFarDetection extends LinearOpMode {
     public int state = 0;
 
 
-    public Pose startPose = new Pose(88, 6, Math.toRadians(0)); //public Pose startPose = new Pose(50, 6, Math.toRadians(180));
-    public Pose precollectSpikeMark3Pose = new Pose(100, 34, Math.toRadians(0));
-    public Pose controlPointLoading1 = new Pose(29, 11).mirror();
-    public Pose controlPointLoading2 = new Pose(14, 21).mirror();
-    public Pose collectSpikeMark3Pose = new Pose(126, 34, Math.toRadians(0));
-    public Pose collectLoadingZone1 = new Pose(132, 8, Math.toRadians(0));
-    public Pose preCollectLoadingZone1 = new Pose(113, 7, Math.toRadians(0));
-    public Pose loadingArtifact = new Pose(131, 10, Math.toRadians(-90));
+    public Pose startPose = new Pose(84.5, 6, Math.toRadians(0)); //public Pose startPose = new Pose(50, 6, Math.toRadians(180));
+    public Pose precollectSpikeMark3Pose = new Pose(84.5, 35, Math.toRadians(0));
+    public Pose controlPointLoading1 = new Pose(25.5, 11).mirror();
+    public Pose controlPointLoading2 = new Pose(10.5, 21).mirror();
+    public Pose collectSpikeMark3Pose = new Pose(126, 35, Math.toRadians(0));
+    public Pose collectLoadingZone1 = new Pose(127.5, 6, Math.toRadians(0));
+    public Pose preCollectLoadingZone1 = new Pose(108.5, 6, Math.toRadians(0));
+    public Pose loadingArtifact = new Pose(127.5, 10, Math.toRadians(-90));
 
     private final ElapsedTime autoTimer = new ElapsedTime();
     private final ElapsedTime timer = new ElapsedTime();
@@ -46,10 +46,10 @@ public class AutoRedFarDetection extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        robot = new Robot(hardwareMap, startPose, true, Constants.Color.Blue, telemetry, gamepad1);
+        robot = new Robot(hardwareMap, startPose, true, Constants.Color.Red, telemetry, gamepad1);
         telemetry.setMsTransmissionInterval(1200);
         robot.outtake.turret.reset();
-        autoColor = Constants.Color.Blue;
+        autoColor = Constants.Color.Red;
         robot.drive.resetTeleOpHeading();
         robot.camera.setPipeline(HighCamera.Pipelines.AprilTagLocation);
         robot.camera.startCapture();
@@ -87,7 +87,7 @@ public class AutoRedFarDetection extends LinearOpMode {
 
         PathChain goShootSpike = robot.drive.pathBuilder()
                 .addPath(new BezierLine(collectSpikeMark3Pose, startPose))
-                .setLinearHeadingInterpolation(collectSpikeMark3Pose.getHeading(), Math.toRadians(180))
+                .setLinearHeadingInterpolation(collectSpikeMark3Pose.getHeading(), Math.toRadians(0))
                 .build();
         PathChain goShootDetection = robot.drive.pathBuilder()
                 .addPath(new BezierLine(loadingArtifact, startPose))
@@ -182,7 +182,7 @@ public class AutoRedFarDetection extends LinearOpMode {
                     }
                     break;
                 case 8:
-                    if (robot.isDone() || robot.intake.isFull) {
+                    if (robot.isDone()) {
                         robot.shouldAlignTurret = true;
                         robot.drive.followPath(goShootSpike);
                         robot.outtake.setShootingVelocityForPose(startPose, -8.5);
