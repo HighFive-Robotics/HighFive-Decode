@@ -126,12 +126,10 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
             }
 
             if(gamepad1.dpad_left) {
-                robot.drive.setStartingPose(new Pose(RedGoalDistance.getX(),RedGoalDistance.getY(),robot.drive.getPose().getHeading()));
                 robot.drive.setPose(new Pose(RedGoalDistance.getX(),RedGoalDistance.getY(),robot.drive.getPose().getHeading()));
             }
 
             if(gamepad1.dpad_right) {
-                robot.drive.setStartingPose(new Pose(BlueGoalDistance.getX(),BlueGoalDistance.getY(),robot.drive.getPose().getHeading()));
                 robot.drive.setPose(new Pose(BlueGoalDistance.getX(),BlueGoalDistance.getY(),robot.drive.getPose().getHeading()));
             }
 
