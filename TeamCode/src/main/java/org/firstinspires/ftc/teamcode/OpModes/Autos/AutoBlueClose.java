@@ -28,8 +28,6 @@ public class  AutoBlueClose extends LinearOpMode {
 
     public Pose shootPose1 = new Pose(45, 95, Math.toRadians(180));
     public Pose shootPose2 = new Pose(55, 81.5, Math.toRadians(180));
-    public Pose shootPoseTurret2 = new Pose(55, 81.5, Math.toRadians(-100));
-    public Pose shootPoseTurretLoading2 = new Pose(55, 81.5, Math.toRadians(-90));
     public Pose shootPose3 = new Pose(50, 110, Math.toRadians(-90));
 
     public Pose preCollectSpikeMark2Pose = new Pose(45, 60, Math.toRadians(180));
@@ -41,21 +39,8 @@ public class  AutoBlueClose extends LinearOpMode {
     public Pose openGatePose = new Pose(15.3, 70, Math.toRadians(-90));
     public Pose controlPointGate = new Pose(53, 67.5);
 
-    public Pose preCollectGatePose = new Pose(18.5, 58, Math.toRadians(140));
-    public Pose controlPointCollectGate1 = new Pose(55, 68.5);
-    public Pose controlPointCollectGate2 = new Pose(19.75, 65);
-    public Pose collectGatePose = new Pose(12, 58, Math.toRadians(140));
-    public Pose collectGatePose2 = new Pose(12, 59, Math.toRadians(140));
-    public Pose controlPointGateCollectGate1 = new Pose(16, 47);
-    public Pose controlPointGateCollectGate2 = new Pose(50, 69);
-    public Pose controlPointGateCollectFinalGate1 = new Pose(19, 40.5);
-    public Pose controlPointGateCollectFinalGate2 = new Pose(37, 99.5);
-
     public Pose preCollectSpikeMark3Pose = new Pose(55, 35, Math.toRadians(180));
     public Pose collectSpikeMark3Pose = new Pose(12, 35, Math.toRadians(180));
-
-    public Pose preCollectLoadingZone1 = new Pose(18, 30, Math.toRadians(-90));
-    public Pose collectLoadingZone1 = new Pose(18, 12, Math.toRadians(-90));
 
     public Pose preCollectLoadingZone2 = new Pose(7, 50, Math.toRadians(-90));
     public Pose collectLoadingZone2 = new Pose(7, 12, Math.toRadians(-90));
@@ -118,36 +103,9 @@ public class  AutoBlueClose extends LinearOpMode {
                 .setLinearHeadingInterpolation(openGatePose.getHeading(), shootPose2.getHeading())
                 .build();
 
-        PathChain preCollectGate = robot.drive.pathBuilder()
-                .addPath(new BezierLine(shootPose2, preCollectGatePose))
-                .setLinearHeadingInterpolation(shootPose2.getHeading(),preCollectGatePose.getHeading())
-                .build();
-
-        PathChain collectGate = robot.drive.pathBuilder()
-                .addPath(new BezierLine(preCollectGatePose, collectGatePose))
-                .setLinearHeadingInterpolation(preCollectGatePose.getHeading(),collectGatePose.getHeading())
-                .build();
-
-        PathChain startCollectingGate = robot.drive.pathBuilder()
-                .addPath(new BezierLine(preCollectGatePose, collectGatePose2))
-                .setLinearHeadingInterpolation(preCollectGatePose.getHeading(),collectGatePose2.getHeading())
-                .build();
-
-        PathChain shootGate = robot.drive.pathBuilder()
-                .addPath(new BezierCurve(collectGatePose,controlPointGateCollectGate1,controlPointGateCollectGate2, shootPose2))
-                .setTangentHeadingInterpolation()
-                .setReversed()
-                .build();
-
-        PathChain shootGateFinal = robot.drive.pathBuilder()
-                .addPath(new BezierCurve(collectGatePose,controlPointGateCollectFinalGate1,controlPointGateCollectFinalGate2, shootPose3))
-                .setTangentHeadingInterpolation()
-                .setReversed()
-                .build();
-
         PathChain goForSpike3 = robot.drive.pathBuilder()
                 .addPath(new BezierLine(shootPose2, preCollectSpikeMark3Pose))
-                .setLinearHeadingInterpolation(Math.toRadians(-135),preCollectSpikeMark3Pose.getHeading())
+                .setLinearHeadingInterpolation(shootPose2.getHeading(),preCollectSpikeMark3Pose.getHeading())
                 .build();
 
         PathChain collectSpike3 = robot.drive.pathBuilder()
@@ -160,30 +118,6 @@ public class  AutoBlueClose extends LinearOpMode {
                 .setLinearHeadingInterpolation(Math.toRadians(180),Math.toRadians(180))
                 .build();
 
-        PathChain shootSpike3Final  = robot.drive.pathBuilder()
-                .addPath(new BezierLine(collectSpikeMark3Pose, shootPose3))
-                .setLinearHeadingInterpolation(Math.toRadians(180),Math.toRadians(-90))
-                .build();
-
-        PathChain preCollectLoading1 = robot.drive.pathBuilder()
-                .addPath(new BezierLine(shootPose2, preCollectLoadingZone1))
-                .setLinearHeadingInterpolation(preCollectLoadingZone1.getHeading(),preCollectLoadingZone1.getHeading())
-                .build();
-
-        PathChain collectLoading1 = robot.drive.pathBuilder()
-                .addPath(new BezierLine(preCollectLoadingZone1, collectLoadingZone1))
-                .setLinearHeadingInterpolation(preCollectLoadingZone1.getHeading(),collectLoadingZone1.getHeading())
-                .build();
-
-        PathChain shootLoading1 = robot.drive.pathBuilder()
-                .addPath(new BezierLine(collectLoadingZone1, shootPose2))
-                .setLinearHeadingInterpolation(collectLoadingZone1.getHeading(),shootPoseTurretLoading2.getHeading())
-                .build();
-
-        PathChain shootLoading1Final = robot.drive.pathBuilder()
-                .addPath(new BezierLine(collectLoadingZone1, shootPose3))
-                .setLinearHeadingInterpolation(collectLoadingZone1.getHeading(),shootPose3.getHeading())
-                .build();
 
         PathChain preCollectLoading2 = robot.drive.pathBuilder()
                 .addPath(new BezierLine(shootPose2, preCollectLoadingZone2))
@@ -193,11 +127,6 @@ public class  AutoBlueClose extends LinearOpMode {
         PathChain collectLoading2 = robot.drive.pathBuilder()
                 .addPath(new BezierLine(preCollectLoadingZone2, collectLoadingZone2))
                 .setLinearHeadingInterpolation(preCollectLoadingZone2.getHeading(),collectLoadingZone2.getHeading())
-                .build();
-
-        PathChain shootLoading2 = robot.drive.pathBuilder()
-                .addPath(new BezierLine(collectLoadingZone2, shootPose2))
-                .setLinearHeadingInterpolation(collectLoadingZone2.getHeading(),shootPoseTurretLoading2.getHeading())
                 .build();
 
         PathChain shootLoading2Final = robot.drive.pathBuilder()

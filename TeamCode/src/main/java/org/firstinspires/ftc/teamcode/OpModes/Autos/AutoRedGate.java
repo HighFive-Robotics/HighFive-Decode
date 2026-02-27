@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode.OpModes.Autos;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.finalAutoPose;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
@@ -19,27 +17,28 @@ import org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
 @Autonomous(name = "🔵AutoCloseGate🔵")
-public class AutoBlueGate extends LinearOpMode {
+public class AutoRedGate extends LinearOpMode {
 
     public Robot robot;
     public int state = 0, cycles = 0;
 
-    public Pose startPose = new Pose(13, 113, Math.toRadians(0));
+    public Pose startPose = new Pose(125, 114, Math.toRadians(180));//    public Pose startPose = new Pose(13, 113, Math.toRadians(0));
 
-    public Pose shootPose1 = new Pose(45, 95, Math.toRadians(180));
-    public Pose shootPose2 = new Pose(55, 81.5, Math.toRadians(180));
+    public Pose shootPose1 = new Pose(93, 95, Math.toRadians(0));
+    public Pose shootPose2 = new Pose(83, 81.5, Math.toRadians(0));
+    public Pose shootPose3 = new Pose(78, 110, Math.toRadians(-90));
 
-    public Pose preCollectSpikeMark2Pose = new Pose(45, 60, Math.toRadians(180));
-    public Pose collectSpikeMark2Pose = new Pose(12, 60, Math.toRadians(180));
-    public Pose controlPointSpike2 = new Pose(48.5, 61);
+    public Pose preCollectSpikeMark2Pose = new Pose(83, 60, Math.toRadians(0));
+    public Pose collectSpikeMark2Pose = new Pose(124, 60, Math.toRadians(0));
+    public Pose controlPointSpike2 = new Pose(48.5, 60);
 
-    public Pose collectSpikeMark1Pose = new Pose(18, 81.5, Math.toRadians(180));
-    public Pose preOpenGatePose = new Pose(20, 70, Math.toRadians(-90));
-    public Pose openGatePose = new Pose(15.3, 70, Math.toRadians(-90));
-    public Pose controlPointGate = new Pose(53, 67.5);
+    public Pose collectSpikeMark1Pose = new Pose(120, 81.5, Math.toRadians(0));
+    public Pose preOpenGatePose = new Pose(117, 70, Math.toRadians(-90));
+    public Pose openGatePose = new Pose(123, 70, Math.toRadians(-90));
+    public Pose controlPointGate = new Pose(85, 67.5);
 
-    public Pose preCollectGatePose = new Pose(18.5, 58, Math.toRadians(140));
-    public Pose collectGatePose = new Pose(12, 58, Math.toRadians(140));
+    public Pose preCollectGatePose = new Pose(119.5, 58, Math.toRadians(40));
+    public Pose collectGatePose = new Pose(126, 58, Math.toRadians(40));
 
     private final ElapsedTime autoTimer = new ElapsedTime();
     private final ElapsedTime timer = new ElapsedTime();
@@ -59,6 +58,7 @@ public class AutoBlueGate extends LinearOpMode {
         Constants.Globals.afterAuto = true;
         robot.shouldAlignTurret = false;
         telemetry.setMsTransmissionInterval(500);
+
         PathChain preloadPath = robot.drive.pathBuilder()
                 .addPath(new BezierLine(startPose, shootPose1))
                 .setLinearHeadingInterpolation(startPose.getHeading(), shootPose1.getHeading())
@@ -66,22 +66,22 @@ public class AutoBlueGate extends LinearOpMode {
 
         PathChain goForSpike2 = robot.drive.pathBuilder()
                 .addPath(new BezierLine(shootPose1, preCollectSpikeMark2Pose))
-                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .setConstantHeadingInterpolation(Math.toRadians(0))
                 .build();
 
         PathChain collectSpike2 = robot.drive.pathBuilder()
                 .addPath(new BezierLine(preCollectSpikeMark2Pose, collectSpikeMark2Pose))
-                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .setConstantHeadingInterpolation(Math.toRadians(0))
                 .build();
 
         PathChain shootSpike2 = robot.drive.pathBuilder()
                 .addPath(new BezierCurve(collectSpikeMark2Pose,controlPointSpike2, shootPose2))
-                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .setConstantHeadingInterpolation(Math.toRadians(0))
                 .build();
 
         PathChain collectSpike1 = robot.drive.pathBuilder()
                 .addPath(new BezierLine(shootPose2, collectSpikeMark1Pose))
-                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .setConstantHeadingInterpolation(Math.toRadians(0))
                 .build();
 
         PathChain preOpenGate = robot.drive.pathBuilder()
@@ -113,7 +113,6 @@ public class AutoBlueGate extends LinearOpMode {
                 .addPath(new BezierLine(collectGatePose, shootPose2))
                 .setLinearHeadingInterpolation(collectGatePose.getHeading(),shootPose2.getHeading())
                 .build();
-
 
         telemetry.addLine("Ready for Action");
         telemetry.update();
