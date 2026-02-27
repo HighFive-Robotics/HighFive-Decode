@@ -171,6 +171,7 @@ public class  AutoBlueMix extends LinearOpMode {
                         robot.drive.followPath(goForSpike2, true);
                         robot.outtake.alignTurret(shootPose2 , 2);
                         robot.outtake.setShootingVelocity(robot.outtake.calculateDistanceToGoal(shootPose2)-2);
+                        robot.setAction(Robot.Actions.StopCamera);
                         timer.reset();
                         state++;
                     }
@@ -193,6 +194,7 @@ public class  AutoBlueMix extends LinearOpMode {
                     if (robot.isDone()) {
                         robot.intake.setPower(IntakeMotor.States.Wait);
                         robot.setAction(Robot.Actions.Shoot);
+                        robot.setAction(Robot.Actions.ResetTurretCamera);
                         state++;
                     }
                     break;
@@ -200,6 +202,7 @@ public class  AutoBlueMix extends LinearOpMode {
                     if (!robot.shootingSequence) {
                         robot.drive.followPath(collectSpike1)  ;
                         robot.intake.setPower(IntakeMotor.States.Collect);
+                        robot.setAction(Robot.Actions.StopCamera);
                         timer.reset();
                         state++;
                     }
@@ -234,6 +237,7 @@ public class  AutoBlueMix extends LinearOpMode {
                     if (robot.isDone()) {
                         robot.intake.setPower(IntakeMotor.States.Wait);
                         robot.setAction(Robot.Actions.Shoot);
+                        robot.setAction(Robot.Actions.ResetTurretCamera);
                         state = 13;
                     }
                     break;
@@ -241,6 +245,7 @@ public class  AutoBlueMix extends LinearOpMode {
                     if (!robot.shootingSequence) {
                         robot.drive.followPath(preCollectGate, true);
                         robot.intake.setPower(IntakeMotor.States.Spit);
+                        robot.setAction(Robot.Actions.StopCamera);
                         timer.reset();
                         state++;
                     }
@@ -286,6 +291,7 @@ public class  AutoBlueMix extends LinearOpMode {
                     if (robot.isDone()) {
                         robot.intake.setPower(IntakeMotor.States.Wait);
                         robot.setAction(Robot.Actions.Shoot);
+                        robot.setAction(Robot.Actions.ResetTurretCamera);
                         state = 21;
                     }
                     break;
@@ -294,6 +300,7 @@ public class  AutoBlueMix extends LinearOpMode {
                         robot.shouldAlignTurret = false;
                         robot.drive.followPath(preCollectLoading2, true);
                         robot.intake.setPower(IntakeMotor.States.Collect);
+                        robot.setAction(Robot.Actions.StopCamera);
                         timer.reset();
                         state++;
                     }
@@ -328,10 +335,27 @@ public class  AutoBlueMix extends LinearOpMode {
                     if (robot.isDone()) {
                         robot.intake.setPower(IntakeMotor.States.Wait);
                         robot.setAction(Robot.Actions.Shoot);
+                        robot.setAction(Robot.Actions.ResetTurretCamera);
                         timer.reset();
                         state++;
                     }
                     break;
+            }
+
+            if(state == 3){
+                robot.outtake.alignTurret(shootPose1);
+            }
+            if(state == 7){
+                robot.outtake.alignTurret(shootPose2);
+            }
+            if(state == 13){
+                robot.outtake.alignTurret(shootPose2);
+            }
+            if(state == 21){
+                robot.outtake.alignTurret(shootPose2);
+            }
+            if(state == 26){
+                robot.outtake.alignTurret(shootPose3);
             }
 
             finalAutoPose = robot.drive.getPose();

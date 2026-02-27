@@ -24,13 +24,15 @@ public class AutoBlueFarDetection extends LinearOpMode {
     public Robot robot;
     public int state = 0;
 
-    public Pose startPose = new Pose(54, 6, Math.toRadians(90));
-    public Pose shootPose = new Pose( 56,12, Math.toRadians(135));
-    public Pose collectSpikeMark3Pose = new Pose(16, 34, Math.toRadians(180));
+
+    public Pose startPose = new Pose(50, 6, Math.toRadians(180));
+    public Pose precollectSpikeMark3Pose = new Pose(54, 34, Math.toRadians(180));
     public Pose controlPoint1 = new Pose(60, 38);
-    public Pose collectLoadingZone1 = new Pose(12, 12, Math.toRadians(180));
-    public Pose preCollectLoadingZone1 = new Pose(25, 12, Math.toRadians(180));
-    public Pose parkPose = new Pose(12, 12, Math.toRadians(180));
+    public Pose controlPointLoading1 = new Pose(29, 11);
+    public Pose controlPointLoading2 = new Pose(14, 20);
+    public Pose collectSpikeMark3Pose = new Pose(16, 34, Math.toRadians(180));
+    public Pose collectLoadingZone1 = new Pose(6, 8, Math.toRadians(180));
+    public Pose preCollectLoadingZone1 = new Pose(25, 7, Math.toRadians(180));
 
     private final ElapsedTime autoTimer = new ElapsedTime();
     private final ElapsedTime timer = new ElapsedTime();
@@ -42,54 +44,52 @@ public class AutoBlueFarDetection extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         robot = new Robot(hardwareMap, startPose, true, Constants.Color.Blue, telemetry, gamepad1);
+        telemetry.setMsTransmissionInterval(1200);
         robot.outtake.turret.reset();
         autoColor = Constants.Color.Blue;
         robot.drive.resetTeleOpHeading();
+        robot.camera.setPipeline(HighCamera.Pipelines.AprilTagLocation);
         robot.camera.startCapture();
         robot.drive.setConstants(Constants.FConstants);
-        PathChain preloadPath = robot.drive.pathBuilder()
-                .addPath(new BezierLine(startPose, shootPose))
-                .setLinearHeadingInterpolation(startPose.getHeading(), shootPose.getHeading())
-                .build();
         PathChain collectLoading = robot.drive.pathBuilder()
-                .addPath(new BezierLine(shootPose, collectLoadingZone1))
-                .setLinearHeadingInterpolation(shootPose.getHeading(), collectLoadingZone1.getHeading())
+                .addPath(new BezierCurve(startPose,
+                        controlPointLoading1,
+                        controlPointLoading2,
+                        collectLoadingZone1))
+                .setLinearHeadingInterpolation(startPose.getHeading(), collectLoadingZone1.getHeading())
                 .build();
-
         PathChain preCollectLoading = robot.drive.pathBuilder()
                 .addPath(new BezierLine(collectLoadingZone1, preCollectLoadingZone1))
                 .setLinearHeadingInterpolation(collectLoadingZone1.getHeading(), preCollectLoadingZone1.getHeading())
                 .build();
-
         PathChain finishCollecting = robot.drive.pathBuilder()
                 .addPath(new BezierLine(preCollectLoadingZone1, collectLoadingZone1))
                 .setLinearHeadingInterpolation(preCollectLoadingZone1.getHeading(), collectLoadingZone1.getHeading())
                 .build();
-
         PathChain goShootLoading = robot.drive.pathBuilder()
-                .addPath(new BezierLine(collectLoadingZone1, shootPose))
-                .setLinearHeadingInterpolation(collectLoadingZone1.getHeading(), shootPose.getHeading())
+                .addPath(new BezierLine(collectLoadingZone1, startPose))
+                .setLinearHeadingInterpolation(collectLoadingZone1.getHeading(), startPose.getHeading())
                 .build();
         PathChain goCollectSpike = robot.drive.pathBuilder()
                 .addPath(new BezierCurve(
-                        shootPose,
+                        startPose,
                         controlPoint1,
                         collectSpikeMark3Pose
-                )).setTangentHeadingInterpolation()
+                ))
+                .setLinearHeadingInterpolation(startPose.getHeading() , collectSpikeMark3Pose.getHeading())
                 .build();
 
         PathChain goShootSpike = robot.drive.pathBuilder()
-                .addPath(new BezierLine(collectSpikeMark3Pose, shootPose))
+                .addPath(new BezierLine(collectSpikeMark3Pose, startPose))
                 .setLinearHeadingInterpolation(collectSpikeMark3Pose.getHeading(), Math.toRadians(180))
                 .build();
 
         Constants.Globals.afterAuto = true;
         robot.shouldAlignTurret = false;
         telemetry.addLine("Ready for Action");
-        telemetry.update();
         waitForStart();
 
-        robot.outtake.setShootingVelocityForPose(shootPose);
+        robot.outtake.setShootingVelocityForPose(startPose,-5);
         robot.update();
         autoTimer.reset();
         timer.reset();
@@ -101,49 +101,61 @@ public class AutoBlueFarDetection extends LinearOpMode {
 
             switch (state) {
                 case 0:
-                    robot.drive.followPath(preloadPath);
-                    robot.outtake.alignTurret(shootPose);
+                    robot.shouldAlignTurret = true;
+                    robot.setAction(Robot.Actions.ResetTurretCamera);
                     state++;
                     break;
                 case 1:
-                    if(robot.isDone() || autoTimer.milliseconds() > 5000) {
+                    if(!robot.resetWithCamera) {
+                        robot.outtake.turret.addOffsetDegrees(3.5);
                         robot.setAction(Robot.Actions.Shoot);
                         timer.reset();
                         state++;
                     }
                     break;
                 case 2:
-                    if(!robot.shootingSequence || timer.milliseconds() >= 3000) {
+                    if(!robot.shootingSequence) {
                         robot.drive.followPath(collectLoading);
+                        robot.shouldAlignTurret = false;
                         robot.intake.setPower(Collect);
                         timer.reset();
                         state++;
                     }
                     break;
                 case 3:
-                    if (robot.isDone() || robot.intake.isFull) {
+                    if (robot.isDone()) {
                         robot.drive.followPath(preCollectLoading);
+                        robot.intake.setPower(Collect);
                         timer.reset();
                         state++;
                     }
                     break;
                 case 4:
-                    if (robot.isDone() || robot.intake.isFull) {
+                    if (robot.isDone()) {
                         robot.drive.followPath(finishCollecting);
+                        robot.intake.setPower(Collect);
+                        robot.outtake.setShootingVelocityForPose(Po);
                         timer.reset();
                         state++;
                     }
                     break;
                 case 5:
-                    if (timer.milliseconds() >= 750 || robot.intake.isFull) {
-                        robot.outtake.alignTurret(shootPose);
+                    if (timer.milliseconds() >= 550 || robot.intake.isFull) {
+                        robot.shouldAlignTurret = true;
                         robot.drive.followPath(goShootLoading);
                         timer.reset();
-                        state++;
+                        state = 50;
+                    }
+                    break;
+                case 50:
+                    if(robot.isDone()){
+                        robot.setAction(Robot.Actions.ResetTurretCamera);
+                        state = 6;
                     }
                     break;
                 case 6:
-                    if (robot.isDone() || timer.milliseconds() >= 5000) {
+                    if (!robot.resetWithCamera) {
+                        robot.outtake.turret.addOffsetDegrees(3.5);
                         robot.intake.setPower(IntakeMotor.States.Wait);
                         robot.setAction(Robot.Actions.Shoot);
                         timer.reset();
@@ -151,8 +163,9 @@ public class AutoBlueFarDetection extends LinearOpMode {
                     }
                     break;
                 case 7:
-                    if(!robot.shootingSequence || timer.milliseconds() >= 3000) {
+                    if(!robot.shootingSequence) {
                         robot.drive.followPath(goCollectSpike);
+                        robot.shouldAlignTurret = false;
                         robot.intake.setPower(Collect);
                         timer.reset();
                         state++;
@@ -160,7 +173,7 @@ public class AutoBlueFarDetection extends LinearOpMode {
                     break;
                 case 8:
                     if(robot.isDone() || robot.intake.isFull) {
-                        robot.outtake.alignTurret(shootPose);
+                        robot.shouldAlignTurret = true;
                         robot.drive.followPath(goShootSpike);
                         timer.reset();
                         state++;
@@ -168,10 +181,18 @@ public class AutoBlueFarDetection extends LinearOpMode {
                     break;
                 case 9:
                     if (robot.isDone() || timer.milliseconds() >= 5000) {
+                        robot.setAction(Robot.Actions.ResetTurretCamera);
+                        timer.reset();
+                        state = 90;
+                    }
+                    break;
+                case 90:
+                    if(!robot.resetWithCamera){
+                        robot.outtake.turret.addOffsetDegrees(3.5);
                         robot.intake.setPower(IntakeMotor.States.Wait);
                         robot.setAction(Robot.Actions.Shoot);
                         timer.reset();
-                        state++;
+                        state = 10;
                     }
                     break;
                 case 10:
@@ -187,7 +208,7 @@ public class AutoBlueFarDetection extends LinearOpMode {
                 case 11:
                     Pose camPose = robot.camera.getBallPose(robot.drive.getPose());
                     boolean isValidDetection = camPose != null &&
-                            Math.hypot(camPose.getX() - robot.drive.getPose().getX(), camPose.getY() - robot.drive.getPose().getY()) > 2.0;
+                            Math.hypot(camPose.getX() - robot.drive.getPose().getX(), camPose.getY() - robot.drive.getPose().getY()) > 3.5;
                     if (isValidDetection) {
                         PathChain targetPath = robot.drive.pathBuilder()
                                 .addPath(new BezierLine(robot.drive.getPose(), camPose))
@@ -199,7 +220,7 @@ public class AutoBlueFarDetection extends LinearOpMode {
                         timer.reset();
                         state++;
                     } else {
-                        if (scanTimer.milliseconds() > 70) {
+                        if (scanTimer.milliseconds() > 200) {
                             scanAngle += (2.0 * scanDirection);
                             if (scanAngle > 60 || scanAngle < -60) {
                                 scanDirection *= -1;
@@ -239,8 +260,8 @@ public class AutoBlueFarDetection extends LinearOpMode {
                     break;
                 case 14:
                     PathChain backToShoot = robot.drive.pathBuilder()
-                            .addPath(new BezierLine(robot.drive.getPose(), shootPose))
-                            .setLinearHeadingInterpolation(robot.drive.getPose().getHeading(), shootPose.getHeading())
+                            .addPath(new BezierLine(robot.drive.getPose(), startPose))
+                            .setLinearHeadingInterpolation(robot.drive.getPose().getHeading(), startPose.getHeading())
                             .build();
 
                     robot.drive.followPath(backToShoot);
@@ -268,8 +289,8 @@ public class AutoBlueFarDetection extends LinearOpMode {
                     robot.intake.setPower(IntakeMotor.States.Wait);
 
                     PathChain parkingPath = robot.drive.pathBuilder()
-                            .addPath(new BezierLine(robot.drive.getPose(), parkPose))
-                            .setLinearHeadingInterpolation(robot.drive.getPose().getHeading(), parkPose.getHeading())
+                            .addPath(new BezierLine(robot.drive.getPose(), collectLoadingZone1))
+                            .setLinearHeadingInterpolation(robot.drive.getPose().getHeading(), collectLoadingZone1.getHeading())
                             .build();
                     robot.drive.followPath(parkingPath);
                     state++;
@@ -280,10 +301,9 @@ public class AutoBlueFarDetection extends LinearOpMode {
 
             finalAutoPose = robot.drive.getPose();
             robot.update();
-
             telemetry.addData("State: ", state);
-            telemetry.addData("Cycles Performed: ", collectedArtifactsCount);
-            telemetry.addData("Time Left: ", 30 - (autoTimer.milliseconds() / 1000.0));
+            //telemetry.addData("Cycles Performed: ", collectedArtifactsCount);
+            //telemetry.addData("Time Left: ", 30 - (autoTimer.milliseconds() / 1000.0));
             telemetry.update();
         }
 

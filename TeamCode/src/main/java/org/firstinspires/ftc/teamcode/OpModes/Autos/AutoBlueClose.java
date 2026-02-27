@@ -192,6 +192,7 @@ public class  AutoBlueClose extends LinearOpMode {
                     if (robot.isDone()) {
                         robot.intake.setPower(IntakeMotor.States.Wait);
                         robot.setAction(Robot.Actions.Shoot);
+                        robot.setAction(Robot.Actions.ResetTurretCamera);
                         state++;
                     }
                     break;
@@ -199,6 +200,7 @@ public class  AutoBlueClose extends LinearOpMode {
                     if (!robot.shootingSequence) {
                         robot.drive.followPath(collectSpike1)  ;
                         robot.intake.setPower(IntakeMotor.States.Collect);
+                        robot.setAction(Robot.Actions.StopCamera);
                         timer.reset();
                         state++;
                     }
@@ -233,6 +235,7 @@ public class  AutoBlueClose extends LinearOpMode {
                     if (robot.isDone()) {
                         robot.intake.setPower(IntakeMotor.States.Wait);
                         robot.setAction(Robot.Actions.Shoot);
+                        robot.setAction(Robot.Actions.ResetTurretCamera);
                         state = 13;
                     }
                     break;
@@ -240,6 +243,7 @@ public class  AutoBlueClose extends LinearOpMode {
                     if (!robot.shootingSequence) {
                         robot.drive.followPath(goForSpike3, true);
                         robot.intake.setPower(IntakeMotor.States.Collect);
+                        robot.setAction(Robot.Actions.StopCamera);
                         timer.reset();
                         state++;
                     }
@@ -262,6 +266,7 @@ public class  AutoBlueClose extends LinearOpMode {
                     if (robot.isDone()) {
                         robot.intake.setPower(IntakeMotor.States.Wait);
                         robot.setAction(Robot.Actions.Shoot);
+                        robot.setAction(Robot.Actions.ResetTurretCamera);
                         state = 17;
                     }
                     break;
@@ -270,6 +275,7 @@ public class  AutoBlueClose extends LinearOpMode {
                         robot.shouldAlignTurret = false;
                         robot.drive.followPath(preCollectLoading2, true);
                         robot.intake.setPower(IntakeMotor.States.Collect);
+                        robot.setAction(Robot.Actions.StopCamera);
                         timer.reset();
                         state++;
                     }
@@ -304,12 +310,28 @@ public class  AutoBlueClose extends LinearOpMode {
                     if (robot.isDone()) {
                         robot.intake.setPower(IntakeMotor.States.Wait);
                         robot.setAction(Robot.Actions.Shoot);
+                        robot.setAction(Robot.Actions.ResetTurretCamera);
                         timer.reset();
                         state++;
                     }
                     break;
             }
 
+            if(state == 3){
+                robot.outtake.alignTurret(shootPose1);
+            }
+            if(state == 7){
+                robot.outtake.alignTurret(shootPose2);
+            }
+            if(state == 13){
+                robot.outtake.alignTurret(shootPose2);
+            }
+            if(state == 17){
+                robot.outtake.alignTurret(shootPose2);
+            }
+            if(state == 22){
+                robot.outtake.alignTurret(shootPose3);
+            }
             finalAutoPose = robot.drive.getPose();
             robot.update();
 

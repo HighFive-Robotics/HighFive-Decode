@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.OpModes.TeleOps;
 
+import static org.firstinspires.ftc.teamcode.Constants.Globals.BlueGoalDistance;
+import static org.firstinspires.ftc.teamcode.Constants.Globals.RedGoalDistance;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.finalAutoPose;
 import static org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor.States.Collect;
@@ -122,8 +124,33 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
                 }
                 robot.drive.resetTeleOpHeading();
             }
+
+            if(gamepad1.dpad_left) {
+                robot.drive.setStartingPose(new Pose(RedGoalDistance.getX(),RedGoalDistance.getY(),robot.drive.getPose().getHeading()));
+                robot.drive.setPose(new Pose(RedGoalDistance.getX(),RedGoalDistance.getY(),robot.drive.getPose().getHeading()));
+            }
+
+            if(gamepad1.dpad_right) {
+                robot.drive.setStartingPose(new Pose(BlueGoalDistance.getX(),BlueGoalDistance.getY(),robot.drive.getPose().getHeading()));
+                robot.drive.setPose(new Pose(BlueGoalDistance.getX(),BlueGoalDistance.getY(),robot.drive.getPose().getHeading()));
+            }
+
+            if(gamepad1.dpad_down) {
+                if(gamepad1.dpad_up) {
+                    if (robot.allianceColor == Constants.Color.Red) {
+                        robot.drive.startFieldCentricDrive(gamepad1, true, 0);
+                    }
+                    robot.drive.setStartingPose(new Pose(132, 6, 0));
+                    robot.drive.setPose(new Pose(132, 6, 0));
+                }
+                robot.drive.resetTeleOpHeading();
+            }
+
             if(gamepad2.ps){
                 robot.setAction(Robot.Actions.ResetTurretCamera);
+            }
+            if(gamepad2.circle){
+                robot.setAction(Robot.Actions.StopShoot);
             }
             if(gamepad2.leftStickButtonWasPressed()){
                 robot.outtake.turret.reset();
@@ -143,9 +170,9 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
                     gamepad2.setLedColor(132 / 255.0, 88 / 255.0, 164 / 255.0, 2147483647);
                 }
             }
+
             telemetry.addData("Distance:", robot.outtake.distanceToGoal);
-            telemetry.addData("Bleah:",robot.outtake.distanceToGoal >= 50 && robot.outtake.distanceToGoal <= 250);
-            telemetry.addData("Bleah2:",robot.outtake.distanceToGoal >= 250 && robot.outtake.distanceToGoal <= 415);
+            telemetry.addData("Pose:", robot.drive.getPose());
             telemetry.update();
             robot.update();
         }

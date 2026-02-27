@@ -179,7 +179,7 @@ public class Outtake extends HighModule {
         if(distanceToGoal <= 180){
             offset = Range.clip(Range.scale(distanceToGoal, 60, 180, 0.5, 0.3), 0.15, 0.5);
         }else{
-            offset = Range.clip(Range.scale(distanceToGoal, 180, 360, 0.25, 0.15), 0.15, 0.25);
+            offset = 0.15;//TODO maybbe 0.2
         }
         shooter.addToleranceCompensationOffset(offset);
     }
@@ -188,7 +188,7 @@ public class Outtake extends HighModule {
         if(distanceToGoal <= 180){
             offset = Range.clip(Range.scale(distanceToGoal, 60, 180, 0.4, 0.265), 0.15, 0.5);
         }else{
-            offset = Range.clip(Range.scale(distanceToGoal, 180, 360, 0.25, 0.15), 0.15, 0.25);
+            offset = 0.15;//TODO maybbe 0.2
         }
         shooter.addToleranceCompensationOffset(offset);
     }

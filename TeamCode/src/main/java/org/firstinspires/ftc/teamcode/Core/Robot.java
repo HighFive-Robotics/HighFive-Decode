@@ -60,6 +60,7 @@ public class Robot extends HighModule {
     public enum Actions {
         Shoot,
         ResetTurretCamera,
+        StopCamera,
         StopShoot,
         None
     }
@@ -142,6 +143,11 @@ public class Robot extends HighModule {
                 outtake.linkageCamera.setState(LinkageCamera.States.Goal, 150);
                 camera.startCapture();
                 resetWithCamera = true;
+                break;
+            case StopCamera:
+                outtake.linkageCamera.setState(LinkageCamera.States.Artifact, 150);
+                camera.pauseCapture();
+                resetWithCamera = false;
                 break;
             case None:
                 break;
