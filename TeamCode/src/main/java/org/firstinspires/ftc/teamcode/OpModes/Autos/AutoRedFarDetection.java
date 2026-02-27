@@ -18,21 +18,20 @@ import org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.LinkageCamera;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
-@Autonomous(name = "🔵AutoFar🔵")
+@Autonomous(name = "🔴AutoFar🔴")
 public class AutoRedFarDetection extends LinearOpMode {
 
     public Robot robot;
     public int state = 0;
 
 
-    public Pose startPose = new Pose(88, 6, Math.toRadians(180)); //public Pose startPose = new Pose(50, 6, Math.toRadians(180));
-    public Pose precollectSpikeMark3Pose = new Pose(38, 34, Math.toRadians(180));
-    public Pose controlPoint1 = new Pose(60, 38);
+    public Pose startPose = new Pose(88, 6, Math.toRadians(0)); //public Pose startPose = new Pose(50, 6, Math.toRadians(180));
+    public Pose precollectSpikeMark3Pose = new Pose(100, 34, Math.toRadians(0));
     public Pose controlPointLoading1 = new Pose(29, 11).mirror();
     public Pose controlPointLoading2 = new Pose(14, 21).mirror();
-    public Pose collectSpikeMark3Pose = new Pose(126, 34, Math.toRadians(180));
-    public Pose collectLoadingZone1 = new Pose(132, 8, Math.toRadians(180));
-    public Pose preCollectLoadingZone1 = new Pose(113, 7, Math.toRadians(180));
+    public Pose collectSpikeMark3Pose = new Pose(126, 34, Math.toRadians(0));
+    public Pose collectLoadingZone1 = new Pose(132, 8, Math.toRadians(0));
+    public Pose preCollectLoadingZone1 = new Pose(113, 7, Math.toRadians(0));
     public Pose loadingArtifact = new Pose(131, 10, Math.toRadians(-90));
 
     private final ElapsedTime autoTimer = new ElapsedTime();
@@ -267,12 +266,23 @@ public class AutoRedFarDetection extends LinearOpMode {
                         state = 9;
                     }
                     break;
+                case 100:
+                    robot.outtake.linkageCamera.setState(LinkageCamera.States.Goal);
+                    robot.intake.setPower(IntakeMotor.States.Wait);
+                    robot.setAction(Robot.Actions.StopShoot);
+                    PathChain parkingPath = robot.drive.pathBuilder()
+                            .addPath(new BezierLine(robot.drive.getPose(), collectLoadingZone1))
+                            .setLinearHeadingInterpolation(robot.drive.getPose().getHeading(), collectLoadingZone1.getHeading())
+                            .build();
+                    robot.drive.followPath(parkingPath);
+                    state++;
+                    break;
+                case 101:
+                    break;
             }
             finalAutoPose = robot.drive.getPose();
             robot.update();
             telemetry.addData("State: ", state);
-            //telemetry.addData("Cycles Performed: ", collectedArtifactsCount);
-            //telemetry.addData("Time Left: ", 30 - (autoTimer.milliseconds() / 1000.0));
             telemetry.update();
         }
 

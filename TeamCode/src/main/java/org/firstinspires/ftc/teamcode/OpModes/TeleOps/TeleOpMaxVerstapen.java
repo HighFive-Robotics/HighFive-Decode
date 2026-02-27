@@ -150,6 +150,13 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
             if(gamepad2.circle){
                 robot.setAction(Robot.Actions.StopShoot);
             }
+            if(gamepad2.triangleWasPressed()){
+                if(robot.outtake.turret.allianceColor == Constants.Color.Blue){
+                    robot.outtake.turret.allianceColor= Constants.Color.Red;
+                } else {
+                    robot.outtake.turret.allianceColor= Constants.Color.Blue;
+                }
+            }
             if(gamepad2.leftStickButtonWasPressed()){
                 robot.outtake.turret.reset();
             }

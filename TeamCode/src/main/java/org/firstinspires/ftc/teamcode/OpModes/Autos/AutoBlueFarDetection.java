@@ -268,6 +268,19 @@ public class AutoBlueFarDetection extends LinearOpMode {
                         state = 9;
                     }
                     break;
+                case 100:
+                    robot.outtake.linkageCamera.setState(LinkageCamera.States.Goal);
+                    robot.intake.setPower(IntakeMotor.States.Wait);
+                    robot.setAction(Robot.Actions.StopShoot);
+                    PathChain parkingPath = robot.drive.pathBuilder()
+                            .addPath(new BezierLine(robot.drive.getPose(), collectLoadingZone1))
+                            .setLinearHeadingInterpolation(robot.drive.getPose().getHeading(), collectLoadingZone1.getHeading())
+                            .build();
+                    robot.drive.followPath(parkingPath);
+                    state++;
+                    break;
+                case 101:
+                    break;
             }
             finalAutoPose = robot.drive.getPose();
             robot.update();

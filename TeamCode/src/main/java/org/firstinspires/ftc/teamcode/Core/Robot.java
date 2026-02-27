@@ -245,13 +245,6 @@ public class Robot extends HighModule {
             resetWithCamera();
         }
         led.update();
-//        telemetry.addData("Freq pinpoint", drive.poseTracker.localizer);
-        telemetry.addData("States", shootingState);
-        telemetry.addData("Jerk ", outtake.shooter.jerk);
-        telemetry.addData("Ball fired status", outtake.hasShot);
-        telemetry.addData("atTargetCompensated", outtake.shooter.atTargetCompensated());
-        telemetry.addData("Camera pose ", cameraPose.toString());
-        telemetry.addData("atTarget", outtake.shooter.atTarget());
         if (state == States.Collect) {
             if (intake.isFull) {
                 led.setColor(Green);
