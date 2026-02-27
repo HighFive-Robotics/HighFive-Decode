@@ -7,6 +7,8 @@ import static org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor.Stat
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.HeadingInterpolator;
+import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -26,20 +28,24 @@ public class AutoBlueFarDetection extends LinearOpMode {
 
 
     public Pose startPose = new Pose(50, 6, Math.toRadians(180));
-    public Pose precollectSpikeMark3Pose = new Pose(54, 34, Math.toRadians(180));
+    public Pose precollectSpikeMark3Pose = new Pose(38, 34, Math.toRadians(180));
     public Pose controlPoint1 = new Pose(60, 38);
     public Pose controlPointLoading1 = new Pose(29, 11);
-    public Pose controlPointLoading2 = new Pose(14, 20);
-    public Pose collectSpikeMark3Pose = new Pose(16, 34, Math.toRadians(180));
+    public Pose controlPointLoading2 = new Pose(14, 21);
+    public Pose collectSpikeMark3Pose = new Pose(12, 34, Math.toRadians(180));
     public Pose collectLoadingZone1 = new Pose(6, 8, Math.toRadians(180));
     public Pose preCollectLoadingZone1 = new Pose(25, 7, Math.toRadians(180));
+    public Pose loadingArtifact = new Pose(7, 10, Math.toRadians(-90));
 
     private final ElapsedTime autoTimer = new ElapsedTime();
     private final ElapsedTime timer = new ElapsedTime();
     private final ElapsedTime scanTimer = new ElapsedTime();
-    private int collectedArtifactsCount = 0;
     private double scanAngle = 0;
     private int scanDirection = 1;
+    private Pose cameraPose;
+    private PathChain ballPath;
+    PathChain auxToLoading;
+
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -71,17 +77,24 @@ public class AutoBlueFarDetection extends LinearOpMode {
                 .setLinearHeadingInterpolation(collectLoadingZone1.getHeading(), startPose.getHeading())
                 .build();
         PathChain goCollectSpike = robot.drive.pathBuilder()
-                .addPath(new BezierCurve(
+                .addPath(new BezierLine(
                         startPose,
-                        controlPoint1,
+                        precollectSpikeMark3Pose
+                ))
+                .setLinearHeadingInterpolation(startPose.getHeading(), collectSpikeMark3Pose.getHeading())
+                .addPath(new BezierLine(
+                        precollectSpikeMark3Pose,
                         collectSpikeMark3Pose
                 ))
-                .setLinearHeadingInterpolation(startPose.getHeading() , collectSpikeMark3Pose.getHeading())
                 .build();
 
         PathChain goShootSpike = robot.drive.pathBuilder()
                 .addPath(new BezierLine(collectSpikeMark3Pose, startPose))
                 .setLinearHeadingInterpolation(collectSpikeMark3Pose.getHeading(), Math.toRadians(180))
+                .build();
+        PathChain goShootDetection = robot.drive.pathBuilder()
+                .addPath(new BezierLine(loadingArtifact, startPose))
+                .setLinearHeadingInterpolation(loadingArtifact.getHeading(), startPose.getHeading())
                 .build();
 
         Constants.Globals.afterAuto = true;
@@ -89,7 +102,7 @@ public class AutoBlueFarDetection extends LinearOpMode {
         telemetry.addLine("Ready for Action");
         waitForStart();
 
-        robot.outtake.setShootingVelocityForPose(startPose,-5);
+        robot.outtake.setShootingVelocityForPose(startPose, -1);
         robot.update();
         autoTimer.reset();
         timer.reset();
@@ -106,7 +119,7 @@ public class AutoBlueFarDetection extends LinearOpMode {
                     state++;
                     break;
                 case 1:
-                    if(!robot.resetWithCamera) {
+                    if (!robot.resetWithCamera) {
                         robot.outtake.turret.addOffsetDegrees(3.5);
                         robot.setAction(Robot.Actions.Shoot);
                         timer.reset();
@@ -114,7 +127,7 @@ public class AutoBlueFarDetection extends LinearOpMode {
                     }
                     break;
                 case 2:
-                    if(!robot.shootingSequence) {
+                    if (!robot.shootingSequence) {
                         robot.drive.followPath(collectLoading);
                         robot.shouldAlignTurret = false;
                         robot.intake.setPower(Collect);
@@ -134,7 +147,7 @@ public class AutoBlueFarDetection extends LinearOpMode {
                     if (robot.isDone()) {
                         robot.drive.followPath(finishCollecting);
                         robot.intake.setPower(Collect);
-                        robot.outtake.setShootingVelocityForPose(Po);
+                        robot.outtake.setShootingVelocityForPose(startPose, -7.5);
                         timer.reset();
                         state++;
                     }
@@ -148,7 +161,7 @@ public class AutoBlueFarDetection extends LinearOpMode {
                     }
                     break;
                 case 50:
-                    if(robot.isDone()){
+                    if (robot.isDone()) {
                         robot.setAction(Robot.Actions.ResetTurretCamera);
                         state = 6;
                     }
@@ -163,7 +176,7 @@ public class AutoBlueFarDetection extends LinearOpMode {
                     }
                     break;
                 case 7:
-                    if(!robot.shootingSequence) {
+                    if (!robot.shootingSequence) {
                         robot.drive.followPath(goCollectSpike);
                         robot.shouldAlignTurret = false;
                         robot.intake.setPower(Collect);
@@ -172,9 +185,10 @@ public class AutoBlueFarDetection extends LinearOpMode {
                     }
                     break;
                 case 8:
-                    if(robot.isDone() || robot.intake.isFull) {
+                    if (robot.isDone() || robot.intake.isFull) {
                         robot.shouldAlignTurret = true;
                         robot.drive.followPath(goShootSpike);
+                        robot.outtake.setShootingVelocityForPose(startPose, -8.5);
                         timer.reset();
                         state++;
                     }
@@ -187,7 +201,7 @@ public class AutoBlueFarDetection extends LinearOpMode {
                     }
                     break;
                 case 90:
-                    if(!robot.resetWithCamera){
+                    if (!robot.resetWithCamera) {
                         robot.outtake.turret.addOffsetDegrees(3.5);
                         robot.intake.setPower(IntakeMotor.States.Wait);
                         robot.setAction(Robot.Actions.Shoot);
@@ -196,109 +210,64 @@ public class AutoBlueFarDetection extends LinearOpMode {
                     }
                     break;
                 case 10:
-                    if(!robot.shootingSequence || timer.milliseconds() >= 3000) {
-                        robot.outtake.linkageCamera.setState(LinkageCamera.States.Artifact, 300);
-                        robot.camera.setPipeline(HighCamera.Pipelines.BallDetection);
+                    if (!robot.shootingSequence || timer.milliseconds() >= 3000) {
                         scanAngle = 0;
                         scanDirection = 1;
+                        robot.outtake.linkageCamera.setState(LinkageCamera.States.Artifact, 300);
+                        robot.camera.setPipeline(HighCamera.Pipelines.BallDetection);
+                        robot.shouldAlignTurret = false;
+                        robot.outtake.turret.setOffset(0);
+                        robot.intake.setPower(Collect);
+                        robot.outtake.turret.setTarget(scanAngle);
                         scanTimer.reset();
+                        timer.reset();
                         state++;
                     }
                     break;
                 case 11:
-                    Pose camPose = robot.camera.getBallPose(robot.drive.getPose());
-                    boolean isValidDetection = camPose != null &&
-                            Math.hypot(camPose.getX() - robot.drive.getPose().getX(), camPose.getY() - robot.drive.getPose().getY()) > 3.5;
-                    if (isValidDetection) {
-                        PathChain targetPath = robot.drive.pathBuilder()
-                                .addPath(new BezierLine(robot.drive.getPose(), camPose))
-                                .setLinearHeadingInterpolation(robot.drive.getPose().getHeading(), camPose.getHeading())
+                    cameraPose = robot.camera.getBallPose(robot.drive.getPose());
+                    if (cameraPose != null) {
+                        ballPath = robot.drive.pathBuilder()
+                                .addPath(new BezierLine(
+                                        robot.drive.getPose(),
+                                        cameraPose
+                                ))
+                                .setTangentHeadingInterpolation()
                                 .build();
-
-                        robot.drive.followPath(targetPath);
-                        robot.intake.setPower(Collect);
-                        timer.reset();
+                        robot.drive.followPath(ballPath);
                         state++;
                     } else {
-                        if (scanTimer.milliseconds() > 200) {
-                            scanAngle += (2.0 * scanDirection);
-                            if (scanAngle > 60 || scanAngle < -60) {
-                                scanDirection *= -1;
+                        if (scanTimer.milliseconds() >= 150) {
+                            scanAngle += 5 * scanDirection;
+                            if(scanAngle >= 60){
+                                scanDirection = -1;
+                            }else if (scanAngle <= -60){
+                                scanDirection = 1;
                             }
-                            robot.outtake.turret.setTargetDegrees(scanAngle);
                             scanTimer.reset();
                         }
                     }
                     break;
                 case 12:
-                    if (robot.isDone() || robot.intake.isFull || timer.milliseconds() > 4000) {
-                        if (robot.intake.isFull) {
-                            state = 14;
-                        } else {
-                            Pose currentPose = robot.drive.getPose();
-                            Pose pushForward = new Pose(
-                                    currentPose.getX() + 15 * Math.cos(currentPose.getHeading()),
-                                    currentPose.getY() + 15 * Math.sin(currentPose.getHeading()),
-                                    currentPose.getHeading()
-                            );
-
-                            PathChain pushPath = robot.drive.pathBuilder()
-                                    .addPath(new BezierLine(currentPose, pushForward))
-                                    .setLinearHeadingInterpolation(currentPose.getHeading(), pushForward.getHeading())
-                                    .build();
-
-                            robot.drive.followPath(pushPath);
-                            timer.reset();
-                            state++;
-                        }
+                    if(robot.isDone()){
+                        auxToLoading = robot.drive.pathBuilder()
+                                .addPath(new BezierLine(
+                                        robot.drive.getPose(),
+                                        loadingArtifact
+                                ))
+                                .setLinearHeadingInterpolation(robot.drive.getHeading() , loadingArtifact.getHeading())
+                                .build();
+                        robot.drive.followPath(auxToLoading);
+                        state++;
                     }
                     break;
                 case 13:
-                    if (robot.isDone() || robot.intake.isFull || timer.milliseconds() > 2500) {
-                        state++;
+                    if(robot.isDone()){
+                        state = 9;
+                        robot.outtake.setShootingVelocityForPose(startPose, -8.5);
                     }
-                    break;
-                case 14:
-                    PathChain backToShoot = robot.drive.pathBuilder()
-                            .addPath(new BezierLine(robot.drive.getPose(), startPose))
-                            .setLinearHeadingInterpolation(robot.drive.getPose().getHeading(), startPose.getHeading())
-                            .build();
-
-                    robot.drive.followPath(backToShoot);
-                    robot.intake.setPower(IntakeMotor.States.Wait);
-                    robot.outtake.linkageCamera.setState(LinkageCamera.States.Goal, 300);
-                    timer.reset();
-                    state++;
-                    break;
-                case 15:
-                    robot.outtake.alignTurret(robot.drive.getPose());
-                    if (robot.isDone() || timer.milliseconds() > 4000) {
-                        robot.setAction(Robot.Actions.Shoot);
-                        collectedArtifactsCount++;
-                        timer.reset();
-                        state++;
-                    }
-                    break;
-                case 16:
-                    if(!robot.shootingSequence || timer.milliseconds() >= 3000) {
-                        state = 10;
-                    }
-                    break;
-                case 100:
-                    robot.outtake.linkageCamera.setState(LinkageCamera.States.Goal);
-                    robot.intake.setPower(IntakeMotor.States.Wait);
-
-                    PathChain parkingPath = robot.drive.pathBuilder()
-                            .addPath(new BezierLine(robot.drive.getPose(), collectLoadingZone1))
-                            .setLinearHeadingInterpolation(robot.drive.getPose().getHeading(), collectLoadingZone1.getHeading())
-                            .build();
-                    robot.drive.followPath(parkingPath);
-                    state++;
-                    break;
-                case 101:
                     break;
             }
-
             finalAutoPose = robot.drive.getPose();
             robot.update();
             telemetry.addData("State: ", state);

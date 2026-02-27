@@ -140,8 +140,8 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
                     if (robot.allianceColor == Constants.Color.Red) {
                         robot.drive.startFieldCentricDrive(gamepad1, true, 0);
                     }
-                    robot.drive.setStartingPose(new Pose(132, 6, 0));
-                    robot.drive.setPose(new Pose(132, 6, 0));
+                    robot.drive.setStartingPose(new Pose(132, 6, Math.PI/2));
+                    robot.drive.setPose(new Pose(132, 6, Math.PI/2));
                 }
                 robot.drive.resetTeleOpHeading();
             }

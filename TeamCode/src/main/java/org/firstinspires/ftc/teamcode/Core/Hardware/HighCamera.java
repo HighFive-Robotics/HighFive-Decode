@@ -220,7 +220,7 @@ public class HighCamera {
 
     public Pose getBallPose(Pose robotPose) {
         double[] data = getBallData();
-        if (data == null || data.length < 3) return null;
+        if (data == null || data.length < 3 || (data[0] == 0 && data[1] == 0))return null;
 
         double x_robot = data[0];
         double y_robot = data[1];
