@@ -219,6 +219,9 @@ public class AutoBlueGate extends LinearOpMode {
                         robot.setAction(Robot.Actions.Shoot);
                         robot.setAction(Robot.Actions.ResetTurretCamera);
                         state = 13;
+                        if(cycles == 2){
+                            state = 19;
+                        }
                     }
                     break;
                 case 13:
@@ -259,14 +262,9 @@ public class AutoBlueGate extends LinearOpMode {
                     break;
                 case 18:
                     if (timer.milliseconds() >= 1100) {
-                        if(cycles < 2){
-                            robot.drive.followPath(shootGate, true);
-                            robot.outtake.setShootingVelocityForPose(shootPose2);
-                            state = 12;
-                        } else {
-                            robot.drive.followPath(collectSpike1, true);
-                            state++;
-                        }
+                        robot.drive.followPath(shootGate, true);
+                        robot.outtake.setShootingVelocityForPose(shootPose2);
+                        state = 12;
                         robot.intake.setPower(IntakeMotor.States.Collect);
                     }
                     break;
@@ -278,7 +276,7 @@ public class AutoBlueGate extends LinearOpMode {
             if(state == 7){
                 robot.outtake.alignTurret(shootPose2);
             }
-            if(state == 13){
+            if(state == 13 || state == 19){
                 robot.outtake.alignTurret(shootPose2);
             }
 
