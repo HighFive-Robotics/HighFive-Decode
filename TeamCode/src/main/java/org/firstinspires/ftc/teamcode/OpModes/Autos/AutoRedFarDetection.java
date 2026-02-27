@@ -7,8 +7,6 @@ import static org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor.Stat
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
-import com.pedropathing.paths.HeadingInterpolator;
-import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -21,21 +19,21 @@ import org.firstinspires.ftc.teamcode.Core.Module.Outtake.LinkageCamera;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
 @Autonomous(name = "🔵AutoFar🔵")
-public class AutoBlueFarDetection extends LinearOpMode {
+public class AutoRedFarDetection extends LinearOpMode {
 
     public Robot robot;
     public int state = 0;
 
 
-    public Pose startPose = new Pose(50, 6, Math.toRadians(180));
+    public Pose startPose = new Pose(88, 6, Math.toRadians(180)); //public Pose startPose = new Pose(50, 6, Math.toRadians(180));
     public Pose precollectSpikeMark3Pose = new Pose(38, 34, Math.toRadians(180));
     public Pose controlPoint1 = new Pose(60, 38);
-    public Pose controlPointLoading1 = new Pose(29, 11);
-    public Pose controlPointLoading2 = new Pose(14, 21);
-    public Pose collectSpikeMark3Pose = new Pose(12, 34, Math.toRadians(180));
-    public Pose collectLoadingZone1 = new Pose(6, 8, Math.toRadians(180));
-    public Pose preCollectLoadingZone1 = new Pose(25, 7, Math.toRadians(180));
-    public Pose loadingArtifact = new Pose(7, 10, Math.toRadians(-90));
+    public Pose controlPointLoading1 = new Pose(29, 11).mirror();
+    public Pose controlPointLoading2 = new Pose(14, 21).mirror();
+    public Pose collectSpikeMark3Pose = new Pose(126, 34, Math.toRadians(180));
+    public Pose collectLoadingZone1 = new Pose(132, 8, Math.toRadians(180));
+    public Pose preCollectLoadingZone1 = new Pose(113, 7, Math.toRadians(180));
+    public Pose loadingArtifact = new Pose(131, 10, Math.toRadians(-90));
 
     private final ElapsedTime autoTimer = new ElapsedTime();
     private final ElapsedTime timer = new ElapsedTime();
@@ -120,7 +118,7 @@ public class AutoBlueFarDetection extends LinearOpMode {
                     break;
                 case 1:
                     if (!robot.resetWithCamera) {
-                        robot.outtake.turret.addOffsetDegrees(3.5);
+                        robot.outtake.turret.addOffsetDegrees(-3.5);
                         robot.setAction(Robot.Actions.Shoot);
                         timer.reset();
                         state++;
@@ -168,7 +166,7 @@ public class AutoBlueFarDetection extends LinearOpMode {
                     break;
                 case 6:
                     if (!robot.resetWithCamera) {
-                        robot.outtake.turret.addOffsetDegrees(3.5);
+                        robot.outtake.turret.addOffsetDegrees(-3.5);
                         robot.intake.setPower(IntakeMotor.States.Wait);
                         robot.setAction(Robot.Actions.Shoot);
                         timer.reset();
@@ -202,7 +200,7 @@ public class AutoBlueFarDetection extends LinearOpMode {
                     break;
                 case 90:
                     if (!robot.resetWithCamera) {
-                        robot.outtake.turret.addOffsetDegrees(3.5);
+                        robot.outtake.turret.addOffsetDegrees(-3.5);
                         robot.intake.setPower(IntakeMotor.States.Wait);
                         robot.setAction(Robot.Actions.Shoot);
                         timer.reset();
@@ -259,12 +257,13 @@ public class AutoBlueFarDetection extends LinearOpMode {
                                 .build();
                         robot.drive.followPath(auxToLoading);
                         state++;
+                        robot.outtake.setShootingVelocityForPose(startPose, -8.5);
                     }
                     break;
                 case 13:
                     if(robot.isDone()){
-                        robot.outtake.setShootingVelocityForPose(startPose, -8.5);
                         robot.drive.followPath(ballPath,true);
+                        robot.outtake.setShootingVelocityForPose(startPose, -8.5);
                         state = 9;
                     }
                     break;
