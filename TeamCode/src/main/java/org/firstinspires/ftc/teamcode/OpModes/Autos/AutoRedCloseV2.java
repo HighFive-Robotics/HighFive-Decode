@@ -15,8 +15,8 @@ import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
-@Autonomous(name = "🔴AutoCloseLoadingZone🔴")
-public class AutoRedClose extends LinearOpMode {
+@Autonomous(name = "🔴AutoCloseSpikes🔴")
+public class AutoRedCloseV2 extends LinearOpMode {
 
     public Robot robot;
     public int state = 0;
@@ -25,33 +25,30 @@ public class AutoRedClose extends LinearOpMode {
 
     public Pose shootPose1 = new Pose(93, 95, Math.toRadians(0));
     public Pose shootPose2 = new Pose(83, 81.5, Math.toRadians(0));
-    public Pose shootPose3 = new Pose(78, 110, Math.toRadians(-90));
+    public Pose shootPose3 = new Pose(78, 110, Math.toRadians(0));
 
-    public Pose preCollectSpikeMark2Pose = new Pose(83, 60, Math.toRadians(0));
-    public Pose collectSpikeMark2Pose = new Pose(127, 60, Math.toRadians(0));
+    public Pose preCollectSpikeMark2Pose = new Pose(83, 61.5, Math.toRadians(0));
+    public Pose collectSpikeMark2Pose = new Pose(127, 61.5, Math.toRadians(0));
     public Pose controlPointSpike2 = new Pose(90, 60);
 
     public Pose collectSpikeMark1Pose = new Pose(120, 81.5, Math.toRadians(0));
-    public Pose preOpenGatePose = new Pose(117, 70, Math.toRadians(-90));
-    public Pose openGatePose = new Pose(123, 70, Math.toRadians(-90));
+    public Pose preOpenGatePose = new Pose(117, 68.5, Math.toRadians(-90));
+    public Pose openGatePose = new Pose(123, 68.5, Math.toRadians(-90));
     public Pose controlPointGate = new Pose(85, 67.5);
 
-    public Pose preCollectGatePose = new Pose(119.5, 58, Math.toRadians(40));
-    public Pose collectGatePose = new Pose(126, 58, Math.toRadians(40));
-    public Pose collectGatePose2 = new Pose(126, 59, Math.toRadians(40));
-
-    public Pose preCollectSpikeMark3Pose = new Pose(93, 35, Math.toRadians(0));
-    public Pose collectSpikeMark3Pose = new Pose(125, 35, Math.toRadians(0));
-
-    public Pose preCollectLoadingZone2 = new Pose(131, 50, Math.toRadians(-90));
-    public Pose collectLoadingZone2 = new Pose(131, 12, Math.toRadians(-90));
+//    public Pose collectSpikeMark1Pose = new Pose(18, 81.5, Math.toRadians(180));
+//    public Pose controlPointGate = new Pose(53, 67.5);
+    public Pose preCollectSpikeMark3Pose = new Pose(93, 36, Math.toRadians(0));
+    public Pose collectSpikeMark3Pose = new Pose(125.5, 36, Math.toRadians(0));
 
     private final ElapsedTime autoTimer = new ElapsedTime();
     private final ElapsedTime timer = new ElapsedTime();
 
+    boolean failsafe = true;
+
     @Override
     public void runOpMode() throws InterruptedException {
-        telemetry.setMsTransmissionInterval(500);
+        telemetry.setMsTransmissionInterval(300);
         robot = new Robot(hardwareMap, startPose, true, Constants.Color.Red, telemetry, gamepad1);
         robot.outtake.turret.reset();
         robot.outtake.startBreakBeamThread();
@@ -61,8 +58,7 @@ public class AutoRedClose extends LinearOpMode {
         robot.drive.setConstants(Constants.FConstants);
         Constants.Globals.afterAuto = true;
         robot.shouldAlignTurret = false;
-
-
+        telemetry.setMsTransmissionInterval(500);
         PathChain preloadPath = robot.drive.pathBuilder()
                 .addPath(new BezierLine(startPose, shootPose1))
                 .setLinearHeadingInterpolation(startPose.getHeading(), shootPose1.getHeading())
@@ -78,19 +74,9 @@ public class AutoRedClose extends LinearOpMode {
                 .setConstantHeadingInterpolation(Math.toRadians(0))
                 .build();
 
-        PathChain shootSpike2 = robot.drive.pathBuilder()
-                .addPath(new BezierCurve(collectSpikeMark2Pose,controlPointSpike2, shootPose2))
-                .setConstantHeadingInterpolation(Math.toRadians(0))
-                .build();
-
-        PathChain collectSpike1 = robot.drive.pathBuilder()
-                .addPath(new BezierLine(shootPose2, collectSpikeMark1Pose))
-                .setConstantHeadingInterpolation(Math.toRadians(0))
-                .build();
-
         PathChain preOpenGate = robot.drive.pathBuilder()
-                .addPath(new BezierLine(collectSpikeMark1Pose, preOpenGatePose))
-                .setLinearHeadingInterpolation(collectSpikeMark1Pose.getHeading(), preOpenGatePose.getHeading())
+                .addPath(new BezierLine(collectSpikeMark2Pose, preOpenGatePose))
+                .setLinearHeadingInterpolation(collectSpikeMark2Pose.getHeading(), preOpenGatePose.getHeading())
                 .build();
 
         PathChain openGate = robot.drive.pathBuilder()
@@ -98,24 +84,19 @@ public class AutoRedClose extends LinearOpMode {
                 .setLinearHeadingInterpolation(preOpenGatePose.getHeading(), openGatePose.getHeading())
                 .build();
 
+        PathChain shootSpike2 = robot.drive.pathBuilder()
+                .addPath(new BezierCurve(openGatePose,controlPointSpike2, shootPose2))
+                .setLinearHeadingInterpolation(Math.toRadians(-90),Math.toRadians(0))
+                .build();
+
+        PathChain collectSpike1 = robot.drive.pathBuilder()
+                .addPath(new BezierLine(shootPose2, collectSpikeMark1Pose))
+                .setConstantHeadingInterpolation(Math.toRadians(0))
+                .build();
+
         PathChain shootSpike1 = robot.drive.pathBuilder()
-                .addPath(new BezierCurve(openGatePose, controlPointGate, shootPose2))
-                .setLinearHeadingInterpolation(openGatePose.getHeading(), shootPose2.getHeading())
-                .build();
-
-        PathChain preCollectGate = robot.drive.pathBuilder()
-                .addPath(new BezierLine(shootPose2, preCollectGatePose))
-                .setLinearHeadingInterpolation(shootPose2.getHeading(),preCollectGatePose.getHeading())
-                .build();
-
-        PathChain collectGate = robot.drive.pathBuilder()
-                .addPath(new BezierLine(preCollectGatePose, collectGatePose))
-                .setLinearHeadingInterpolation(preCollectGatePose.getHeading(),collectGatePose.getHeading())
-                .build();
-
-        PathChain shootGate = robot.drive.pathBuilder()
-                .addPath(new BezierLine(collectGatePose, shootPose2))
-                .setLinearHeadingInterpolation(collectGatePose.getHeading(),shootPose2.getHeading())
+                .addPath(new BezierCurve(collectSpikeMark1Pose, controlPointGate, shootPose2))
+                .setLinearHeadingInterpolation(collectSpikeMark1Pose.getHeading(), shootPose2.getHeading())
                 .build();
 
         PathChain goForSpike3 = robot.drive.pathBuilder()
@@ -128,24 +109,9 @@ public class AutoRedClose extends LinearOpMode {
                 .setConstantHeadingInterpolation(Math.toRadians(0))
                 .build();
 
-        PathChain shootSpike3 = robot.drive.pathBuilder()
-                .addPath(new BezierLine(collectSpikeMark3Pose, shootPose2))
+        PathChain shootSpike3Final = robot.drive.pathBuilder()
+                .addPath(new BezierLine(collectSpikeMark3Pose, shootPose3))
                 .setLinearHeadingInterpolation(Math.toRadians(0),Math.toRadians(0))
-                .build();
-
-        PathChain preCollectLoading2 = robot.drive.pathBuilder()
-                .addPath(new BezierLine(shootPose2, preCollectLoadingZone2))
-                .setLinearHeadingInterpolation(preCollectLoadingZone2.getHeading(),preCollectLoadingZone2.getHeading())
-                .build();
-
-        PathChain collectLoading2 = robot.drive.pathBuilder()
-                .addPath(new BezierLine(preCollectLoadingZone2, collectLoadingZone2))
-                .setLinearHeadingInterpolation(preCollectLoadingZone2.getHeading(),collectLoadingZone2.getHeading())
-                .build();
-
-        PathChain shootLoading2Final = robot.drive.pathBuilder()
-                .addPath(new BezierLine(collectLoadingZone2, shootPose3))
-                .setLinearHeadingInterpolation(collectLoadingZone2.getHeading(),shootPose3.getHeading())
                 .build();
 
         telemetry.addLine("Ready for Action");
@@ -167,7 +133,8 @@ public class AutoRedClose extends LinearOpMode {
                     break;
                 case 1:
                     if(robot.isDone()){
-                        robot.outtake.setShootingVelocityForPose(shootPose1);
+                        robot.outtake.setShootingVelocityForPose(shootPose1 , -2);
+                        robot.outtake.turret.motor.setMaxPIDPower(1);
                         robot.setAction(Robot.Actions.ResetTurretCamera);
                         timer.reset();
                         state = 2;
@@ -183,8 +150,7 @@ public class AutoRedClose extends LinearOpMode {
                     if (!robot.shootingSequence) {
                         robot.drive.followPath(goForSpike2, true);
                         robot.outtake.alignTurret(shootPose2 , -2);
-                        robot.outtake.setShootingVelocity(robot.outtake.calculateDistanceToGoal(shootPose2)-3.5);
-                        robot.setAction(Robot.Actions.StopCamera);
+                        robot.outtake.setShootingVelocityForPose(shootPose2 , -2.5);
                         timer.reset();
                         state++;
                     }
@@ -197,13 +163,32 @@ public class AutoRedClose extends LinearOpMode {
                     }
                     break;
                 case 5:
-                    if (robot.drive.atParametricEnd()) {
+                    if (robot.isDone()) {
                         robot.intake.setPower(IntakeMotor.States.Collect);
-                        robot.drive.followPath(shootSpike2, true);
+                        robot.drive.followPath(preOpenGate, true);
                         state++;
                     }
                     break;
                 case 6:
+                    if (robot.drive.atParametricEnd()) {
+                        robot.drive.followPath(openGate);
+                        state++;
+                    }
+                    break;
+                case 7:
+                    if (robot.drive.atParametricEnd()) {
+                        timer.reset();
+                        state++;
+                    }
+                    break;
+                case 8:
+                    if (timer.milliseconds() >= 425) {
+                        robot.outtake.alignTurret(shootPose2, -2.5);
+                        robot.drive.followPath(shootSpike2, true);
+                        state++;
+                    }
+                    break;
+                case 9:
                     if (robot.isDone()) {
                         robot.intake.setPower(IntakeMotor.States.Wait);
                         robot.setAction(Robot.Actions.Shoot);
@@ -211,37 +196,19 @@ public class AutoRedClose extends LinearOpMode {
                         state++;
                     }
                     break;
-                case 7:
-                    if (!robot.shootingSequence) {
-                        robot.drive.followPath(collectSpike1)  ;
-                        robot.intake.setPower(IntakeMotor.States.Collect);
-                        robot.setAction(Robot.Actions.StopShoot);
-                        timer.reset();
-                        state++;
-                    }
-                    break;
-                case 8:
-                    if (robot.isDone()) {
-                        robot.intake.setPower(IntakeMotor.States.Collect);
-                        robot.drive.followPath(preOpenGate, true);
-                        state++;
-                    }
-                    break;
-                case 9:
-                    if (robot.drive.atParametricEnd()) {
-                        robot.drive.followPath(openGate);
-                        state++;
-                    }
-                    break;
                 case 10:
-                    if (robot.drive.atParametricEnd()) {
+                    if (!robot.shootingSequence) {
+                        robot.drive.followPath(collectSpike1);
+                        robot.intake.setPower(IntakeMotor.States.Collect);
+                        robot.setAction(Robot.Actions.StopCamera);
                         timer.reset();
                         state++;
                     }
                     break;
                 case 11:
-                    if (timer.milliseconds() >= 425) {
-                        robot.outtake.alignTurret(shootPose2, -2.5);
+                    if (robot.drive.atParametricEnd()) {
+                        robot.intake.setPower(IntakeMotor.States.Collect);
+                        robot.outtake.alignTurret(shootPose2, 2);
                         robot.drive.followPath(shootSpike1, true);
                         state++;
                     }
@@ -257,8 +224,11 @@ public class AutoRedClose extends LinearOpMode {
                 case 13:
                     if (!robot.shootingSequence) {
                         robot.drive.followPath(goForSpike3, true);
+                        //robot.outtake.setShootingVelocity(robot.outtake.calculateDistanceToGoal(shootPose3)-2);
+                        robot.outtake.setShootingVelocityForPose(shootPose3, -2);
+                        robot.outtake.alignTurret(shootPose3, -5);
                         robot.intake.setPower(IntakeMotor.States.Collect);
-                        robot.setAction(Robot.Actions.StopShoot);
+                        robot.setAction(Robot.Actions.StopCamera);
                         timer.reset();
                         state++;
                     }
@@ -272,7 +242,7 @@ public class AutoRedClose extends LinearOpMode {
                     break;
                 case 15:
                     if (robot.drive.atParametricEnd()) {
-                        robot.drive.followPath(shootSpike3, true);
+                        robot.drive.followPath(shootSpike3Final, true);
                         timer.reset();
                         state++;
                     }
@@ -281,54 +251,7 @@ public class AutoRedClose extends LinearOpMode {
                     if (robot.isDone()) {
                         robot.intake.setPower(IntakeMotor.States.Wait);
                         robot.setAction(Robot.Actions.Shoot);
-                        robot.setAction(Robot.Actions.ResetTurretCamera);
                         state = 17;
-                    }
-                    break;
-                case 17:
-                    if (!robot.shootingSequence) {
-                        robot.shouldAlignTurret = false;
-                        robot.drive.followPath(preCollectLoading2, true);
-                        robot.intake.setPower(IntakeMotor.States.Collect);
-                        robot.setAction(Robot.Actions.StopCamera);
-                        timer.reset();
-                        state++;
-                    }
-                    break;
-                case 18:
-                    if (robot.drive.atParametricEnd()  || robot.intake.isPartial) {
-                        robot.drive.followPath(collectLoading2, true);
-                        robot.drive.setMaxPower(0.75);
-                        timer.reset();
-                        state++;
-                    }
-                    break;
-                case 19:
-                    if (robot.drive.atParametricEnd() || robot.intake.isPartial) {
-                        timer.reset();
-                        state = 24;
-                    }
-                    break;
-                case 20:
-                    if ((timer.milliseconds() >= 300  || robot.intake.isFull) && autoTimer.milliseconds() <= 28000) {
-                        robot.outtake.alignTurret(shootPose3, 4.5);
-                        robot.drive.setMaxPower(1);
-                        robot.outtake.setShootingVelocityForPose(shootPose3);
-                        robot.outtake.turret.setOffset(0);
-                        robot.drive.setMaxPower(1);
-                        robot.drive.followPath(shootLoading2Final, true);
-                        timer.reset();
-                        state++;
-                    }
-                    break;
-                case 21:
-                    if (robot.isDone()) {
-
-                        robot.intake.setPower(IntakeMotor.States.Wait);
-                        robot.setAction(Robot.Actions.Shoot);
-                        robot.setAction(Robot.Actions.ResetTurretCamera);
-                        timer.reset();
-                        state++;
                     }
                     break;
             }
@@ -343,12 +266,8 @@ public class AutoRedClose extends LinearOpMode {
                 robot.outtake.alignTurret(shootPose2);
             }
             if(state == 17){
-                robot.outtake.alignTurret(shootPose2);
-            }
-            if(state == 22){
                 robot.outtake.alignTurret(shootPose3);
             }
-
             finalAutoPose = robot.drive.getPose();
             robot.update();
 

@@ -100,6 +100,7 @@ public class AutoBlueFarDetection extends LinearOpMode {
         Constants.Globals.afterAuto = true;
         robot.shouldAlignTurret = false;
         telemetry.addLine("Ready for Action");
+        telemetry.update();
         waitForStart();
 
         robot.outtake.setShootingVelocityForPose(startPose, -1);

@@ -135,9 +135,17 @@ public class Robot extends HighModule {
                 timerShoot.reset();
                 break;
             case StopShoot:
-                shootingSequence = false;
+                intake.setPower(IntakeMotor.States.Wait);
+                outtake.shooter.setUpTargetVelocity(outtake.shooter.getTargetDown());
+                outtake.resetErrorTolerance();
+                outtake.shooter.disableCompensation();
+                outtake.isShooting = false;
+                outtake.closeBlocker();
+                outtake.shooter.wasAtTarget = false;
                 intake.canStop = true;
-                shootingState = 0;
+                shootingSequence = false;
+                shootingState = -1;
+                cycles = -1;
                 break;
             case ResetTurretCamera:
                 outtake.linkageCamera.setState(LinkageCamera.States.Goal, 150);
@@ -234,7 +242,6 @@ public class Robot extends HighModule {
                 camera.pauseCapture();
           }
         }
-        telemetry.addData("D", outtake.linkageCamera.atTarget());
         intake.update();
         drive.update();
         outtake.update(drive.getPose());
