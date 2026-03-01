@@ -40,6 +40,7 @@ public class ShooterCalibration extends LinearOpMode {
     Follower drive;
     boolean shootingSequence = false, holdingSequence = false;
     public static boolean dacia = false;
+    public static double filterGain = 0.2;
     ElapsedTime timerShoot;
     Pose cameraPose = new Pose(6,6,0);
 
@@ -171,8 +172,13 @@ public class ShooterCalibration extends LinearOpMode {
             if (!shootingSequence) {
                 outtake.shooter.disableCompensation();
             }
+            if(gamepad1.shareWasPressed()){
+                outtake.shooter.motorDown.pidfVelocity.setFilterGain(filterGain);
+                outtake.shooter.motorUp.pidfVelocity.setFilterGain(filterGain);
+            }
 
             outtake.update(drive.getPose());
+            outtake.shooter.updateAllCoefficients();
             outtake.alignTurret();
             outtake.debug();
             telemetry.addData("PID speed" , outtake.shooter.motorDown.pidfVelocity.getPositionError());

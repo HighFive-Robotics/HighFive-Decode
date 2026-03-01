@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Core.Module.Outtake;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.shooterMotorDownName;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.shooterMotorUpName;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.encoderResolutionBack;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.filterGainBack;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.kC;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.kaBack;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.kdBack;
@@ -12,6 +13,7 @@ import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterB
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.ksBack;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.wheelDiameterBack;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterFlyWheelParams.encoderResolutionFly;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterFlyWheelParams.filterGainFly;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterFlyWheelParams.kaFly;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterFlyWheelParams.kdFly;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterFlyWheelParams.kfFly;
@@ -67,6 +69,8 @@ public class Shooter extends HighModule {
         motorUp.setTolerance(0.08);
         upTolerance = 0.08;
         downTolerance = 0.15;
+        motorUp.pidfVelocity.setFilterGain(filterGainBack);
+        motorDown.pidfVelocity.setFilterGain(filterGainFly);
     }
 
 

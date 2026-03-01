@@ -89,13 +89,13 @@ public class Constants {
     public static class OuttakeConstants {
         @Config
         public static class ShooterFlyWheelParams {
-            public static double kpFly = 0.004, kdFly = 0.0001, kiFly = 0.0035, kfFly = 0.00016, ksFly = 0, kaFly = 0;
+            public static double kpFly = 0.0025, kdFly = 0.0001, kiFly = 0.0075, kfFly = 0.00016, ksFly = 0, kaFly = 0 , filterGainFly= 0.4;
             public static final double wheelDiameterFly = 0.096;
             public static final double encoderResolutionFly = 28;
         }
         @Config
         public static class ShooterBackWheelParams {
-            public static double kpBack = 0.00093, kdBack = 0.00002, kiBack = 0.0009, kfBack = 0.00008, ksBack = 0, kaBack = 0;
+            public static double kpBack = 0.00093, kdBack = 0.00002, kiBack = 0.0009, kfBack = 0.00008, ksBack = 0, kaBack = 0 , filterGainBack = 0.4;
             public static final double wheelDiameterBack = 0.048;
             public static final double encoderResolutionBack = 28;
             public static double kC = 1;

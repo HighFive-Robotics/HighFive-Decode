@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.OpModes.Autos;
+package org.firstinspires.ftc.teamcode.OpModes.AutoFar;
 
 import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.finalAutoPose;
@@ -7,8 +7,6 @@ import static org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor.Stat
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
-import com.pedropathing.paths.HeadingInterpolator;
-import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -76,16 +74,18 @@ public class AutoBlueFarDetection extends LinearOpMode {
                 .addPath(new BezierLine(collectLoadingZone1, startPose))
                 .setLinearHeadingInterpolation(collectLoadingZone1.getHeading(), startPose.getHeading())
                 .build();
-        PathChain goCollectSpike = robot.drive.pathBuilder()
-                .addPath(new BezierLine(
-                        startPose,
-                        precollectSpikeMark3Pose
-                ))
-                .setLinearHeadingInterpolation(startPose.getHeading(), collectSpikeMark3Pose.getHeading())
+
+        PathChain preCollectSpike3 = robot.drive.pathBuilder()
+                .addPath(new BezierLine(startPose, precollectSpikeMark3Pose))
+                .setLinearHeadingInterpolation(startPose.getHeading(), precollectSpikeMark3Pose.getHeading())
+                .build();
+
+        PathChain collectSpike3 = robot.drive.pathBuilder()
                 .addPath(new BezierLine(
                         precollectSpikeMark3Pose,
                         collectSpikeMark3Pose
                 ))
+                .setLinearHeadingInterpolation(precollectSpikeMark3Pose.getHeading(),collectSpikeMark3Pose.getHeading())
                 .build();
 
         PathChain goShootSpike = robot.drive.pathBuilder()
@@ -178,10 +178,17 @@ public class AutoBlueFarDetection extends LinearOpMode {
                     break;
                 case 7:
                     if (!robot.shootingSequence) {
-                        robot.drive.followPath(goCollectSpike);
+                        robot.drive.followPath(preCollectSpike3);
                         robot.shouldAlignTurret = false;
                         robot.intake.setPower(Collect);
                         timer.reset();
+                        state = 75;
+                    }
+                    break;
+                case 75:
+                    if (robot.drive.atParametricEnd()) {
+                        robot.intake.setPower(IntakeMotor.States.Collect);
+                        robot.drive.followPath(collectSpike3, true);
                         state++;
                     }
                     break;
