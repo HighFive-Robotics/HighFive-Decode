@@ -57,6 +57,7 @@ public class ShooterCalibration extends LinearOpMode {
         outtake.turret.reset();
         timerShoot = new ElapsedTime();
         double tolerance;
+        outtake.shooter.motorDown.pidfVelocity.setFilterGain(0.6);
         telemetry.addLine("Init");
         FtcDashboard.getInstance().startCameraStream(camera.ll, 0);
         waitForStart();
@@ -174,6 +175,7 @@ public class ShooterCalibration extends LinearOpMode {
             outtake.update(drive.getPose());
             outtake.alignTurret();
             outtake.debug();
+            telemetry.addData("PID speed" , outtake.shooter.motorDown.pidfVelocity.getPositionError());
             //telemetry.addData("holding" , holdingSequence);
             //telemetry.addData("Robot Pose" , drive.getPose());
             //telemetry.addData("Camera Pose", cameraPose);

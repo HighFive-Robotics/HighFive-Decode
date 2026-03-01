@@ -86,7 +86,9 @@ public class VelocityPID {
         prevSetPoint = setPoint;
         setPoint = sp;
     }
-
+    public void setFilterGain(double filterGain){
+        this.filterGain = filterGain;
+    }
     public boolean atSetPoint() {
         return Math.abs(getVelocityError()) <= errorTolerance_v;
     }

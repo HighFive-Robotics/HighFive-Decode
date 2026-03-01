@@ -154,7 +154,7 @@ public class  AutoBlueCloseV2 extends LinearOpMode {
                     if (!robot.shootingSequence) {
                         robot.drive.followPath(goForSpike2, true);
                         robot.outtake.alignTurret(shootPose2 , 2);
-                        robot.outtake.setShootingVelocityForPose(shootPose2 , -2.5);
+                        robot.outtake.setShootingVelocityForPose(shootPose2 , -4);
                         timer.reset();
                         state++;
                     }
@@ -187,7 +187,7 @@ public class  AutoBlueCloseV2 extends LinearOpMode {
                     break;
                 case 8:
                     if (timer.milliseconds() >= 425) {
-                        robot.outtake.alignTurret(shootPose2, 2.5);
+                        robot.outtake.alignTurret(shootPose2, 1.5);
                         robot.drive.followPath(shootSpike2, true);
                         state++;
                     }
