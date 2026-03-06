@@ -19,6 +19,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.Core.Module.Outtake.GoalPose;
 
 public class Constants {
 
@@ -29,6 +30,8 @@ public class Constants {
         public static Pose finalAutoPose = new Pose(6, 6   , 0);
         public static Color autoColor = Color.Red;
         public static Case randomizedCase = Case.None;
+        public static GoalPose RedGoal =  new GoalPose(121 , 121, 33 , 39 , 4);
+        public static GoalPose BlueGoal =  new GoalPose(18.5 , 123.5, 33 , 39 , 4);
         public static Pose BlueGoalCorner = new Pose(8, 136), BlueGoalWallUp = new Pose(10, 136), BlueGoalWallLeft = new Pose(10, 134), BlueGoalDistance = new Pose(18.5, 123.5);
         public static Pose RedGoalCorner = new Pose(136, 136), RedGoalWallUp = new Pose(134, 136), RedGoalWallRight = new Pose(136, 134), RedGoalDistance = new Pose(121, 121);
     }
@@ -69,6 +72,7 @@ public class Constants {
         public static String cameraName = "limelight";
         public static String cameraServoName = "CS";
         public static String brakeName = "BS";
+        public static String hoodServoName = "HD";
     }
 
     public static class Intake {
@@ -112,6 +116,14 @@ public class Constants {
         public static class LinkageCameraConstants{
             public static double ArtifactPose = 0.42  ;
             public static double GoalPose = 0.3;
+        }
+        @Config
+        public static class HoodConstants{
+            public static double minAngle = 17;
+            public static double maxAngle = 44;
+            public static double minServoPos = 0.76  ;
+            public static double maxServoPos = 0.15;
+            public static double initAngle = 20;
         }
 
     }

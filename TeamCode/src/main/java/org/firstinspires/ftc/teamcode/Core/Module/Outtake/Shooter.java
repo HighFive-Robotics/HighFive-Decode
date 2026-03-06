@@ -2,15 +2,6 @@ package org.firstinspires.ftc.teamcode.Core.Module.Outtake;
 
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.shooterMotorDownName;
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.shooterMotorUpName;
-import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.encoderResolutionBack;
-import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.kC;
-import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.kaBack;
-import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.kdBack;
-import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.kfBack;
-import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.kiBack;
-import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.kpBack;
-import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.ksBack;
-import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.wheelDiameterBack;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterFlyWheelParams.encoderResolutionFly;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterFlyWheelParams.kaFly;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterFlyWheelParams.kdFly;
@@ -19,7 +10,6 @@ import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterF
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterFlyWheelParams.kpFly;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterFlyWheelParams.ksFly;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterFlyWheelParams.wheelDiameterFly;
-
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -32,14 +22,18 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighMotor;
 @Config
 public class Shooter extends HighModule {
     public HighMotor motorUp, motorDown;
-    public double velocityUp, velocityDown, upTolerance, downTolerance, toleranceCompensation = 0.2, upOffset = 0, downOffset = 0, compOffset = 0;
-    public double targetUp, targetUpCompensated, targetDown;
-    public boolean shouldCompensate = false, wasAtTarget = false;
-    private double lastVelocityDown, lastVelocityUp;
+
+    public double currentVelocity;
+    public double tolerance = 0.15, toleranceOffset = 0;
+    public double targetVelocity;
+    public boolean wasAtTarget = false;
+    private double lastVelocity;
     public double jerk = 0;
 
+    public static double maxVelocity = 7.2;
+
     public Shooter(HardwareMap hwMap) {
-        target = 0;
+        targetVelocity = 0;
         motorDown = HighMotor.Builder.startBuilding()
                 .setMotor(hwMap.get(DcMotorEx.class, shooterMotorDownName))
                 .setRunMode(HighMotor.RunMode.Velocity)
@@ -51,228 +45,69 @@ public class Shooter extends HighModule {
                 .setVelocityPIDCoefficients(kpFly, kiFly, kdFly, kfFly, ksFly, kaFly, 1)
                 .setUseZeroPowerBehaviour(false)
                 .build();
-        motorDown.setTolerance(0.15);
 
+        motorDown.pidfVelocity.setFilterGain(0.8);
+        motorDown.setTolerance(tolerance);
         motorUp = HighMotor.Builder.startBuilding()
                 .setMotor(hwMap.get(DcMotorEx.class, shooterMotorUpName))
-                .setRunMode(HighMotor.RunMode.Velocity)
+                .setRunMode(HighMotor.RunMode.Standard)
                 .setReverseMotor(false)
-                .setEncoder(true, false)
-                .setEncoderResolution(encoderResolutionBack / 2)
-                .setWheelDiameter(wheelDiameterBack)
-                .useVoltageComensationForVelocity(true)
-                .setVelocityPIDCoefficients(kpBack, kiBack, kdBack, kfBack, ksBack, kaBack, 1)
                 .setUseZeroPowerBehaviour(false)
                 .build();
-        motorUp.pidfVelocity.setFilterGain(0.8);
-        motorDown.pidfVelocity.setFilterGain(0.8);
-        motorUp.setTolerance(0.08);
-        upTolerance = 0.08;
-        downTolerance = 0.15;
     }
 
-
-    public void setUpTargetVelocity(double velocity) {
-        this.targetUp = Range.clip(velocity, 0, 7.2);
-        motorUp.setTarget(velocity);
+    public void setTargetVelocity(double velocity) {
+        this.targetVelocity = Range.clip(velocity, 0, maxVelocity);
+        motorDown.setTarget(this.targetVelocity);
     }
 
-    public void setDownTargetVelocity(double velocity) {
-        this.targetDown = Range.clip(velocity, 0, 6.8);
-        motorDown.setTarget(velocity);
-    }
-
-    public void setTargetVelocity(double down, double up) {
-        setUpTargetVelocity(up);
-        setDownTargetVelocity(down);
-    }
-
-    public void setTargetVelocity(double distance) {
-        double rawDown = TrajectoryRegression.calculateDown(distance);
-        double rawUp = TrajectoryRegression.calculateUp(distance);
-        kC = TrajectoryRegression.calculateKC(distance);
-        setTargetVelocity(rawDown, rawUp);
-    }
-
-    public void setTargetVelocityCompensation(double distance) {
-        shouldCompensate = true;
-        setTargetVelocity(distance);
-    }
-
-    public void setManualVelocity(double velocity) {
-        setTargetVelocity(velocity, velocity);
-        shouldCompensate = true;
-        target = velocity;
-
-    }
-
-    public static double getDownVelocityFromDistance(double x) {
-        return TrajectoryRegression.calculateDown(x);
-    }
-
-    public static double getUpVelocityFromDistance(double x) {
-        return TrajectoryRegression.calculateUp(x);
-    }
-
-    public double getVelocityErrorUp() {
-        return Math.abs(getTargetUp() - velocityUp);
-    }
-
-    public double getVelocityErrorDown() {
-        return Math.abs(targetDown - velocityDown);
-    }
-
-    public double getVelocityErrorCompensation() {
-        return 2 * target - (velocityUp + velocityDown);
-    }
-
-    public boolean upAtTarget() {
-        return Math.abs(getTargetUp() - velocityUp) <= (upTolerance + upOffset);
-    }
-
-    public boolean downAtTarget() {
-        return Math.abs(targetDown - velocityDown) <= (downTolerance + downOffset);
+    public double getVelocityError() {
+        return Math.abs(targetVelocity - currentVelocity);
     }
 
     @Override
     public boolean atTarget() {
-        if (shouldCompensate) {
-            double targetSum = getTargetUp() + targetDown;
-            double actualSum = velocityUp + velocityDown;
-            double sumError = Math.abs(targetSum - actualSum);
-            double targetDiff = targetDown - getTargetUp();
-            double actualDiff = velocityDown - velocityUp;
-            double diffError = Math.abs(targetDiff - actualDiff);
-            double allowedSumError = toleranceCompensation + compOffset;
-            double allowedDiffError = allowedSumError * 3;
-            return (sumError <= allowedSumError) && (diffError <= allowedDiffError);
-        }
-        return upAtTarget() && downAtTarget();
+        return getVelocityError() <= (tolerance + toleranceOffset);
     }
 
-    public boolean atTargetCompensated() {
-        return Math.abs((getTargetUp() + targetDown) - (velocityUp + velocityDown)) <= (toleranceCompensation + compOffset);
+    public void setToleranceOffset(double offset) {
+        this.toleranceOffset = offset;
     }
 
-    public void setToleranceCompensationOffset(double offset) {
-        this.compOffset = offset;
-    }
-
-    public void addToleranceCompensationOffset(double offset) {
-        this.compOffset += offset;
-    }
-
-    public double getDownTolerance() {
-        return downTolerance;
-    }
-
-    public double getUpTolerance() {
-        return upTolerance;
-    }
-
-    public void setUpToleranceOffset(double offset) {
-        this.upOffset = offset;
-    }
-
-    public void setDownToleranceOffset(double offset) {
-        this.downOffset = offset;
-    }
-
-    public void addToUpToleranceOffset(double offset) {
-        this.upOffset += offset;
-    }
-
-    public void addToDownToleranceOffset(double offset) {
-        this.downOffset += offset;
+    public void addToleranceOffset(double offset) {
+        this.toleranceOffset += offset;
     }
 
     @Override
     public double getTarget() {
-        return target;
+        return targetVelocity;
     }
 
-    public double getTargetDown() {
-        return targetDown;
-    }
-
-    public double getTargetUp() {
-        if (shouldCompensate) {
-            return targetUpCompensated;
-        }
-        return targetUp;
-    }
-
-    public double getToleranceCompensation() {
-        return toleranceCompensation + compOffset;
-    }
-
-    public double getUpOffset() {
-        return upTolerance + upOffset;
-    }
-
-    public double getDownOffset() {
-        return downTolerance + downOffset;
-    }
-
-    public void setPIDCoefficientsDown(double kp, double kd, double ki, double kf) {
+    public void setPIDCoefficients(double kp, double kd, double ki, double kf) {
         motorDown.setVelocityPIDCoefficients(kp, ki, kd, kf, 1);
     }
 
-    public void setPIDCoefficientsUp(double kp, double kd, double ki, double kf) {
-        motorUp.setVelocityPIDCoefficients(kp, ki, kd, kf, 1);
-    }
-
-    public void updateCoefficientsDown() {
+    public void updateCoefficients() {
         motorDown.setVelocityPIDFSA(kpFly, kiFly, kdFly, kfFly, ksFly, kaFly, 1);
     }
 
-    public void updateCoefficientsUp() {
-        motorUp.setVelocityPIDFSA(kpBack, kiBack, kdBack, kfBack, ksBack, kaBack, 1);
+    public void setTolerance(double newTolerance) {
+        this.tolerance = newTolerance;
+        motorDown.setTolerance(newTolerance);
     }
 
-    public void setTolerance(double upTolerance, double downTolerance) {
-        this.upTolerance = upTolerance;
-        this.downTolerance = downTolerance;
-    }
-
-    public void updateAllCoefficients() {
-        updateCoefficientsDown();
-        updateCoefficientsUp();
-    }
-    public boolean atTargetIndividual(){
-        return upAtTarget() && downAtTarget();
-    }
-    public void nanUp() {
-        motorUp.setVelocityPIDFSA(0, 0, 0, 0, 0, 0, 1);
-    }
-
-    public void nanDown() {
+    public void nanMotors() {
         motorDown.setVelocityPIDFSA(0, 0, 0, 0, 0, 0, 1);
-    }
-
-    public void enableCompensation() {
-        shouldCompensate = true;
-    }
-
-    public void disableCompensation() {
-        shouldCompensate = false;
     }
 
     @Override
     public void update() {
-        velocityUp = motorUp.getCurrentVelocity();
-        velocityDown = motorDown.getCurrentVelocity();
-        jerk = Math.max(Math.abs(lastVelocityDown - velocityDown), Math.abs(-lastVelocityUp + velocityUp));
-        if (shouldCompensate) {
-            targetUpCompensated = targetUp + getVelocityErrorDown() * kC;
-            motorUp.setTarget(targetUpCompensated);
-        } else {
-            motorUp.setTarget(targetUp);
-        }
-
-        lastVelocityDown = velocityDown;
-        lastVelocityUp = velocityUp;
-        motorUp.update();
+        currentVelocity = motorDown.getCurrentVelocity();
+        jerk = Math.abs(lastVelocity - currentVelocity);
+        lastVelocity = currentVelocity;
         motorDown.update();
+        double appliedPower = motorDown.motor.getPower();
+        motorUp.setPower(appliedPower);
+        motorUp.update();
     }
 }

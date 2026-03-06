@@ -129,16 +129,13 @@ public class Robot extends HighModule {
                 shootingSequence = true;
                 intake.canStop = false;
                 shootingState = 0;
-                outtake.shooter.disableCompensation();
                 outtake.isShooting = true;
                 outtake.shooter.wasAtTarget = false;
                 timerShoot.reset();
                 break;
             case StopShoot:
                 intake.setPower(IntakeMotor.States.Wait);
-                outtake.shooter.setUpTargetVelocity(outtake.shooter.getTargetDown());
                 outtake.resetErrorTolerance();
-                outtake.shooter.disableCompensation();
                 outtake.isShooting = false;
                 outtake.closeBlocker();
                 outtake.shooter.wasAtTarget = false;
@@ -186,7 +183,7 @@ public class Robot extends HighModule {
                     break;
                 case 1:
                     if (cycles <= 3 || holdingSequence) {
-                        if (outtake.atTargetCompensated() || (cycles <= 1 && outtake.atTarget())) {
+                        if (outtake.atTarget() || (cycles <= 1 && outtake.atTarget())) {
                             intake.setPower(IntakeMotor.States.Collect);
                             intake.intakeMotor.update();
                             shootingState++;
@@ -194,9 +191,7 @@ public class Robot extends HighModule {
                         }
                     } else {
                         intake.setPower(IntakeMotor.States.Wait);
-                        outtake.shooter.setUpTargetVelocity(outtake.shooter.getTargetDown());
                         outtake.resetErrorTolerance();
-                        outtake.shooter.disableCompensation();
                         outtake.isShooting = false;
                         outtake.closeBlocker();
                         outtake.shooter.wasAtTarget = false;
@@ -214,19 +209,17 @@ public class Robot extends HighModule {
                             if(!isAuto)outtake.addErrorToleranceScaled();
                             else outtake.addErrorToleranceScaledAuto();
                         }
-                        if (!outtake.atTargetCompensated()) {
+                        if (!outtake.atTarget()) {
                             intake.setPower(IntakeMotor.States.Wait);
                             intake.intakeMotor.update();
                         }
-                        outtake.shooter.enableCompensation();
                         shootingState = 1;
                         cycles++;
                     } else if (timerShoot.milliseconds() > 1000) {
-                        if (!outtake.atTargetCompensated()) {
+                        if (!outtake.atTarget()) {
                             intake.setPower(IntakeMotor.States.Wait);
                             intake.intakeMotor.update();
                         }
-                        outtake.shooter.enableCompensation();
                         shootingState = 1;
                         cycles++;
                     }

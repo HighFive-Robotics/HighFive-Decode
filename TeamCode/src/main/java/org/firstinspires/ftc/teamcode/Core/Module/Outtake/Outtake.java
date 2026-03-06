@@ -2,11 +2,12 @@ package org.firstinspires.ftc.teamcode.Core.Module.Outtake;
 
 
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.breakBeamOuttakeName;
+import static org.firstinspires.ftc.teamcode.Constants.Globals.BlueGoal;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.BlueGoalDistance;
+import static org.firstinspires.ftc.teamcode.Constants.Globals.RedGoal;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.RedGoalDistance;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.LinkageCameraConstants.ArtifactPose;
-import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterBackWheelParams.kC;
 
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -27,18 +28,24 @@ public class Outtake extends HighModule {
     public DigitalChannel breakBeamOuttake;
     private final Telemetry telemetry;
 
-    public Pose robotPose;
+    public Pose robotPose = new Pose(0,0,0);
     public final ElapsedTime timer = new ElapsedTime();
     public double distanceToGoal;
     public volatile boolean hasShot = false;
     private Thread breakBeamThread;
     private volatile boolean isRunning = true;
     public boolean isShooting = false;
+    public static double gravitationalCoef = 386.1; // in/s^2
+    public static double shooterHeight = 14.5;
+    public static double kE = 1.25;
+    public static double baseClearanceOffset = 5.0;
+    public Hood hood;
 
 
     public Outtake(HardwareMap hardwareMap, Constants.Color color, Telemetry telemetry , boolean isAuto) {
         shooter = new Shooter(hardwareMap);
         turret = new Turret(hardwareMap, color, telemetry);
+        hood = new Hood(hardwareMap , isAuto);
         linkageCamera = new LinkageCamera(hardwareMap,ArtifactPose,isAuto);
         blocker = new Blocker(hardwareMap, Blocker.ClosedPosition, isAuto);
         breakBeamOuttake = hardwareMap.get(DigitalChannel.class, breakBeamOuttakeName);
@@ -82,23 +89,58 @@ public class Outtake extends HighModule {
     public void setShootingVelocity() {
         shooter.setTargetVelocity(distanceToGoal);
     }
-
-    public void setShootingVelocityCompensation(double dist) {
-        shooter.setTargetVelocityCompensation(dist);
+    public void setRawVelocity(double velocity) {
+        shooter.setTargetVelocity(velocity);
     }
-
-    public void setShootingVelocity(double up, double down) {
-        shooter.setDownTargetVelocity(down);
-        shooter.setUpTargetVelocity(up);
-    }
-
-    public void setShootingVelocityCompensation() {
-        setShootingVelocityCompensation(distanceToGoal);
-    }
-
     public void setShootingVelocityOffset(double offset) {
         setShootingVelocity(distanceToGoal + offset);
     }
+    // E COOKED CEL MAI PROBABIL
+    public void setShooterPhysicsForPose(Pose robotPose, GoalPose goal, double trajectoryOffsetDegrees) {
+        double distanceToCenter = Math.hypot(goal.x - robotPose.getX(), goal.y - robotPose.getY());
+        double distanceToFrontWall = distanceToCenter - goal.frontWallOffsetRadius;
+        double frontWallHeightDelta = goal.frontWallZ - shooterHeight;
+        double wallClearanceAngleRads = Math.atan2(frontWallHeightDelta, distanceToFrontWall);
+        double wallClearanceAngleDegrees = Math.toDegrees(wallClearanceAngleRads);
+        double targetAngleDegrees = wallClearanceAngleDegrees + baseClearanceOffset + trajectoryOffsetDegrees;
+        targetAngleDegrees = Range.clip(targetAngleDegrees, Constants.OuttakeConstants.HoodConstants.minAngle, Constants.OuttakeConstants.HoodConstants.maxAngle);
+        hood.setAngle(targetAngleDegrees);
+        double targetHeightDelta = goal.targetZ - shooterHeight;
+        double alphaRads = Math.toRadians(targetAngleDegrees);
+        double sinA = Math.sin(alphaRads);
+        double cosA = Math.cos(alphaRads);
+        double denominator = 2 * cosA * (distanceToCenter * sinA - targetHeightDelta * cosA);
+        if (denominator > 0) {
+            double targetVelocity = 2 * kE * distanceToCenter * Math.sqrt(gravitationalCoef / denominator);
+            shooter.setTargetVelocity(targetVelocity);
+        } else {
+            shooter.setTargetVelocity(0);
+        }
+    }
+    public void setShooterPhysicsForPose(Pose robotPose, GoalPose goal) {
+        setShooterPhysicsForPose(robotPose, goal, 0.0);
+    }
+    public void setShooterPhysics() {
+        switch (autoColor){
+            case Blue:
+                setShooterPhysicsForPose(robotPose, BlueGoal);
+                break;
+            case Red:
+                setShooterPhysicsForPose(robotPose, RedGoal);
+                break;
+        }
+    }
+    public void setShooterPhysics(double offsetDeg) {
+        switch (autoColor){
+            case Blue:
+                setShooterPhysicsForPose(robotPose, BlueGoal , offsetDeg);
+                break;
+            case Red:
+                setShooterPhysicsForPose(robotPose, RedGoal , offsetDeg);
+                break;
+        }
+    }
+
 
     public void openBlocker() {
         blocker.setState(Blocker.States.Open);
@@ -133,47 +175,18 @@ public class Outtake extends HighModule {
     public boolean atTarget() {
         return shooter.atTarget() && turret.atTarget();
     }
-
-    public boolean atTargetCompensated() {
-        return shooter.atTargetCompensated() && turret.atTarget();
+    public void increaseToleranceOffset(double offset) {
+        shooter.addToleranceOffset(offset);
     }
-
-    public void increaseToleranceOffset(double down, double up) {
-        shooter.addToDownToleranceOffset(down);
-        shooter.addToUpToleranceOffset(up);
+    public void decreaseToleranceOffset(double offset) {
+        shooter.addToleranceOffset(-offset);
     }
-
-    public void decreaseToleranceOffset(double down, double up) {
-        shooter.addToDownToleranceOffset(-down);
-        shooter.addToUpToleranceOffset(-up);
+    public void setToleranceOffset(double offset) {
+        shooter.setToleranceOffset(offset);
     }
-
-
-    public void setToleranceCompensationOffset(double offset) {
-        shooter.setToleranceCompensationOffset(offset);
+    public boolean checkErrorTolerance(double error) {
+        return Math.abs(shooter.getVelocityError()) <= error;
     }
-
-    public void setToleranceOffset(double down, double up) {
-        shooter.setDownToleranceOffset(down);
-        shooter.setUpToleranceOffset(up);
-    }
-
-    public boolean checkErrorTolerance(double down, double up) {
-        return shooter.getVelocityErrorDown() >= down || shooter.getVelocityErrorUp() >= up;
-    }
-
-    public boolean checkErrorToleranceDown(double error) {
-        return shooter.getVelocityErrorDown() >= error;
-    }
-
-    public boolean checkErrorToleranceUp(double error) {
-        return shooter.getVelocityErrorUp() >= error;
-    }
-
-    public boolean checkErrorToleranceCompensation(double error) {
-        return Math.abs(shooter.getVelocityErrorCompensation()) <= error;
-    }
-
     public void addErrorToleranceScaled() {
         double offset;
         if(distanceToGoal <= 180){
@@ -181,7 +194,7 @@ public class Outtake extends HighModule {
         }else{
             offset = 0.15;//TODO maybbe 0.2
         }
-        shooter.addToleranceCompensationOffset(offset);
+        shooter.addToleranceOffset(offset);
     }
     public void addErrorToleranceScaledAuto() {
         double offset;
@@ -190,11 +203,11 @@ public class Outtake extends HighModule {
         }else{
             offset = 0.15;//TODO maybbe 0.2
         }
-        shooter.addToleranceCompensationOffset(offset);
+        shooter.addToleranceOffset(offset);
     }
 
     public boolean detectShoot() {
-        if (atTargetCompensated()) {
+        if (atTarget()) {
             shooter.wasAtTarget = true;
             return false;
         }
@@ -207,8 +220,7 @@ public class Outtake extends HighModule {
     }
 
     public void resetErrorTolerance() {
-        shooter.setToleranceCompensationOffset(0);
-        setToleranceOffset(0, 0);
+        shooter.setToleranceOffset(0);
     }
 
     public double getDistanceToGoalTime() {
@@ -220,17 +232,8 @@ public class Outtake extends HighModule {
         shooter.update();
         turret.update();
         blocker.update();
+        hood.update();
         linkageCamera.update();
-//        if (hasShot) {
-//            if (timer.milliseconds() >= 30 || !breakBeamOuttake.getState()) {
-//                hasShot = false;
-//            }
-//        }
-//
-//        if (!hasShot && breakBeamOuttake.getState()) {
-//            timer.reset();
-//            hasShot = true;
-//        }
     }
 
     public void update(Pose robotPose) {
@@ -261,17 +264,8 @@ public class Outtake extends HighModule {
         setShootingVelocity(calculateDistanceToGoal(pose) + offset);
     }
     public void debug() {
-        telemetry.addData("Shooter Down Tollerence + Offset", shooter.getDownOffset());
-        telemetry.addData("Shooter Up Tollerence + Offset", shooter.getUpOffset());
-        telemetry.addData("Shooter Compensation Tolerance + Offset", shooter.getToleranceCompensation());
         telemetry.addData("Distance ", distanceToGoal);
-        telemetry.addData("Kc ", kC);
         telemetry.addData("Down Velocity", shooter.motorDown.getCurrentVelocity());
-        telemetry.addData("Down Target", shooter.getTargetDown());
-        telemetry.addData("Up Velocity", shooter.motorUp.getCurrentVelocity());
-        telemetry.addData("Up Target", shooter.getTargetUp());
-        telemetry.addData("General Target", shooter.target);
-        telemetry.addData("Down error velocity", shooter.getVelocityErrorDown());
         telemetry.addData("Ticks: ", turret.getCurrentTicks());
         telemetry.addData("Target Ticks: ", turret.getTargetTicks());
         telemetry.addData("Power: ", turret.motor.getPower());
