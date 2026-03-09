@@ -1,15 +1,15 @@
 package org.firstinspires.ftc.teamcode.Core.Module.Outtake;
 
-import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.shooterMotorDownName;
-import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.shooterMotorUpName;
-import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterFlyWheelParams.encoderResolutionFly;
-import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterFlyWheelParams.kaFly;
-import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterFlyWheelParams.kdFly;
-import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterFlyWheelParams.kfFly;
-import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterFlyWheelParams.kiFly;
-import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterFlyWheelParams.kpFly;
-import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterFlyWheelParams.ksFly;
-import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterFlyWheelParams.wheelDiameterFly;
+import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.shooterMotorLeftName;
+import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.shooterMotorRightName;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterConstants.encoderResolutionFly;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterConstants.kaFly;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterConstants.kdFly;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterConstants.kfFly;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterConstants.kiFly;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterConstants.kpFly;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterConstants.ksFly;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterConstants.wheelDiameterFly;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighMotor;
 
 @Config
 public class Shooter extends HighModule {
-    public HighMotor motorUp, motorDown;
+    public HighMotor motorRight, motorLeft;
 
     public double currentVelocity;
     public double tolerance = 0.15, toleranceOffset = 0;
@@ -34,10 +34,10 @@ public class Shooter extends HighModule {
 
     public Shooter(HardwareMap hwMap) {
         targetVelocity = 0;
-        motorDown = HighMotor.Builder.startBuilding()
-                .setMotor(hwMap.get(DcMotorEx.class, shooterMotorDownName))
+        motorLeft = HighMotor.Builder.startBuilding()
+                .setMotor(hwMap.get(DcMotorEx.class, shooterMotorLeftName))
                 .setRunMode(HighMotor.RunMode.Velocity)
-                .setReverseMotor(false)
+                .setReverseMotor(true)
                 .setEncoder(true, false)
                 .setEncoderResolution(encoderResolutionFly)
                 .setWheelDiameter(wheelDiameterFly)
@@ -46,10 +46,10 @@ public class Shooter extends HighModule {
                 .setUseZeroPowerBehaviour(false)
                 .build();
 
-        motorDown.pidfVelocity.setFilterGain(0.8);
-        motorDown.setTolerance(tolerance);
-        motorUp = HighMotor.Builder.startBuilding()
-                .setMotor(hwMap.get(DcMotorEx.class, shooterMotorUpName))
+        motorLeft.pidfVelocity.setFilterGain(0.8);
+        motorLeft.setTolerance(tolerance);
+        motorRight = HighMotor.Builder.startBuilding()
+                .setMotor(hwMap.get(DcMotorEx.class, shooterMotorRightName))
                 .setRunMode(HighMotor.RunMode.Standard)
                 .setReverseMotor(false)
                 .setUseZeroPowerBehaviour(false)
@@ -57,8 +57,12 @@ public class Shooter extends HighModule {
     }
 
     public void setTargetVelocity(double velocity) {
+        velocity = getFlyWheelVelocity(velocity);
         this.targetVelocity = Range.clip(velocity, 0, maxVelocity);
-        motorDown.setTarget(this.targetVelocity);
+        motorLeft.setTarget(this.targetVelocity);
+    }
+    public double getFlyWheelVelocity(double v0){
+        return v0*2*1.25;
     }
 
     public double getVelocityError() {
@@ -84,30 +88,30 @@ public class Shooter extends HighModule {
     }
 
     public void setPIDCoefficients(double kp, double kd, double ki, double kf) {
-        motorDown.setVelocityPIDCoefficients(kp, ki, kd, kf, 1);
+        motorLeft.setVelocityPIDCoefficients(kp, ki, kd, kf, 1);
     }
 
     public void updateCoefficients() {
-        motorDown.setVelocityPIDFSA(kpFly, kiFly, kdFly, kfFly, ksFly, kaFly, 1);
+        motorLeft.setVelocityPIDFSA(kpFly, kiFly, kdFly, kfFly, ksFly, kaFly, 1);
     }
 
     public void setTolerance(double newTolerance) {
         this.tolerance = newTolerance;
-        motorDown.setTolerance(newTolerance);
+        motorLeft.setTolerance(newTolerance);
     }
 
     public void nanMotors() {
-        motorDown.setVelocityPIDFSA(0, 0, 0, 0, 0, 0, 1);
+        motorLeft.setVelocityPIDFSA(0, 0, 0, 0, 0, 0, 1);
     }
 
     @Override
     public void update() {
-        currentVelocity = motorDown.getCurrentVelocity();
+        currentVelocity = motorLeft.getCurrentVelocity();
         jerk = Math.abs(lastVelocity - currentVelocity);
         lastVelocity = currentVelocity;
-        motorDown.update();
-        double appliedPower = motorDown.motor.getPower();
-        motorUp.setPower(appliedPower);
-        motorUp.update();
+        motorLeft.update();
+        double appliedPower = motorLeft.motor.getPower();
+        motorRight.setPower(appliedPower);
+        motorRight.update();
     }
 }

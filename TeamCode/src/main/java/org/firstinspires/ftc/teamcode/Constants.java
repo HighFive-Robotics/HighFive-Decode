@@ -63,8 +63,8 @@ public class Constants {
         public static String breakBeamIntakeNameUp = "IBU";
         public static String breakBeamIntakeNameDown = "IBD";
         public static String breakBeamOuttakeName = "OB";
-        public static String shooterMotorUpName = "OMT";
-        public static String shooterMotorDownName = "OMB";
+        public static String shooterMotorRightName = "OMR";
+        public static String shooterMotorLeftName = "OML";
         public static String turretMotorName = "TM";
         public static String blockerServoName = "BO";
         public static String ledName1 = "L1";
@@ -92,19 +92,6 @@ public class Constants {
 
     public static class OuttakeConstants {
         @Config
-        public static class ShooterFlyWheelParams {
-            public static double kpFly = 0.004, kdFly = 0.0001, kiFly = 0.0035, kfFly = 0.00016, ksFly = 0, kaFly = 0;
-            public static final double wheelDiameterFly = 0.096;
-            public static final double encoderResolutionFly = 28;
-        }
-        @Config
-        public static class ShooterBackWheelParams {
-            public static double kpBack = 0.00093, kdBack = 0.00002, kiBack = 0.0009, kfBack = 0.00008, ksBack = 0, kaBack = 0;
-            public static final double wheelDiameterBack = 0.048;
-            public static final double encoderResolutionBack = 28;
-            public static double kC = 1;
-        }
-        @Config
         public static class TurretParams {
             public static double kpTurret = 0.03, kdTurret = 0.0014, kiTurret = 0.06, kfTurret = 0.0001;
             public static double kp2Turret = 0.047, kd2Turret = 0.0009, ki2Turret = 0.002, thresholdSmallPID = 35;
@@ -121,11 +108,20 @@ public class Constants {
         public static class HoodConstants{
             public static double minAngle = 17;
             public static double maxAngle = 44;
-            public static double minServoPos = 0.76  ;
-            public static double maxServoPos = 0.15;
+            public static double minServoPos = 0.825;
+            public static double maxServoPos = 0.175;
             public static double initAngle = 20;
         }
-
+        @Config
+        public static class ShooterConstants{
+            public static double kpFly = 0.004, kdFly = 0.0001, kiFly = 0.0035, kfFly = 0.00016, ksFly = 0, kaFly = 0;
+            public static final double wheelDiameterFly = 0.096;
+            public static final double encoderResolutionFly = 28;
+            public static double deltaHeight = 31.2;
+            public static double scoreAngle = Math.toRadians(-30);
+            public static double tolerancePointRadius = 5;
+            public static double gravitationalCoef = 386.1; // in/s^2
+        }
     }
     @Config
     public static class CameraConstants {

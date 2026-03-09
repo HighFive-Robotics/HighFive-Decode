@@ -1,19 +1,14 @@
 package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
-import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.intakeMotorName;
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Constants;
-import org.firstinspires.ftc.teamcode.Core.Hardware.HighCamera;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
@@ -23,7 +18,8 @@ public class ShooterCalibration extends LinearOpMode {
 
     public enum Mode {
         Manual,
-        Physics
+        Physics,
+        SOTM,
     }
     public static Mode mode = Mode.Manual;
     public static double manualVelocity = 0; 
@@ -71,25 +67,26 @@ public class ShooterCalibration extends LinearOpMode {
             if (gamepad1.square) {
                 mode = Mode.Physics;
             }
-            if (gamepad1.circle) {
-                robot.outtake.shooter.updateCoefficients();
-            }
             if (gamepad1.optionsWasPressed()) {
                robot.setAction(Robot.Actions.ResetTurretCamera);
             }
             if(gamepad1.shareWasPressed()){
-                robot.outtake.shooter.motorDown.pidfVelocity.setFilterGain(filterGain);
+                robot.outtake.shooter.motorLeft.pidfVelocity.setFilterGain(filterGain);
             }
             if (mode == Mode.Manual) {
                 robot.outtake.shooter.setTargetVelocity(manualVelocity);
                 robot.outtake.hood.setAngle(manualHoodAngle);
             } else if (mode == Mode.Physics) {
                 robot.outtake.setShooterPhysics();
+            }else if (mode == Mode.SOTM){
+                robot.outtake.shootOnTheMove(robot.drive.getVelocity());
             }
             robot.update();
+            robot.outtake.shooter.updateCoefficients();
             robot.outtake.debug();
             telemetry.addData("Mode", mode);
-            telemetry.addData("PID Velo Error", robot.outtake.shooter.motorDown.pidfVelocity.getPositionError());
+            telemetry.addData("PARAMS SOTM : ", robot.outtake.getShootOnTheMoveVelocity(robot.drive.getVelocity()));
+            telemetry.addData("PID Velo Error", robot.outtake.shooter.motorLeft.pidfVelocity.getPositionError());
             telemetry.addData("Robot Pose", robot.drive.getPose());
             telemetry.update();
         }

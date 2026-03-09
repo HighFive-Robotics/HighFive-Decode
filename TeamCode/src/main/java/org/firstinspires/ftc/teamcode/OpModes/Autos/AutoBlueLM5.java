@@ -325,10 +325,6 @@ public class AutoBlueLM5 extends LinearOpMode {
             robot.update();
             telemetry.addData("State: ", state);
             telemetry.addData("Distance: ", robot.outtake.distanceToGoal);
-            telemetry.addData("Target Up: ", robot.outtake.shooter.getTargetUp());
-            telemetry.addData("Velo Up: ", robot.outtake.shooter.getVelocityErrorUp());
-            telemetry.addData("Target Down: ", robot.outtake.shooter.getTargetDown());
-            telemetry.addData("Velo Down: ", robot.outtake.shooter.getVelocityErrorDown());
             telemetry.addData("State: ", state);
 
            // telemetry.addData("Distance:", robot.outtake.distanceToGoal);

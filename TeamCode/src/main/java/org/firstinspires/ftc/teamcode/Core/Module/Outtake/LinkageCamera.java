@@ -28,7 +28,7 @@ public class LinkageCamera extends HighModule {
                 .setServo(hwMap.get(Servo.class , cameraServoName))
                 .setMotionProfilerRunMode()
                 .setMotionProfilerCoefficients(3,4,2)
-                .setInitPosition(initPosition, isAuto)
+//                .setInitPosition(initPosition, isAuto)
                 .build();
     }
 

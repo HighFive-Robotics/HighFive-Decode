@@ -3,13 +3,22 @@ package org.firstinspires.ftc.teamcode.Core.Module.Outtake;
 
 import static org.firstinspires.ftc.teamcode.Constants.DeviceNames.breakBeamOuttakeName;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.BlueGoal;
+import static org.firstinspires.ftc.teamcode.Constants.Globals.BlueGoalCorner;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.BlueGoalDistance;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.RedGoal;
+import static org.firstinspires.ftc.teamcode.Constants.Globals.RedGoalCorner;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.RedGoalDistance;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.HoodConstants.maxAngle;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.HoodConstants.minAngle;
 import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.LinkageCameraConstants.ArtifactPose;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterConstants.deltaHeight;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterConstants.gravitationalCoef;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterConstants.scoreAngle;
+import static org.firstinspires.ftc.teamcode.Constants.OuttakeConstants.ShooterConstants.tolerancePointRadius;
 
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.math.Vector;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -25,7 +34,6 @@ public class Outtake extends HighModule {
     public Turret turret;
     public LinkageCamera linkageCamera;
     public Blocker blocker;
-    public DigitalChannel breakBeamOuttake;
     private final Telemetry telemetry;
 
     public Pose robotPose = new Pose(0,0,0);
@@ -35,10 +43,10 @@ public class Outtake extends HighModule {
     private Thread breakBeamThread;
     private volatile boolean isRunning = true;
     public boolean isShooting = false;
-    public static double gravitationalCoef = 386.1; // in/s^2
-    public static double shooterHeight = 14.5;
+    public static double shooterHeight = 11.8;
     public static double kE = 1.25;
     public static double baseClearanceOffset = 5.0;
+    public double turretOffsetSotm = 0;
     public Hood hood;
 
 
@@ -48,38 +56,13 @@ public class Outtake extends HighModule {
         hood = new Hood(hardwareMap , isAuto);
         linkageCamera = new LinkageCamera(hardwareMap,ArtifactPose,isAuto);
         blocker = new Blocker(hardwareMap, Blocker.ClosedPosition, isAuto);
-        breakBeamOuttake = hardwareMap.get(DigitalChannel.class, breakBeamOuttakeName);
-        breakBeamOuttake.setMode(DigitalChannel.Mode.INPUT);
         this.telemetry = telemetry;
     }
 
     public void startBreakBeamThread() {
-        breakBeamThread = new Thread(() -> {
-            boolean lastState = false;
-            while (isRunning && isShooting) {
-                boolean currentState = breakBeamOuttake.getState();
-                if (!hasShot && currentState) {
-                    timer.reset();
-                    hasShot = true;
-                }
-                if (hasShot) {
-                    if (timer.milliseconds() >= 65) {
-                        hasShot = false;
-                    }
-                }
-                lastState = currentState;
-            }
-        });
-
-        breakBeamThread.setPriority(Thread.MAX_PRIORITY);
-        breakBeamThread.start();
     }
 
     public void stopBreakBeamThread() {
-        isRunning = false;
-        if (breakBeamThread != null) {
-            breakBeamThread.interrupt();
-        }
     }
 
     public void setShootingVelocity(double dist) {
@@ -103,7 +86,7 @@ public class Outtake extends HighModule {
         double wallClearanceAngleRads = Math.atan2(frontWallHeightDelta, distanceToFrontWall);
         double wallClearanceAngleDegrees = Math.toDegrees(wallClearanceAngleRads);
         double targetAngleDegrees = wallClearanceAngleDegrees + baseClearanceOffset + trajectoryOffsetDegrees;
-        targetAngleDegrees = Range.clip(targetAngleDegrees, Constants.OuttakeConstants.HoodConstants.minAngle, Constants.OuttakeConstants.HoodConstants.maxAngle);
+        targetAngleDegrees = Range.clip(targetAngleDegrees, minAngle, Constants.OuttakeConstants.HoodConstants.maxAngle);
         hood.setAngle(targetAngleDegrees);
         double targetHeightDelta = goal.targetZ - shooterHeight;
         double alphaRads = Math.toRadians(targetAngleDegrees);
@@ -140,8 +123,61 @@ public class Outtake extends HighModule {
                 break;
         }
     }
+    public Pose getGoalPose( ){
+        switch (autoColor){
+            case Blue:
+                return BlueGoalCorner;
+            default:
+                return RedGoalCorner;
+        }
+    }
+    public void shootOnTheMove(Vector robotVelocity){
+        Vector robotToGoal = getGoalPose().minus(robotPose).getAsVector();
+        double x = robotToGoal.getMagnitude() - tolerancePointRadius;
 
+        double hoodAngle = Range.clip(Math.atan2(2*deltaHeight, x - Math.tan(scoreAngle)) , Math.toRadians(minAngle) , Math.toRadians(maxAngle));
+        double v0 = Math.sqrt( (gravitationalCoef*x*x) / (2* Math.pow(Math.cos(hoodAngle), 2) * (x * Math.tan(hoodAngle) - deltaHeight)));
 
+        double coordTheta = robotVelocity.getTheta() - robotToGoal.getTheta();
+
+        double vrr = -Math.cos(coordTheta) * robotVelocity.getMagnitude();
+        double vrt = Math.sin(coordTheta) * robotVelocity.getMagnitude();
+
+        double vy0 = v0 * Math.sin(hoodAngle);
+        double vxComp = v0 * Math.cos(hoodAngle) + vrr;
+        double vxNew = Math.sqrt(vxComp * vxComp + vrt * vrt);
+        double time = x / (Math.cos(hoodAngle) * v0);
+        double xNew = vxNew * time;
+        hoodAngle = Range.clip(Math.atan2(vy0, vxNew) , Math.toRadians(minAngle) , Math.toRadians(maxAngle));
+        v0 = Math.sqrt( (gravitationalCoef*xNew*xNew) / (2* Math.pow(Math.cos(hoodAngle), 2) * (xNew * Math.tan(hoodAngle) - deltaHeight)));
+
+        turretOffsetSotm = Math.tan(vrt / vxComp);
+        hood.setAngleRadians(hoodAngle);
+        shooter.setTargetVelocity(v0);
+    }
+    public String getShootOnTheMoveVelocity(Vector robotVelocity){
+        Vector robotToGoal = getGoalPose().minus(robotPose).getAsVector();
+        double x = robotToGoal.getMagnitude() - tolerancePointRadius;
+
+        double hoodAngle = Range.clip(Math.atan2(2*deltaHeight, x - Math.tan(scoreAngle)) , Math.toRadians(minAngle) , Math.toRadians(maxAngle));
+        double v0 = Math.sqrt( (gravitationalCoef*x*x) / (2* Math.pow(Math.cos(hoodAngle), 2) * (x * Math.tan(hoodAngle) - deltaHeight)));
+
+        double coordTheta = robotVelocity.getTheta() - robotToGoal.getTheta();
+
+        double vrr = -Math.cos(coordTheta) * robotVelocity.getMagnitude();
+        double vrt = Math.sin(coordTheta) * robotVelocity.getMagnitude();
+
+        double vy0 = v0 * Math.sin(hoodAngle);
+        double vxComp = v0 * Math.cos(hoodAngle) + vrr;
+        double vxNew = Math.sqrt(vxComp * vxComp + vrt * vrt);
+        double time = x / (Math.cos(hoodAngle) * v0);
+        double xNew = vxNew * time;
+        hoodAngle = Range.clip(Math.atan2(vy0, vxNew) , Math.toRadians(minAngle) , Math.toRadians(maxAngle));
+        v0 = Math.sqrt( (gravitationalCoef*xNew*xNew) / (2* Math.pow(Math.cos(hoodAngle), 2) * (xNew * Math.tan(hoodAngle) - deltaHeight)));
+
+        turretOffsetSotm = Math.tan(vrt / vxComp);
+        return "V0 " + v0 + " Hood Angle " + hoodAngle;
+    }
     public void openBlocker() {
         blocker.setState(Blocker.States.Open);
     }
@@ -157,7 +193,9 @@ public class Outtake extends HighModule {
         turret.setTarget(turret.getTargetAngleFromDistance(robotPose));
         turret.addOffsetDegrees(offsetDegrees);
     }
-
+    public void alignTurretSOTM(){
+        turret.setTarget(turret.getTargetAngleFromDistance(robotPose) + turretOffsetSotm);
+    }
     public void alignTurret() {
         alignTurret(robotPose);
     }
@@ -265,7 +303,8 @@ public class Outtake extends HighModule {
     }
     public void debug() {
         telemetry.addData("Distance ", distanceToGoal);
-        telemetry.addData("Down Velocity", shooter.motorDown.getCurrentVelocity());
+        telemetry.addData("Velocity", shooter.motorLeft.getCurrentVelocity());
+        telemetry.addData("Target Velocity", shooter.getTarget());
         telemetry.addData("Ticks: ", turret.getCurrentTicks());
         telemetry.addData("Target Ticks: ", turret.getTargetTicks());
         telemetry.addData("Power: ", turret.motor.getPower());

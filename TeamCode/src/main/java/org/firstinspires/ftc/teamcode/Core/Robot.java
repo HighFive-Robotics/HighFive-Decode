@@ -45,7 +45,7 @@ public class Robot extends HighModule {
     public List<LynxModule> allHubs;
 
     boolean isAuto;
-    public boolean shootingSequence = false, holdingSequence = false, shouldAlignTurret = true, visionAlign = false , resetWithCamera= false;
+    public boolean shootingSequence = false, holdingSequence = false, shouldAlignTurret = true, visionAlign = false , resetWithCamera= false, sotm = true;
     private Pose cameraPose = new Pose(0, 0, 0);
     int shootingState = 0;
     Double tx = null;
@@ -145,12 +145,12 @@ public class Robot extends HighModule {
                 cycles = -1;
                 break;
             case ResetTurretCamera:
-                outtake.linkageCamera.setState(LinkageCamera.States.Goal, 150);
+//                outtake.linkageCamera.setState(LinkageCamera.States.Goal, 150);
                 camera.startCapture();
                 resetWithCamera = true;
                 break;
             case StopCamera:
-                outtake.linkageCamera.setState(LinkageCamera.States.Artifact, 150);
+//                outtake.linkageCamera.setState(LinkageCamera.States.Artifact, 150);
                 camera.pauseCapture();
                 resetWithCamera = false;
                 break;
@@ -231,7 +231,7 @@ public class Robot extends HighModule {
             outtake.turret.updateVisionOffset(tx);
             if(tx != null && Math.abs(tx) <= toleranceTurretDeg){
                 resetWithCamera = false;
-                outtake.linkageCamera.setState(LinkageCamera.States.Artifact);
+//                outtake.linkageCamera.setState(LinkageCamera.States.Artifact);
                 camera.pauseCapture();
           }
         }
@@ -239,7 +239,9 @@ public class Robot extends HighModule {
         drive.update();
         outtake.update(drive.getPose());
         if (shouldAlignTurret) {
-            outtake.alignTurret();
+            if(sotm){
+                outtake.alignTurretSOTM();
+            }else outtake.alignTurret();
         }
         if (visionAlign) {
             resetWithCamera();
