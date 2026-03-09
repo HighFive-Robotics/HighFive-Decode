@@ -41,8 +41,8 @@ public class Hood extends HighModule {
         hoodServo.setPosition(angleToPosition(this.targetAngle));
     }
     public void setAngleRadians(double angle){
-        angle = Math.toRadians(angle);
-        this.targetAngle = Math.max(minAngle, Math.min(maxAngle, angle));
+        double newangle = Math.toRadians(angle);
+        this.targetAngle = Math.max(minAngle, Math.min(maxAngle, newangle));
         hoodServo.setPosition(angleToPosition(this.targetAngle));
     }
     public double getAngle() {

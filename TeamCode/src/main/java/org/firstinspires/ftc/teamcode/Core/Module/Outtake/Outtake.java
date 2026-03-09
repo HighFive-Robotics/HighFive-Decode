@@ -44,7 +44,7 @@ public class Outtake extends HighModule {
     private volatile boolean isRunning = true;
     public boolean isShooting = false;
     public static double shooterHeight = 11.8;
-    public static double kE = 1.25;
+    public static double kE = 1.1;
     public static double baseClearanceOffset = 5.0;
     public double turretOffsetSotm = 0;
     public Hood hood;
@@ -94,7 +94,7 @@ public class Outtake extends HighModule {
         double cosA = Math.cos(alphaRads);
         double denominator = 2 * cosA * (distanceToCenter * sinA - targetHeightDelta * cosA);
         if (denominator > 0) {
-            double targetVelocity =  kE * distanceToCenter * Math.sqrt(gravitationalCoef / denominator);
+            double targetVelocity =  kE * distanceToCenter * Math.sqrt(gravitationalCoef / denominator)  * 0.0254;
             shooter.setTargetVelocity(targetVelocity);
         } else {
             shooter.setTargetVelocity(0);
@@ -135,7 +135,7 @@ public class Outtake extends HighModule {
         Vector robotToGoal = getGoalPose().minus(robotPose).getAsVector();
         double x = robotToGoal.getMagnitude() - tolerancePointRadius;
 
-        double hoodAngle = Range.clip(Math.atan2(2*deltaHeight, x - Math.tan(scoreAngle)) , Math.toRadians(minAngle) , Math.toRadians(maxAngle));
+        double hoodAngle = Range.clip(Math.atan2(2*deltaHeight, x - Math.tan(scoreAngle)) , Math.toRadians(minAngle) , Math.toRadians(maxAngle))  * 0.0254;
         double v0 = Math.sqrt( (gravitationalCoef*x*x) / (2* Math.pow(Math.cos(hoodAngle), 2) * (x * Math.tan(hoodAngle) - deltaHeight)));
 
         double coordTheta = robotVelocity.getTheta() - robotToGoal.getTheta();
@@ -149,7 +149,7 @@ public class Outtake extends HighModule {
         double time = x / (Math.cos(hoodAngle) * v0);
         double xNew = vxNew * time;
         hoodAngle = Range.clip(Math.atan2(vy0, vxNew) , Math.toRadians(minAngle) , Math.toRadians(maxAngle));
-        v0 = Math.sqrt( (gravitationalCoef*xNew*xNew) / (2* Math.pow(Math.cos(hoodAngle), 2) * (xNew * Math.tan(hoodAngle) - deltaHeight)));
+        v0 = Math.sqrt( (gravitationalCoef*xNew*xNew) / (2* Math.pow(Math.cos(hoodAngle), 2) * (xNew * Math.tan(hoodAngle) - deltaHeight)))  * 0.0254;
 
         turretOffsetSotm = Math.tan(vrt / vxComp);
         hood.setAngleRadians(hoodAngle);
@@ -160,7 +160,7 @@ public class Outtake extends HighModule {
         double x = robotToGoal.getMagnitude() - tolerancePointRadius;
 
         double hoodAngle = Range.clip(Math.atan2(2*deltaHeight, x - Math.tan(scoreAngle)) , Math.toRadians(minAngle) , Math.toRadians(maxAngle));
-        double v0 = Math.sqrt( (gravitationalCoef*x*x) / (2* Math.pow(Math.cos(hoodAngle), 2) * (x * Math.tan(hoodAngle) - deltaHeight)));
+        double v0 = Math.sqrt( (gravitationalCoef*x*x) / (2* Math.pow(Math.cos(hoodAngle), 2) * (x * Math.tan(hoodAngle) - deltaHeight))) * 0.0254;
 
         double coordTheta = robotVelocity.getTheta() - robotToGoal.getTheta();
 
@@ -173,7 +173,7 @@ public class Outtake extends HighModule {
         double time = x / (Math.cos(hoodAngle) * v0);
         double xNew = vxNew * time;
         hoodAngle = Range.clip(Math.atan2(vy0, vxNew) , Math.toRadians(minAngle) , Math.toRadians(maxAngle));
-        v0 = Math.sqrt( (gravitationalCoef*xNew*xNew) / (2* Math.pow(Math.cos(hoodAngle), 2) * (xNew * Math.tan(hoodAngle) - deltaHeight)));
+        v0 = Math.sqrt( (gravitationalCoef*xNew*xNew) / (2* Math.pow(Math.cos(hoodAngle), 2) * (xNew * Math.tan(hoodAngle) - deltaHeight)))  * 0.0254;
 
         turretOffsetSotm = Math.tan(vrt / vxComp);
         return "V0 " + v0 + " Hood Angle " + hoodAngle;
