@@ -62,7 +62,7 @@ public class Shooter extends HighModule {
         motorLeft.setTarget(this.targetVelocity);
     }
     public double getFlyWheelVelocity(double v0){
-        return v0*2*1.25;
+        return v0;
     }
 
     public double getVelocityError() {

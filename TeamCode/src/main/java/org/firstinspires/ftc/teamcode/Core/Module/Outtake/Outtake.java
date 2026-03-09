@@ -94,7 +94,7 @@ public class Outtake extends HighModule {
         double cosA = Math.cos(alphaRads);
         double denominator = 2 * cosA * (distanceToCenter * sinA - targetHeightDelta * cosA);
         if (denominator > 0) {
-            double targetVelocity = 2 * kE * distanceToCenter * Math.sqrt(gravitationalCoef / denominator);
+            double targetVelocity =  kE * distanceToCenter * Math.sqrt(gravitationalCoef / denominator);
             shooter.setTargetVelocity(targetVelocity);
         } else {
             shooter.setTargetVelocity(0);
