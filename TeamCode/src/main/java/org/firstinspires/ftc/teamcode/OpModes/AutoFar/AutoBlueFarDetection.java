@@ -25,24 +25,24 @@ public class AutoBlueFarDetection extends LinearOpMode {
     public int state = 0;
 
 
-    public Pose startPose = new Pose(50, 6, Math.toRadians(180));
-    public Pose precollectSpikeMark3Pose = new Pose(50, 34, Math.toRadians(180));
+    public Pose startPose = new Pose(55, 6, Math.toRadians(180));
+    public Pose precollectSpikeMark3Pose = new Pose(55, 35.5, Math.toRadians(180));
     public Pose controlPoint1 = new Pose(60, 38);
-    public Pose controlPointLoading1 = new Pose(29, 11);
-    public Pose controlPointLoading2 = new Pose(14, 21);
-    public Pose collectSpikeMark3Pose = new Pose(9, 34, Math.toRadians(180));
-    public Pose collectLoadingZone1 = new Pose(6, 8, Math.toRadians(180));
-    public Pose preCollectLoadingZone1 = new Pose(25, 7, Math.toRadians(180));
+    public Pose controlPointLoading1 = new Pose(34, 11);
+    public Pose controlPointLoading2 = new Pose(19, 21);
+    public Pose collectSpikeMark3Pose = new Pose(12, 35.5, Math.toRadians(180));
+    public Pose collectLoadingZone1 = new Pose(13, 12, Math.toRadians(180));
+    public Pose preCollectLoadingZone1 = new Pose(23, 12, Math.toRadians(180));
 
-    public Pose collectLoadingZone2 = new Pose(6, 8, Math.toRadians(-150));
-    public Pose preCollectLoadingZone2 = new Pose(8, 17, Math.toRadians(-150));
+    public Pose collectLoadingZone2 = new Pose(13, 12, Math.toRadians(-165));
+    public Pose preCollectLoadingZone2 = new Pose(16, 17, Math.toRadians(-165));
 
     //    public Pose collectLoadingZone2 = new Pose(127.5, 17, Math.toRadians(-30));
     //    public Pose preCollectLoadingZone2 = new Pose(129, 8, Math.toRadians(-30));
 
-    public Pose loadingArtifact = new Pose(7, 10, Math.toRadians(-90));
+    public Pose loadingArtifact = new Pose(12, 10, Math.toRadians(-90));
 
-    public Pose parkPose = new Pose(6, 10, Math.toRadians(180));
+    public Pose parkPose = new Pose(11, 10, Math.toRadians(180));
 
     private final ElapsedTime autoTimer = new ElapsedTime();
     private final ElapsedTime timer = new ElapsedTime();
@@ -72,12 +72,12 @@ public class AutoBlueFarDetection extends LinearOpMode {
                 .build();
 
         PathChain collectLoading = robot.drive.pathBuilder()
-                .addPath(new BezierCurve(startPose,
-                        controlPointLoading1,
-                        controlPointLoading2,
-                        collectLoadingZone1))
-                .setLinearHeadingInterpolation(startPose.getHeading(), collectLoadingZone1.getHeading())
+                .addPath(new BezierLine(collectLoadingZone2, preCollectLoadingZone1))
+                .setLinearHeadingInterpolation(collectLoadingZone2.getHeading(), preCollectLoadingZone1.getHeading())
+                .addPath(new BezierLine(preCollectLoadingZone1, collectLoadingZone1))
+                .setLinearHeadingInterpolation(preCollectLoadingZone1.getHeading(), collectLoadingZone1.getHeading())
                 .build();
+
         PathChain preCollectLoading = robot.drive.pathBuilder()
                 .addPath(new BezierLine(collectLoadingZone1, preCollectLoadingZone1))
                 .setLinearHeadingInterpolation(collectLoadingZone1.getHeading(), preCollectLoadingZone1.getHeading())
@@ -129,13 +129,13 @@ public class AutoBlueFarDetection extends LinearOpMode {
         telemetry.update();
         waitForStart();
 
-        robot.outtake.setShootingVelocityForPose(startPose, -1);
+        robot.outtake.setShootingVelocityForPose(startPose, 25);
         robot.update();
         autoTimer.reset();
         timer.reset();
 
         while (opModeIsActive()) {
-            if (autoTimer.milliseconds() >= 27500 && state < 100 &&  !robot.intake.isPartial) {
+            if (autoTimer.milliseconds() >= 27500 && state < 100) {//&&  !robot.intake.isPartial
                 state = 100;
             }
 
@@ -147,7 +147,7 @@ public class AutoBlueFarDetection extends LinearOpMode {
                     break;
                 case 1:
                     if (!robot.resetWithCamera) {
-                        robot.outtake.turret.addOffsetDegrees(1.5);
+                        robot.outtake.turret.addOffsetDegrees(2);
                         robot.setAction(Robot.Actions.Shoot);
                         timer.reset();
                         state = 2;
@@ -159,21 +159,25 @@ public class AutoBlueFarDetection extends LinearOpMode {
                         robot.shouldAlignTurret = false;
                         robot.intake.setPower(Collect);
                         timer.reset();
-                        state = 4;
+                        state = 3;
                     }
                     break;
-//                case 3:
-//                    if (robot.isDone()) {
-//                        robot.drive.followPath(preCollectLoading);
-//                        robot.intake.setPower(Collect);
-//                        timer.reset();
-//                        state++;
-//                    }
-//                    break;
+                case 3:
+                   if (!robot.isDone() && timer.milliseconds() >= 3000) {
+                        robot.drive.followPath(collectLoading);
+                        robot.intake.setPower(Collect);
+                        timer.reset();
+                        state++;
+                   } else if(robot.isDone() && timer.milliseconds() <= 3000){
+                       state++;
+                   }
+                   break;
                 case 4:
                     if (robot.isDone()) {
                         robot.intake.setPower(Collect);
-                        robot.outtake.setShootingVelocityForPose(startPose, -7.5);
+                        if(isFirstTime){
+                            robot.outtake.setShootingVelocityForPose(startPose, 17);
+                        }
                         timer.reset();
                         state++;
                     }
@@ -181,6 +185,7 @@ public class AutoBlueFarDetection extends LinearOpMode {
                 case 5:
                     if (timer.milliseconds() >= 650 || robot.intake.isFull) {
                         robot.shouldAlignTurret = true;
+                        robot.outtake.turret.addOffsetDegrees(0.7);
                         robot.drive.followPath(goShootLoading);
                         timer.reset();
                         state = 6;
@@ -228,7 +233,7 @@ public class AutoBlueFarDetection extends LinearOpMode {
                 case 8:
                     if (robot.isDone()) {
                         robot.drive.followPath(goShootSpike);
-                        robot.outtake.setShootingVelocityForPose(startPose, -8.5);
+                        robot.outtake.setShootingVelocityForPose(startPose, 6);
                         timer.reset();
                         state = 85;
                     }
@@ -330,6 +335,7 @@ public class AutoBlueFarDetection extends LinearOpMode {
             finalAutoPose = robot.drive.getPose();
             robot.update();
             telemetry.addData("State: ", state);
+            telemetry.addData("Pose: ", robot.drive.getPose());
             telemetry.update();
         }
 

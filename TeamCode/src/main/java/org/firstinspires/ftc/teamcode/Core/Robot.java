@@ -21,6 +21,7 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighModule;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor;
 import org.firstinspires.ftc.teamcode.Core.Module.Intake.Intake;
 
+import org.firstinspires.ftc.teamcode.Core.Module.Others.BrakePiston;
 import org.firstinspires.ftc.teamcode.Core.Module.Others.Led;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.LinkageCamera;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.Outtake;
@@ -42,10 +43,11 @@ public class Robot extends HighModule {
     public Intake intake;
     public HighCamera camera;
     public Led led;
+    public BrakePiston brake;
     public List<LynxModule> allHubs;
 
     boolean isAuto;
-    public boolean shootingSequence = false, holdingSequence = false, shouldAlignTurret = true, visionAlign = false , resetWithCamera= false;
+    public boolean shootingSequence = false, holdingSequence = false, shouldAlignTurret = true, visionAlign = false , resetWithCamera= false , isClose = false;
     private Pose cameraPose = new Pose(0, 0, 0);
     int shootingState = 0;
     Double tx = null;
@@ -72,6 +74,7 @@ public class Robot extends HighModule {
         this.allianceColor = allianceColor;
         drive = Constants.createFollower(hardwareMap);
         camera = new HighCamera(hardwareMap, HighCamera.Pipelines.AprilTagId);
+        brake = new BrakePiston(hardwareMap , BrakePiston.FloatingPosition , isAuto);
         drive.setStartingPose(startPose);
         drive.setPose(startPose);
         if (!isAuto) {
@@ -84,6 +87,10 @@ public class Robot extends HighModule {
         outtake = new Outtake(hardwareMap, allianceColor, telemetry,isAuto);
         intake = new Intake(hardwareMap);
         led = new Led(hardwareMap);
+        if(isAuto){
+            outtake.linkageCamera.setState(LinkageCamera.States.Artifact, 150);
+            outtake.linkageCamera.update();
+        }
         allHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
@@ -102,6 +109,10 @@ public class Robot extends HighModule {
         intake = new Intake(hardwareMap);
         led = new Led(hardwareMap);
         allHubs = hardwareMap.getAll(LynxModule.class);
+        if(isAuto){
+            outtake.linkageCamera.setState(LinkageCamera.States.Artifact, 150);
+            outtake.linkageCamera.update();
+        }
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
@@ -185,51 +196,125 @@ public class Robot extends HighModule {
                     }
                     break;
                 case 1:
-                    if (cycles <= 3 || holdingSequence) {
-                        if (outtake.atTargetCompensated() || (cycles <= 1 && outtake.atTarget())) {
-                            intake.setPower(IntakeMotor.States.Collect);
-                            intake.intakeMotor.update();
-                            shootingState++;
-                            timerShoot.reset();
-                        }
-                    } else {
-                        intake.setPower(IntakeMotor.States.Wait);
-                        outtake.shooter.setUpTargetVelocity(outtake.shooter.getTargetDown());
-                        outtake.resetErrorTolerance();
-                        outtake.shooter.disableCompensation();
-                        outtake.isShooting = false;
-                        outtake.closeBlocker();
-                        outtake.shooter.wasAtTarget = false;
-                        intake.canStop = true;
-                        shootingSequence = false;
-                        shootingState = -1;
-                        cycles = -1;
-                    }
-                    break;
-                case 2:
-                    boolean checkShoot = outtake.detectShoot();
-                    boolean ballFired = (outtake.hasShot || checkShoot || timerShoot.milliseconds() >= 475);
-                    if (ballFired) {
+                    if(isAuto){
                         if (cycles <= 3) {
-                            if(!isAuto)outtake.addErrorToleranceScaled();
-                            else outtake.addErrorToleranceScaledAuto();
-                        }
-                        if (!outtake.atTargetCompensated()) {
+                            if(isClose) {
+                                if (outtake.atTargetIndividual() || outtake.atTarget()) {
+                                    intake.setPower(IntakeMotor.States.Collect);
+                                    intake.intakeMotor.update();
+                                    shootingState++;
+                                    timerShoot.reset();
+                                }
+                            }else{
+                                if (cycles > 1) {
+                                    if ((outtake.atTargetIndividual() || outtake.atTarget()) && timerShoot.milliseconds() >= 245) {
+                                        intake.setPower(IntakeMotor.States.Collect);
+                                        intake.intakeMotor.update();
+                                        shootingState++;
+                                        timerShoot.reset();
+                                    }
+                                }else {
+                                    if ((outtake.atTargetIndividual() || outtake.atTarget())) {
+                                        intake.setPower(IntakeMotor.States.Collect);
+                                        intake.intakeMotor.update();
+                                        shootingState++;
+                                        timerShoot.reset();
+                                    }
+                                }
+                            }
+                        } else {
                             intake.setPower(IntakeMotor.States.Wait);
-                            intake.intakeMotor.update();
+                            outtake.shooter.setUpTargetVelocity(outtake.shooter.getTargetDown());
+                            outtake.resetErrorTolerance();
+                            outtake.shooter.disableCompensation();
+                            outtake.isShooting = false;
+                            outtake.closeBlocker();
+                            outtake.shooter.wasAtTarget = false;
+                            intake.canStop = true;
+                            shootingSequence = false;
+                            shootingState = -1;
+                            cycles = -1;
                         }
-                        outtake.shooter.enableCompensation();
-                        shootingState = 1;
-                        cycles++;
-                    } else if (timerShoot.milliseconds() > 1000) {
-                        if (!outtake.atTargetCompensated()) {
+                        break;
+                    }else {
+                        if (cycles <= 3 || holdingSequence) {
+                            if (outtake.atTargetCompensated() || (cycles <= 1 && outtake.atTarget())) {
+                                intake.setPower(IntakeMotor.States.Collect);
+                                intake.intakeMotor.update();
+                                shootingState++;
+                                timerShoot.reset();
+                            }
+                        } else {
                             intake.setPower(IntakeMotor.States.Wait);
-                            intake.intakeMotor.update();
+                            outtake.shooter.setUpTargetVelocity(outtake.shooter.getTargetDown());
+                            outtake.resetErrorTolerance();
+                            outtake.shooter.disableCompensation();
+                            outtake.isShooting = false;
+                            outtake.closeBlocker();
+                            outtake.shooter.wasAtTarget = false;
+                            intake.canStop = true;
+                            shootingSequence = false;
+                            shootingState = -1;
+                            cycles = -1;
                         }
-                        outtake.shooter.enableCompensation();
-                        shootingState = 1;
-                        cycles++;
+                        break;
                     }
+
+                case 2:
+                    if(!isAuto){
+                        boolean checkShoot = outtake.detectShoot(!isClose);
+                        double timeToShoot = 475;
+                        if(isAuto && isClose) timeToShoot = 350;
+                        boolean ballFired = (outtake.hasShot || checkShoot || timerShoot.milliseconds() >= timeToShoot);
+                        if (ballFired) {
+                            if (cycles <= 3) {
+                                if(!isAuto)outtake.addErrorToleranceScaled();
+                                else outtake.addErrorToleranceScaledAuto(isClose);
+                            }
+                            if (!outtake.atTargetCompensated()) {
+                                intake.setPower(IntakeMotor.States.Wait);
+                                intake.intakeMotor.update();
+                            }
+                            outtake.shooter.enableCompensation();
+                            shootingState = 1;
+                            cycles++;
+                        } else if (timerShoot.milliseconds() > 1000) {
+                            if (!outtake.atTargetCompensated()) {
+                                intake.setPower(IntakeMotor.States.Wait);
+                                intake.intakeMotor.update();
+                            }
+                            outtake.shooter.enableCompensation();
+                            shootingState = 1;
+                            cycles++;
+                        }
+                    }else {
+                        boolean checkShoot = outtake.detectShoot(!isClose);
+                        double timeToShoot = 475;
+                        if(isAuto && isClose) timeToShoot = 350;
+                        boolean ballFired = (outtake.hasShot || checkShoot || timerShoot.milliseconds() >= timeToShoot);
+                        if (ballFired) {
+                            if (cycles <= 3) {
+                                if(!isAuto)outtake.addErrorToleranceScaled();
+                                else outtake.addErrorToleranceScaledAuto(isClose);
+                            }
+                            if (!outtake.atTargetIndividual(true)) {
+                                intake.setPower(IntakeMotor.States.Wait);
+                                intake.intakeMotor.update();
+                            }
+                            outtake.shooter.enableCompensation();
+                            shootingState = 1;
+                            cycles++;
+                        } else if (timerShoot.milliseconds() > 1000) {
+                            if (!outtake.atTargetCompensated()) {
+                                intake.setPower(IntakeMotor.States.Wait);
+                                intake.intakeMotor.update();
+                            }
+                            outtake.shooter.enableCompensation();
+                            shootingState = 1;
+                            cycles++;
+                        }
+                    }
+
                     break;
             }
         }
@@ -245,6 +330,7 @@ public class Robot extends HighModule {
         intake.update();
         drive.update();
         outtake.update(drive.getPose());
+        brake.update();
         if (shouldAlignTurret) {
             outtake.alignTurret();
         }

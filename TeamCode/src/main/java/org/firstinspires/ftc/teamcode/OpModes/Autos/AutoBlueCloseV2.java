@@ -99,7 +99,7 @@ public class  AutoBlueCloseV2 extends LinearOpMode {
                 .build();
 
         PathChain shootSpike1 = robot.drive.pathBuilder()
-                .addPath(new BezierCurve(collectSpikeMark1Pose, controlPointGate, shootPose2))
+                .addPath(new BezierLine(collectSpikeMark1Pose, shootPose2))
                 .setLinearHeadingInterpolation(collectSpikeMark1Pose.getHeading(), shootPose2.getHeading())
                 .build();
 
@@ -125,7 +125,7 @@ public class  AutoBlueCloseV2 extends LinearOpMode {
         Constants.OuttakeConstants.TurretParams.minimumErrorAngleForWalls = Math.PI / 5;
         waitForStart();
         autoTimer.reset();
-        robot.outtake.setShootingVelocity(robot.outtake.calculateDistanceToGoal(shootPose1)+2);
+        robot.outtake.setShootingVelocity(robot.outtake.calculateDistanceToGoal(shootPose1));
         while (opModeIsActive()) {
             switch (state) {
                 case 0:
@@ -153,7 +153,7 @@ public class  AutoBlueCloseV2 extends LinearOpMode {
                 case 3:
                     if (!robot.shootingSequence) {
                         robot.drive.followPath(goForSpike2, true);
-                        robot.outtake.alignTurret(shootPose2 , 2);
+                        robot.outtake.alignTurret(shootPose2 , 1);
                         robot.outtake.setShootingVelocityForPose(shootPose2 , -4);
                         timer.reset();
                         state++;
@@ -187,7 +187,6 @@ public class  AutoBlueCloseV2 extends LinearOpMode {
                     break;
                 case 8:
                     if (timer.milliseconds() >= 425) {
-                        robot.outtake.alignTurret(shootPose2, 1.5);
                         robot.drive.followPath(shootSpike2, true);
                         state++;
                     }
@@ -212,7 +211,6 @@ public class  AutoBlueCloseV2 extends LinearOpMode {
                 case 11:
                     if (robot.drive.atParametricEnd()) {
                         robot.intake.setPower(IntakeMotor.States.Collect);
-                        robot.outtake.alignTurret(shootPose2, 2);
                         robot.drive.followPath(shootSpike1, true);
                         state++;
                     }
@@ -229,8 +227,8 @@ public class  AutoBlueCloseV2 extends LinearOpMode {
                     if (!robot.shootingSequence) {
                         robot.drive.followPath(goForSpike3, true);
                         //robot.outtake.setShootingVelocity(robot.outtake.calculateDistanceToGoal(shootPose3)-2);
-                        robot.outtake.setShootingVelocityForPose(shootPose3, -2);
-                        robot.outtake.alignTurret(shootPose3, 5);
+                        robot.outtake.setShootingVelocityForPose(shootPose3, 1.5);
+                        robot.outtake.alignTurret(shootPose3, 2.75);
                         robot.intake.setPower(IntakeMotor.States.Collect);
                         robot.setAction(Robot.Actions.StopCamera);
                         timer.reset();

@@ -13,8 +13,8 @@ import org.firstinspires.ftc.teamcode.Core.Hardware.HighServo;
 @Config
 public class BrakePiston extends HighModule {
     public HighServo servo;
-    public static double BrakingPosition = 1;
-    public static double FloatingPosition = 0;
+    public static double BrakingPosition = 0;
+    public static double FloatingPosition = 1;
 
     public enum States {
         Brake,

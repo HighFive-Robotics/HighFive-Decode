@@ -24,22 +24,22 @@ public class AutoRedCloseV2 extends LinearOpMode {
     public Pose startPose = new Pose(125, 114, Math.toRadians(180));//    public Pose startPose = new Pose(13, 113, Math.toRadians(0));
 
     public Pose shootPose1 = new Pose(93, 95, Math.toRadians(0));
-    public Pose shootPose2 = new Pose(83, 81.5, Math.toRadians(0));
-    public Pose shootPose3 = new Pose(90, 110, Math.toRadians(0));
+    public Pose shootPose2 = new Pose(83, 83, Math.toRadians(0));
+    public Pose shootPose3 = new Pose(85, 110, Math.toRadians(0));
 
     public Pose preCollectSpikeMark2Pose = new Pose(83, 60, Math.toRadians(0));
-    public Pose collectSpikeMark2Pose = new Pose(127, 60, Math.toRadians(0));
+    public Pose collectSpikeMark2Pose = new Pose(125.5, 60, Math.toRadians(0));
     public Pose controlPointSpike2 = new Pose(90, 60);
 
-    public Pose collectSpikeMark1Pose = new Pose(120, 81.5, Math.toRadians(0));
+    public Pose collectSpikeMark1Pose = new Pose(120, 83, Math.toRadians(0));
     public Pose preOpenGatePose = new Pose(117, 67, Math.toRadians(-90));
     public Pose openGatePose = new Pose(123, 67, Math.toRadians(-90));
     public Pose controlPointGate = new Pose(85, 67.5);
 
 //    public Pose collectSpikeMark1Pose = new Pose(18, 81.5, Math.toRadians(180));
 //    public Pose controlPointGate = new Pose(53, 67.5);
-    public Pose preCollectSpikeMark3Pose = new Pose(93, 36, Math.toRadians(0));
-    public Pose collectSpikeMark3Pose = new Pose(125.5, 36, Math.toRadians(0));
+    public Pose preCollectSpikeMark3Pose = new Pose(93, 37, Math.toRadians(0));
+    public Pose collectSpikeMark3Pose = new Pose(125.5, 37, Math.toRadians(0));
 
     private final ElapsedTime autoTimer = new ElapsedTime();
     private final ElapsedTime timer = new ElapsedTime();
@@ -95,7 +95,7 @@ public class AutoRedCloseV2 extends LinearOpMode {
                 .build();
 
         PathChain shootSpike1 = robot.drive.pathBuilder()
-                .addPath(new BezierCurve(collectSpikeMark1Pose, controlPointGate, shootPose2))
+                .addPath(new BezierLine(collectSpikeMark1Pose, shootPose2))
                 .setLinearHeadingInterpolation(collectSpikeMark1Pose.getHeading(), shootPose2.getHeading())
                 .build();
 
@@ -150,7 +150,7 @@ public class AutoRedCloseV2 extends LinearOpMode {
                     if (!robot.shootingSequence) {
                         robot.drive.followPath(goForSpike2, true);
                         robot.outtake.alignTurret(shootPose2 , -1);
-                        robot.outtake.setShootingVelocityForPose(shootPose2 , -2.5);
+                        robot.outtake.setShootingVelocityForPose(shootPose2 , -1.5);
                         timer.reset();
                         state++;
                     }
@@ -183,7 +183,6 @@ public class AutoRedCloseV2 extends LinearOpMode {
                     break;
                 case 8:
                     if (timer.milliseconds() >= 425) {
-                        robot.outtake.alignTurret(shootPose2, -2.5);
                         robot.drive.followPath(shootSpike2, true);
                         state++;
                     }
@@ -208,7 +207,6 @@ public class AutoRedCloseV2 extends LinearOpMode {
                 case 11:
                     if (robot.drive.atParametricEnd()) {
                         robot.intake.setPower(IntakeMotor.States.Collect);
-                        robot.outtake.alignTurret(shootPose2, -2.5);
                         robot.drive.followPath(shootSpike1, true);
                         state++;
                     }
@@ -225,8 +223,8 @@ public class AutoRedCloseV2 extends LinearOpMode {
                     if (!robot.shootingSequence) {
                         robot.drive.followPath(goForSpike3, true);
                         //robot.outtake.setShootingVelocity(robot.outtake.calculateDistanceToGoal(shootPose3)-2);
-                        robot.outtake.setShootingVelocityForPose(shootPose3, -2);
-                        robot.outtake.alignTurret(shootPose3, 0);
+                        robot.outtake.setShootingVelocityForPose(shootPose3, -4);
+                        robot.outtake.alignTurret(shootPose3, -1.75);
                         robot.intake.setPower(IntakeMotor.States.Collect);
                         robot.setAction(Robot.Actions.StopCamera);
                         timer.reset();

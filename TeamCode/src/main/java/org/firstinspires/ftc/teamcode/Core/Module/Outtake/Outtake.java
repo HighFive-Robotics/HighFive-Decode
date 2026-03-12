@@ -133,6 +133,12 @@ public class Outtake extends HighModule {
     public boolean atTarget() {
         return shooter.atTarget() && turret.atTarget();
     }
+    public boolean atTargetIndividual() {
+        return shooter.atTargetIndividual() && turret.atTarget();
+    }
+    public boolean atTargetIndividual(boolean noOffsets) {
+        return shooter.atTargetIndividual(noOffsets) && turret.atTarget();
+    }
 
     public boolean atTargetCompensated() {
         return shooter.atTargetCompensated() && turret.atTarget();
@@ -183,14 +189,24 @@ public class Outtake extends HighModule {
         }
         shooter.addToleranceCompensationOffset(offset);
     }
-    public void addErrorToleranceScaledAuto() {
+    public void addErrorToleranceScaledAuto(boolean isClose) {
         double offset;
+        double offsetBottom;
         if(distanceToGoal <= 180){
             offset = Range.clip(Range.scale(distanceToGoal, 60, 180, 0.4, 0.265), 0.15, 0.5);
+            offsetBottom = Range.clip(Range.scale(distanceToGoal, 60, 180, 0.4, 0.265), 0.15, 0.5);
         }else{
             offset = 0.15;//TODO maybbe 0.2
+            offsetBottom = Range.clip(Range.scale(distanceToGoal, 180, 420, 0.15, 0.025), 0, 0.5);
         }
+        if(!isClose){
+            shooter.upToleranceCap = 0.25;
+            shooter.downToleranceCap = 0.22;
+        }
+
         shooter.addToleranceCompensationOffset(offset);
+        shooter.addToUpToleranceOffset(offset);
+        shooter.addToDownToleranceOffset(offsetBottom);
     }
 
     public boolean detectShoot() {
@@ -205,9 +221,25 @@ public class Outtake extends HighModule {
         }
         return false;
     }
-
+    public boolean detectShoot(boolean isFar) {
+        if (atTargetCompensated()) {
+            shooter.wasAtTarget = true;
+            return false;
+        }
+        double jerkOffset = 0.35;
+        if(isFar){
+            jerkOffset = 0.4;
+        }
+        if (shooter.wasAtTarget && (shooter.jerk >= jerkOffset)) {
+            shooter.wasAtTarget = false;
+            return true;
+        }
+        return false;
+    }
     public void resetErrorTolerance() {
         shooter.setToleranceCompensationOffset(0);
+        shooter.downToleranceCap = 0;
+        shooter.upToleranceCap = 0;
         setToleranceOffset(0, 0);
     }
 

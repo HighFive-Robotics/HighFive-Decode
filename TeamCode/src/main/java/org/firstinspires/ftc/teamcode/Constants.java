@@ -110,8 +110,8 @@ public class Constants {
         }
         @Config
         public static class LinkageCameraConstants{
-            public static double ArtifactPose = 0.42  ;
-            public static double GoalPose = 0.3;
+            public static double ArtifactPose = 0.35  ;
+            public static double GoalPose = 0.29 ;
         }
 
     }

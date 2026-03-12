@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.Core.Module.Others.BrakePiston;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.LinkageCamera;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
@@ -55,6 +56,14 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
             }
             if(gamepad2.rightBumperWasReleased()){
                 robot.holdingSequence = false;
+            }
+
+            if(gamepad1.rightBumperWasPressed()){
+                robot.brake.setState(BrakePiston.States.Brake);
+            }
+
+            if(gamepad1.leftBumperWasPressed()){
+                robot.brake.setState(BrakePiston.States.Float);
             }
 
             if(gamepad2.left_bumper){

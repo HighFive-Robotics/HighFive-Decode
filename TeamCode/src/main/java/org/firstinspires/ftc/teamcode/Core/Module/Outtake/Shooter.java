@@ -37,6 +37,8 @@ public class Shooter extends HighModule {
     public boolean shouldCompensate = false, wasAtTarget = false;
     private double lastVelocityDown, lastVelocityUp;
     public double jerk = 0;
+    public double upToleranceCap = 0;
+    public double downToleranceCap = 0;
 
     public Shooter(HardwareMap hwMap) {
         target = 0;
@@ -133,6 +135,15 @@ public class Shooter extends HighModule {
     public boolean downAtTarget() {
         return Math.abs(targetDown - velocityDown) <= (downTolerance + downOffset);
     }
+    public boolean upAtTargetSimple() {
+        double newTol = 0.0001;
+        return Math.abs(getTargetUp() - velocityUp) <= (newTol);
+    }
+
+    public boolean downAtTargetSimple() {
+        double newTol = 0.0001;
+        return Math.abs(targetDown - velocityDown) <= (newTol);
+    }
 
     @Override
     public boolean atTarget() {
@@ -180,10 +191,16 @@ public class Shooter extends HighModule {
 
     public void addToUpToleranceOffset(double offset) {
         this.upOffset += offset;
+        if(upToleranceCap != 0){
+            upOffset = Range.clip(upOffset , Double.MIN_VALUE , upToleranceCap);
+        }
     }
 
     public void addToDownToleranceOffset(double offset) {
         this.downOffset += offset;
+        if(downToleranceCap != 0){
+            downOffset = Range.clip(downOffset , Double.MIN_VALUE , downToleranceCap);
+        }
     }
 
     @Override
@@ -241,6 +258,13 @@ public class Shooter extends HighModule {
     }
     public boolean atTargetIndividual(){
         return upAtTarget() && downAtTarget();
+    }
+    public boolean atTargetIndividual(boolean noOffsets){
+        if(!noOffsets) {
+            return upAtTarget() && downAtTarget();
+        }else {
+            return upAtTargetSimple() && downAtTargetSimple();
+        }
     }
     public void nanUp() {
         motorUp.setVelocityPIDFSA(0, 0, 0, 0, 0, 0, 1);
