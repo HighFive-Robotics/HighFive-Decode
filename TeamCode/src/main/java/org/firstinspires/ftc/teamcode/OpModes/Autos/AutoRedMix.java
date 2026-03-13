@@ -24,29 +24,27 @@ public class  AutoRedMix extends LinearOpMode {
     public Robot robot;
     public int state = 0;
 
-    public Pose startPose = new Pose(125, 113, Math.toRadians(180));//    public Pose startPose = new Pose(13, 113, Math.toRadians(0));
+    public Pose startPose = new Pose(125, 114, Math.toRadians(180));//    public Pose startPose = new Pose(13, 113, Math.toRadians(0));
 
     public Pose shootPose1 = new Pose(93, 95, Math.toRadians(0));
-    public Pose shootPose2 = new Pose(83, 81.5, Math.toRadians(0));
-    public Pose shootPose3 = new Pose(78, 110, Math.toRadians(-90));
+    public Pose shootPose2 = new Pose(83, 83, Math.toRadians(0));
+    public Pose shootPose3 = new Pose(85, 110, Math.toRadians(0));
 
     public Pose preCollectSpikeMark2Pose = new Pose(83, 60, Math.toRadians(0));
-    public Pose collectSpikeMark2Pose = new Pose(124, 60, Math.toRadians(0));
+    public Pose collectSpikeMark2Pose = new Pose(125.5, 60, Math.toRadians(0));
     public Pose controlPointSpike2 = new Pose(90, 60);
 
-    public Pose collectSpikeMark1Pose = new Pose(120, 81.5, Math.toRadians(0));
-    public Pose preOpenGatePose = new Pose(118, 70, Math.toRadians(-90));
-    public Pose openGatePose = new Pose(121.5, 70, Math.toRadians(-90));
-    public Pose controlPointGate = new Pose(85, 67.5);
-
-    public Pose preCollectGatePose = new Pose(119.5, 57, Math.toRadians(40));
-    public Pose collectGatePose = new Pose(126, 57, Math.toRadians(40));
-
-    public Pose preCollectLoadingZone2 = new Pose(131, 50, Math.toRadians(-90));
-    public Pose collectLoadingZone2 = new Pose(131, 12, Math.toRadians(-90));
+    public Pose collectSpikeMark1Pose = new Pose(120, 83, Math.toRadians(0));
 
     private final ElapsedTime autoTimer = new ElapsedTime();
     private final ElapsedTime timer = new ElapsedTime();
+
+    public Pose preCollectGatePose = new Pose(119.5, 59, Math.toRadians(40));
+    public Pose collectGatePose = new Pose(126, 59, Math.toRadians(40));
+
+    public Pose preCollectLoadingZone2 = new Pose(130, 30, Math.toRadians(-90));
+    public Pose loadingControlPoint = new Pose(113, 86, Math.toRadians(-90));
+    public Pose collectLoadingZone2 = new Pose(131, 12, Math.toRadians(-80));
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -79,7 +77,7 @@ public class  AutoRedMix extends LinearOpMode {
 
         PathChain shootSpike2 = robot.drive.pathBuilder()
                 .addPath(new BezierCurve(collectSpikeMark2Pose,controlPointSpike2, shootPose2))
-                .setConstantHeadingInterpolation(Math.toRadians(0))
+                .setLinearHeadingInterpolation(collectSpikeMark2Pose.getHeading(),shootPose2.getHeading())
                 .build();
 
         PathChain collectSpike1 = robot.drive.pathBuilder()
@@ -87,19 +85,9 @@ public class  AutoRedMix extends LinearOpMode {
                 .setConstantHeadingInterpolation(Math.toRadians(0))
                 .build();
 
-        PathChain preOpenGate = robot.drive.pathBuilder()
-                .addPath(new BezierLine(collectSpikeMark1Pose, preOpenGatePose))
-                .setLinearHeadingInterpolation(collectSpikeMark1Pose.getHeading(), preOpenGatePose.getHeading())
-                .build();
-
-        PathChain openGate = robot.drive.pathBuilder()
-                .addPath(new BezierLine(preOpenGatePose, openGatePose))
-                .setLinearHeadingInterpolation(preOpenGatePose.getHeading(), openGatePose.getHeading())
-                .build();
-
         PathChain shootSpike1 = robot.drive.pathBuilder()
-                .addPath(new BezierCurve(openGatePose, controlPointGate, shootPose2))
-                .setLinearHeadingInterpolation(openGatePose.getHeading(), shootPose2.getHeading())
+                .addPath(new BezierLine(collectSpikeMark1Pose, shootPose2))
+                .setLinearHeadingInterpolation(collectSpikeMark1Pose.getHeading(), shootPose2.getHeading())
                 .build();
 
         PathChain preCollectGate = robot.drive.pathBuilder()
@@ -118,8 +106,8 @@ public class  AutoRedMix extends LinearOpMode {
                 .build();
 
         PathChain preCollectLoading2 = robot.drive.pathBuilder()
-                .addPath(new BezierLine(shootPose2, preCollectLoadingZone2))
-                .setLinearHeadingInterpolation(preCollectLoadingZone2.getHeading(),preCollectLoadingZone2.getHeading())
+                .addPath(new BezierCurve(shootPose2, loadingControlPoint, preCollectLoadingZone2))
+                .setTangentHeadingInterpolation()
                 .build();
 
         PathChain collectLoading2 = robot.drive.pathBuilder()
@@ -143,103 +131,59 @@ public class  AutoRedMix extends LinearOpMode {
         robot.outtake.setShootingVelocity(robot.outtake.calculateDistanceToGoal(shootPose1)+2);
         while (opModeIsActive()) {
             switch (state) {
-                case 0:
-                    robot.drive.followPath(preloadPath, true);
-                    robot.intake.setPower(IntakeMotor.States.Collect);
-                    robot.outtake.turret.motor.setMaxPIDPower(0.6);
-                    robot.outtake.alignTurret(shootPose1);
-                    state= 1;
-                    break;
-                case 1:
-                    if(robot.isDone()){
-                        robot.outtake.setShootingVelocityForPose(shootPose1);
-                        robot.setAction(Robot.Actions.ResetTurretCamera);
-                        timer.reset();
-                        state = 2;
-                    }
-                    break;
-                case 2:
-                    if (robot.isDone() && (!robot.resetWithCamera || timer.milliseconds() >= 1150)) {
-                        robot.setAction(Robot.Actions.Shoot);
-                        state++;
-                    }
-                    break;
-                case 3:
-                    if (!robot.shootingSequence) {
-                        robot.drive.followPath(goForSpike2, true);
-                        robot.outtake.alignTurret(shootPose2 , -2);
-                        robot.outtake.setShootingVelocity(robot.outtake.calculateDistanceToGoal(shootPose2)-2);
-                        robot.setAction(Robot.Actions.StopCamera);
-                        timer.reset();
-                        state++;
-                    }
-                    break;
-                case 4:
-                    if (robot.drive.atParametricEnd()) {
+                    case 0:
+                        robot.drive.followPath(preloadPath, true);
                         robot.intake.setPower(IntakeMotor.States.Collect);
-                        robot.drive.followPath(collectSpike2, true);
-                        state++;
-                    }
-                    break;
-                case 5:
-                    if (robot.drive.atParametricEnd()) {
-                        robot.intake.setPower(IntakeMotor.States.Collect);
-                        robot.drive.followPath(shootSpike2, true);
-                        state++;
-                    }
-                    break;
-                case 6:
-                    if (robot.isDone()) {
-                        robot.intake.setPower(IntakeMotor.States.Wait);
-                        robot.setAction(Robot.Actions.Shoot);
-                        robot.setAction(Robot.Actions.ResetTurretCamera);
-                        state++;
-                    }
-                    break;
+                        robot.outtake.turret.motor.setMaxPIDPower(0.6);
+                        robot.outtake.alignTurret(shootPose1);
+                        state= 1;
+                        break;
+                    case 1:
+                        if(robot.isDone()){
+                            robot.outtake.setShootingVelocityForPose(shootPose1 , -3);
+                            robot.outtake.turret.motor.setMaxPIDPower(1);
+                            robot.setAction(Robot.Actions.ResetTurretCamera);
+                            timer.reset();
+                            state = 2;
+                        }
+                        break;
+                    case 2:
+                        if (robot.isDone() && (!robot.resetWithCamera || timer.milliseconds() >= 1150)) {
+                            robot.setAction(Robot.Actions.Shoot);
+                            state++;
+                        }
+                        break;
+                    case 3:
+                        if (!robot.shootingSequence) {
+                            robot.drive.followPath(goForSpike2, true);
+                            robot.outtake.alignTurret(shootPose2 , -1);
+                            robot.outtake.setShootingVelocityForPose(shootPose2 , -2.5);
+                            timer.reset();
+                            state++;
+                        }
+                        break;
+                    case 4:
+                        if (robot.drive.atParametricEnd()) {
+                            robot.intake.setPower(IntakeMotor.States.Collect);
+                            robot.drive.followPath(collectSpike2, true);
+                            state++;
+                        }
+                        break;
+                    case 5:
+                        if (robot.drive.atParametricEnd()) {
+                            robot.drive.followPath(shootSpike2, true);
+                            state++;
+                        }
+                        break;
+                    case 6:
+                        if (robot.isDone()) {
+                            robot.intake.setPower(IntakeMotor.States.Wait);
+                            robot.setAction(Robot.Actions.Shoot);
+                            robot.setAction(Robot.Actions.ResetTurretCamera);
+                            state++;
+                        }
+                        break;
                 case 7:
-                    if (!robot.shootingSequence) {
-                        robot.drive.followPath(collectSpike1)  ;
-                        robot.intake.setPower(IntakeMotor.States.Collect);
-                        robot.setAction(Robot.Actions.StopCamera);
-                        timer.reset();
-                        state++;
-                    }
-                    break;
-                case 8:
-                    if (robot.isDone()) {
-                        robot.intake.setPower(IntakeMotor.States.Collect);
-                        robot.drive.followPath(preOpenGate, true);
-                        state++;
-                    }
-                    break;
-                case 9:
-                    if (robot.drive.atParametricEnd()) {
-                        robot.drive.followPath(openGate);
-                        state++;
-                    }
-                    break;
-                case 10:
-                    if (robot.drive.atParametricEnd()) {
-                        timer.reset();
-                        state++;
-                    }
-                    break;
-                case 11:
-                    if (timer.milliseconds() >= 425) {
-                        robot.outtake.alignTurret(shootPose2, -2.5);
-                        robot.drive.followPath(shootSpike1, true);
-                        state++;
-                    }
-                    break;
-                case 12:
-                    if (robot.isDone()) {
-                        robot.intake.setPower(IntakeMotor.States.Wait);
-                        robot.setAction(Robot.Actions.Shoot);
-                        robot.setAction(Robot.Actions.ResetTurretCamera);
-                        state = 13;
-                    }
-                    break;
-                case 13:
                     if (!robot.shootingSequence) {
                         robot.drive.followPath(preCollectGate, true);
                         robot.intake.setPower(IntakeMotor.States.Spit);
@@ -248,36 +192,36 @@ public class  AutoRedMix extends LinearOpMode {
                         state++;
                     }
                     break;
-                case 14:
+                case 8:
                     if (robot.drive.atParametricEnd()) {
                         timer.reset();
                         state++;
                     }
                     break;
-                case 15:
+                case 9:
                     if (timer.milliseconds() >= 50) {
                         robot.intake.setPower(IntakeMotor.States.Wait);
                         robot.drive.followPath(collectGate, true);
                         timer.reset();
-                        state = 16;
+                        state = 10;
                     }
                     break;
-                case 16:
+                case 10:
                     if (timer.milliseconds() >= 80) {
                         robot.intake.setPower(IntakeMotor.States.Collect);
                         state++;
                     }
                     break;
-                case 17:
+                case 11:
                     if (robot.isDone() || robot.intake.isPartial) {
                         timer.reset();
                         state++;
                     }
                     break;
-                case 18:
-                    if (timer.milliseconds() >= 1100) {
+                case 12:
+                    if (timer.milliseconds() >= 1350) {
                         robot.drive.setMaxPower(1);
-                        robot.outtake.setShootingVelocityForPose(shootPose2);
+                        robot.outtake.setShootingVelocityForPose(shootPose2 , -2.65);
                         robot.drive.followPath(shootGate, true);
                         robot.drive.setMaxPower(1);
                         robot.shouldAlignTurret = true;
@@ -285,15 +229,37 @@ public class  AutoRedMix extends LinearOpMode {
                         state++;
                     }
                     break;
-                case 19:
+                case 13:
                     if (robot.isDone()) {
                         robot.intake.setPower(IntakeMotor.States.Wait);
                         robot.setAction(Robot.Actions.Shoot);
-                        robot.setAction(Robot.Actions.ResetTurretCamera);
-                        state = 21;
+                        state = 14;
                     }
                     break;
-                case 21:
+                case 14:
+                    if (!robot.shootingSequence) {
+                        robot.drive.followPath(collectSpike1);
+                        robot.intake.setPower(IntakeMotor.States.Collect);
+                        robot.setAction(Robot.Actions.StopCamera);
+                        timer.reset();
+                        state++;
+                    }
+                    break;
+                case 15:
+                    if (robot.drive.atParametricEnd()) {
+                        robot.intake.setPower(IntakeMotor.States.Collect);
+                        robot.drive.followPath(shootSpike1, true);
+                        state++;
+                    }
+                    break;
+                case 16:
+                    if (robot.isDone()) {
+                        robot.intake.setPower(IntakeMotor.States.Wait);
+                        robot.setAction(Robot.Actions.Shoot);
+                        state = 17;
+                    }
+                    break;
+                case 17:
                     if (!robot.shootingSequence) {
                         robot.shouldAlignTurret = false;
                         robot.drive.followPath(preCollectLoading2, true);
@@ -303,7 +269,7 @@ public class  AutoRedMix extends LinearOpMode {
                         state++;
                     }
                     break;
-                case 22:
+                case 18:
                     if (robot.drive.atParametricEnd()  || robot.intake.isPartial) {
                         robot.drive.followPath(collectLoading2, true);
                         robot.drive.setMaxPower(0.75);
@@ -311,29 +277,26 @@ public class  AutoRedMix extends LinearOpMode {
                         state++;
                     }
                     break;
-                case 23:
-                    if (robot.drive.atParametricEnd() || robot.intake.isPartial) {
+                case 19:
+                    if (robot.drive.atParametricEnd() || robot.intake.isPartial || timer.milliseconds() >= 700) {
                         timer.reset();
-                        state = 24;
+                        state = 20;
                     }
                     break;
-                case 24:
-                    if ((timer.milliseconds() >= 300  || robot.intake.isFull) && autoTimer.milliseconds() <= 27000) {
-                        robot.outtake.alignTurret(shootPose3, 4.5);
+                case 20:
+                    if ((timer.milliseconds() >= 450) && autoTimer.milliseconds() <= 28500) {
+                        robot.outtake.alignTurret(shootPose3, 1.25);
                         robot.drive.setMaxPower(1);
-                        robot.outtake.setShootingVelocityForPose(shootPose3);
-                        robot.outtake.turret.setOffset(0);
-                        robot.drive.setMaxPower(1);
+                        robot.outtake.setShootingVelocityForPose(shootPose3 , -3.3);
                         robot.drive.followPath(shootLoading2Final, true);
                         timer.reset();
                         state++;
                     }
                     break;
-                case 25:
+                case 21:
                     if (robot.isDone()) {
                         robot.intake.setPower(IntakeMotor.States.Wait);
                         robot.setAction(Robot.Actions.Shoot);
-                        robot.setAction(Robot.Actions.ResetTurretCamera);
                         timer.reset();
                         state++;
                     }
@@ -346,13 +309,13 @@ public class  AutoRedMix extends LinearOpMode {
             if(state == 7){
                 robot.outtake.alignTurret(shootPose2);
             }
-            if(state == 13){
+            if(state == 14){
                 robot.outtake.alignTurret(shootPose2);
             }
-            if(state == 21){
+            if(state == 17){
                 robot.outtake.alignTurret(shootPose2);
             }
-            if(state == 26){
+            if(state == 22){
                 robot.outtake.alignTurret(shootPose3);
             }
 

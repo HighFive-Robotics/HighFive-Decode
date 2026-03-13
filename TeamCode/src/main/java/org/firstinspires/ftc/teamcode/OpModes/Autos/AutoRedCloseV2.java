@@ -36,8 +36,6 @@ public class AutoRedCloseV2 extends LinearOpMode {
     public Pose openGatePose = new Pose(123, 67, Math.toRadians(-90));
     public Pose controlPointGate = new Pose(85, 67.5);
 
-//    public Pose collectSpikeMark1Pose = new Pose(18, 81.5, Math.toRadians(180));
-//    public Pose controlPointGate = new Pose(53, 67.5);
     public Pose preCollectSpikeMark3Pose = new Pose(93, 37, Math.toRadians(0));
     public Pose collectSpikeMark3Pose = new Pose(125.5, 37, Math.toRadians(0));
 

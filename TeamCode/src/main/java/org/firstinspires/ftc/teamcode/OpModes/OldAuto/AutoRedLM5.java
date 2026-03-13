@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.OpModes.Autos;
+package org.firstinspires.ftc.teamcode.OpModes.OldAuto;
 
 import static org.firstinspires.ftc.teamcode.Constants.Globals.autoColor;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.finalAutoPose;
