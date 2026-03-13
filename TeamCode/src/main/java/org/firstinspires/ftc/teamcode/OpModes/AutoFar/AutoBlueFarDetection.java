@@ -188,7 +188,7 @@ public class AutoBlueFarDetection extends LinearOpMode {
                         robot.outtake.turret.addOffsetDegrees(0.7);
                         robot.drive.followPath(goShootLoading);
                         timer.reset();
-                        state = 6;
+                        state = 55;
                     }
                     break;
 //                case 50:
@@ -233,7 +233,7 @@ public class AutoBlueFarDetection extends LinearOpMode {
                 case 8:
                     if (robot.isDone()) {
                         robot.drive.followPath(goShootSpike);
-                        robot.outtake.setShootingVelocityForPose(startPose, 6);
+                        robot.outtake.setShootingVelocityForPose(startPose, 7.65);
                         timer.reset();
                         state = 85;
                     }

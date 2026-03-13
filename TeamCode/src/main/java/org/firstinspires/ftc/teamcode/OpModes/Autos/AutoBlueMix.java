@@ -33,8 +33,6 @@ public class  AutoBlueMix extends LinearOpMode {
     public Pose preCollectSpikeMark2Pose = new Pose(45, 60, Math.toRadians(180));
     public Pose collectSpikeMark2Pose = new Pose(12, 60, Math.toRadians(180));
     public Pose controlPointSpike2 = new Pose(55, 68);
-    public Pose preOpenGatePose = new Pose(26, 60, Math.toRadians(-90));
-    public Pose openGatePose = new Pose(15.3, 65, Math.toRadians(-90));
 
     public Pose collectSpikeMark1Pose = new Pose(18, 81.5, Math.toRadians(180));
 
@@ -42,11 +40,11 @@ public class  AutoBlueMix extends LinearOpMode {
     private final ElapsedTime timer = new ElapsedTime();
 
     public Pose preCollectGatePose = new Pose(18.5, 58, Math.toRadians(140));
-    public Pose collectGatePose = new Pose(12, 58, Math.toRadians(140));
+    public Pose collectGatePose = new Pose(11, 58.5, Math.toRadians(140));
 
-    public Pose preCollectLoadingZone2 = new Pose(7, 30, Math.toRadians(-90));
+    public Pose preCollectLoadingZone2 = new Pose(6, 30, Math.toRadians(-90));
     public Pose loadingControlPoint = new Pose(14, 88, Math.toRadians(-90));
-    public Pose collectLoadingZone2 = new Pose(6, 12, Math.toRadians(-100));
+    public Pose collectLoadingZone2 = new Pose(5, 12, Math.toRadians(-100));
 
     @Override
     public void runOpMode() throws InterruptedException {

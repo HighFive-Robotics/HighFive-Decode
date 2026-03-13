@@ -127,7 +127,7 @@ public class AutoRedFarDetection extends LinearOpMode {
         telemetry.update();
         waitForStart();
 
-        robot.outtake.setShootingVelocityForPose(startPose, 25);
+        robot.outtake.setShootingVelocityForPose(startPose, 23.5);
         robot.update();
         autoTimer.reset();
         timer.reset();
@@ -185,7 +185,7 @@ public class AutoRedFarDetection extends LinearOpMode {
                         robot.shouldAlignTurret = true;
                         robot.drive.followPath(goShootLoading);
                         timer.reset();
-                        state = 6;
+                        state = 55;
                     }
                     break;
 //                case 50:
@@ -230,7 +230,7 @@ public class AutoRedFarDetection extends LinearOpMode {
                 case 8:
                     if (robot.isDone()) {
                         robot.drive.followPath(goShootSpike);
-                        robot.outtake.setShootingVelocityForPose(startPose, 6);
+                        robot.outtake.setShootingVelocityForPose(startPose, 8);
                         timer.reset();
                         state = 85;
                     }
