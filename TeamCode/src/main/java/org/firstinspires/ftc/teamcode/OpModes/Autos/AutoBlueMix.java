@@ -156,8 +156,8 @@ public class  AutoBlueMix extends LinearOpMode {
                 case 3:
                     if (!robot.shootingSequence) {
                         robot.drive.followPath(goForSpike2, true);
-                        robot.outtake.alignTurret(shootPose2 , -1.45);
-                        robot.outtake.setShootingVelocityForPose(shootPose2 , -4.35);
+                        robot.outtake.alignTurret(shootPose2 , 0.25);
+                        robot.outtake.setShootingVelocityForPose(shootPose2 , -6.4);
                         timer.reset();
                         state++;
                     }
@@ -221,7 +221,7 @@ public class  AutoBlueMix extends LinearOpMode {
                 case 12:
                     if (timer.milliseconds() >= 1350) {
                         robot.drive.setMaxPower(1);
-                        robot.outtake.setShootingVelocityForPose(shootPose2 , -4.45);
+                        robot.outtake.setShootingVelocityForPose(shootPose2 , -6.4);
                         robot.drive.followPath(shootGate, true);
                         robot.drive.setMaxPower(1);
                         robot.shouldAlignTurret = true;
@@ -270,7 +270,8 @@ public class  AutoBlueMix extends LinearOpMode {
                     }
                     break;
                 case 18:
-                    if (robot.drive.atParametricEnd()  || robot.intake.isPartial) {
+                    state = 20;
+                    if (robot.drive.atParametricEnd()) {
                         robot.drive.followPath(collectLoading2, true);
                         robot.drive.setMaxPower(0.75);
                         timer.reset();
@@ -285,9 +286,9 @@ public class  AutoBlueMix extends LinearOpMode {
                     break;
                 case 20:
                     if ((timer.milliseconds() >= 450) && autoTimer.milliseconds() <= 28500) {
-                        robot.outtake.alignTurret(shootPose3, -2.85);
+                        robot.outtake.alignTurret(shootPose3, -0.95);
                         robot.drive.setMaxPower(1);
-                        robot.outtake.setShootingVelocityForPose(shootPose3 , -4.35);
+                        robot.outtake.setShootingVelocityForPose(shootPose3 , -6.4);
                         robot.drive.followPath(shootLoading2Final, true);
                         timer.reset();
                         state++;

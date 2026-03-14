@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.OpModes.TeleOps;
+package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
 import static org.firstinspires.ftc.teamcode.Constants.Globals.BlueGoalDistance;
 import static org.firstinspires.ftc.teamcode.Constants.Globals.RedGoalDistance;
@@ -9,23 +9,21 @@ import static org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor.Stat
 import static org.firstinspires.ftc.teamcode.Core.Module.Intake.IntakeMotor.States.Wait;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.pedropathing.geometry.Pose;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.Core.Hardware.HighCamera;
 import org.firstinspires.ftc.teamcode.Core.Module.Others.BrakePiston;
 import org.firstinspires.ftc.teamcode.Core.Module.Outtake.LinkageCamera;
 import org.firstinspires.ftc.teamcode.Core.Robot;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-@TeleOp(name = "😎TeleOp😎")
-public class TeleOpMaxVerstapen extends LinearOpMode {
-
+@TeleOp(name = "Camera Align Test")
+@Config
+public class CameraAlignTest extends LinearOpMode {
     Robot robot;
 
     public enum LaunchZone{
@@ -36,10 +34,11 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
     LaunchZone zone = LaunchZone.Far;
 
     boolean rumbled = false;
+    public static double cameraReactivity = 0.02;
 
     @Override
     public void runOpMode() throws InterruptedException {
-//        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         telemetry.setMsTransmissionInterval(1300);
         robot = new Robot(hardwareMap ,finalAutoPose, false , autoColor, telemetry, gamepad1);
         finalAutoPose = new Pose(6,6,0);
@@ -48,6 +47,8 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
         gamepad1.setLedColor(132 / 255.0, 88 / 255.0, 164 / 255.0, 2147483647);
         gamepad2.setLedColor(132 / 255.0, 88 / 255.0, 164 / 255.0, 2147483647);
         robot.outtake.linkageCamera.setState(LinkageCamera.States.Artifact);
+        robot.camera.setPipeline(HighCamera.Pipelines.AprilTagLocation);
+        FtcDashboard.getInstance().startCameraStream(robot.camera.ll, 0);
         waitForStart();
         while(opModeIsActive()){
             if (gamepad2.rightBumperWasPressed()) {
@@ -188,8 +189,13 @@ public class TeleOpMaxVerstapen extends LinearOpMode {
                     gamepad2.setLedColor(132 / 255.0, 88 / 255.0, 164 / 255.0, 2147483647);
                 }
             }
+            if(gamepad2.shareWasPressed()){
+                robot.setAction(Robot.Actions.StopCamera);
+            }
 
+            robot.outtake.turret.visionKp = cameraReactivity;
             telemetry.addData("Distance:", robot.outtake.distanceToGoal);
+            telemetry.addData("Camera Angle:", robot.camera.getHorizontalOffset());
             telemetry.addData("Pose:", robot.drive.getPose());
             telemetry.update();
             robot.update();

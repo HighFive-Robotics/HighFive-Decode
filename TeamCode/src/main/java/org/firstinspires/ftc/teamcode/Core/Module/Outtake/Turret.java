@@ -36,6 +36,7 @@ public class Turret extends HighModule {
     public HighMotor motor;
     public Constants.Color allianceColor;
     public boolean smallPid = true;
+    public double visionKp = 0.045;
 
     public enum States{
         Automated,
@@ -292,7 +293,6 @@ public class Turret extends HighModule {
     }
     public void updateVisionOffset(Double tx) {
         if (tx != null) {
-            double visionKp = 0.02;
             double correction = -tx * visionKp;
             addOffsetDegrees(correction);
         }
